@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Modal,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -15,12 +17,18 @@ import { useAuth } from '../../auth/AuthContext';
 import { AppIcon } from '../../components/AppIcon';
 import { AppTextInput } from '../../components/AppTextInput';
 import { AppButton } from '../../components/AppButton';
+import {
+  getCurrentSupabaseConfig,
+  saveCustomSupabaseConfig,
+  clearCustomSupabaseConfig,
+} from '../../lib/supabase';
 
 export default function LoginScreen() {
   const router = useRouter();
   const { colors, spacing, borderRadius } = useTheme();
   const {
     isConfigured,
+    reloadConfig,
     signInWithEmail,
     signUpWithEmail,
     setGuestMode,
@@ -36,6 +44,64 @@ export default function LoginScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Supabase Cloud Config State
+  const [sbModalVisible, setSbModalVisible] = useState(false);
+  const [sbUrl, setSbUrl] = useState('');
+  const [sbKey, setSbKey] = useState('');
+  const [savingSb, setSavingSb] = useState(false);
+
+  const handleOpenSbModal = () => {
+    const current = getCurrentSupabaseConfig();
+    setSbUrl(current.url);
+    setSbKey(current.anonKey);
+    setSbModalVisible(true);
+  };
+
+  const handleSaveSbConfig = async () => {
+    if (!sbUrl.trim() || !sbKey.trim()) {
+      Alert.alert('Required', 'Please enter both Supabase Project URL and Anon Public Key.');
+      return;
+    }
+    setSavingSb(true);
+    try {
+      const success = await saveCustomSupabaseConfig(sbUrl, sbKey);
+      if (!success) {
+        Alert.alert(
+          'Invalid Configuration',
+          'Please verify that the URL starts with https:// and the Anon Key is valid.'
+        );
+        return;
+      }
+      await reloadConfig();
+      setSbModalVisible(false);
+      Alert.alert('Supabase Connected', 'Supabase credentials saved and initialized successfully!');
+    } catch (err: any) {
+      Alert.alert('Configuration Error', err?.message || 'Failed to apply credentials.');
+    } finally {
+      setSavingSb(false);
+    }
+  };
+
+  const handleResetSbConfig = async () => {
+    Alert.alert(
+      'Reset Credentials',
+      'Are you sure you want to clear saved Supabase credentials and revert to default .env?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: async () => {
+            await clearCustomSupabaseConfig();
+            await reloadConfig();
+            setSbModalVisible(false);
+            Alert.alert('Credentials Cleared', 'Reverted to default configuration.');
+          },
+        },
+      ]
+    );
+  };
 
   const handleSubmit = async () => {
     setErrorMessage(null);
@@ -134,7 +200,9 @@ export default function LoginScreen() {
           </View>
 
           {/* Cloud Status Banner */}
-          <View
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={handleOpenSbModal}
             style={[
               styles.statusBanner,
               {
@@ -143,26 +211,32 @@ export default function LoginScreen() {
                   : colors.warningBg,
                 borderColor: isConfigured ? colors.border : colors.warning,
                 borderRadius: borderRadius.md,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
               },
             ]}
           >
-            <AppIcon
-              family="material"
-              name={isConfigured ? 'cloud-done' : 'cloud-off'}
-              size={18}
-              color={isConfigured ? colors.primary : colors.warning}
-            />
-            <Text
-              style={[
-                styles.statusBannerText,
-                { color: isConfigured ? colors.textPrimary : colors.warning },
-              ]}
-            >
-              {isConfigured
-                ? 'Supabase Cloud Database connected'
-                : 'Supabase URL/Key not configured in .env. Local mode active.'}
-            </Text>
-          </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1, paddingRight: 6 }}>
+              <AppIcon
+                family="material"
+                name={isConfigured ? 'cloud-done' : 'cloud-off'}
+                size={18}
+                color={isConfigured ? colors.primary : colors.warning}
+              />
+              <Text
+                style={[
+                  styles.statusBannerText,
+                  { color: isConfigured ? colors.textPrimary : colors.warning, flex: 1 },
+                ]}
+              >
+                {isConfigured
+                  ? 'Supabase Cloud Database connected (Tap to manage)'
+                  : 'Supabase URL/Key not set. Tap to configure API key.'}
+              </Text>
+            </View>
+            <AppIcon name="settings" size={16} color={isConfigured ? colors.primary : colors.warning} />
+          </TouchableOpacity>
 
           {/* Mode Switcher */}
           <View
@@ -361,6 +435,75 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Supabase API Key & Cloud Config Modal */}
+      <Modal
+        visible={sbModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSbModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View
+            style={[
+              styles.modalCard,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+                borderRadius: borderRadius.lg,
+              },
+            ]}
+          >
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
+                Supabase API Key & Cloud URL
+              </Text>
+              <TouchableOpacity onPress={() => setSbModalVisible(false)}>
+                <AppIcon name="x" size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={{ fontSize: 12, color: colors.textSecondary, lineHeight: 18 }}>
+              Enter your project credentials from supabase.com (Project Settings → API) to enable real-time cloud backup.
+            </Text>
+
+            <View style={styles.modalForm}>
+              <AppTextInput
+                label="Supabase Project URL"
+                placeholder="https://xyzcompany.supabase.co"
+                value={sbUrl}
+                onChangeText={setSbUrl}
+                autoCapitalize="none"
+                iconName="globe"
+              />
+
+              <AppTextInput
+                label="Supabase Anon Public Key"
+                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                value={sbKey}
+                onChangeText={setSbKey}
+                autoCapitalize="none"
+                iconName="key"
+              />
+            </View>
+
+            <View style={styles.modalActions}>
+              <AppButton
+                title="Reset"
+                variant="outline"
+                onPress={handleResetSbConfig}
+                style={styles.modalBtn}
+              />
+              <AppButton
+                title="Save & Connect"
+                onPress={handleSaveSbConfig}
+                loading={savingSb}
+                style={styles.modalBtn}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -471,5 +614,36 @@ const styles = StyleSheet.create({
   offlineButtonText: {
     fontSize: 13,
     fontWeight: '600',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  modalCard: {
+    borderWidth: 1,
+    padding: 20,
+    gap: 16,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  modalForm: {
+    gap: 12,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 8,
+  },
+  modalBtn: {
+    flex: 1,
   },
 });

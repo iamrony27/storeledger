@@ -17,6 +17,7 @@ import { AppTextInput } from '../../components/AppTextInput';
 import { CustomerCard } from '../../components/CustomerCard';
 import { EmptyState } from '../../components/EmptyState';
 import { SyncIndicator } from '../../components/SyncIndicator';
+import { DashboardChart } from '../../components/DashboardChart';
 import { syncEngine } from '../../sync/syncEngine';
 import {
   Customer,
@@ -201,7 +202,7 @@ export default function CustomersScreen() {
         data={filteredCustomers}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.listContainer, { padding: spacing.md }]}
+        contentContainerStyle={[styles.listContainer, { padding: spacing.md, paddingBottom: 120 }]}
         ListHeaderComponent={
           <View style={styles.headerContent}>
             {/* Khatabook-style Financial Summary Card */}
@@ -308,6 +309,9 @@ export default function CustomersScreen() {
                 </Text>
               </View>
             </View>
+
+            {/* Comprehensive Financial Dashboard Chart */}
+            <DashboardChart customers={customers} />
 
             {/* Search Input */}
             <AppTextInput
@@ -623,7 +627,7 @@ const styles = StyleSheet.create({
   },
   fab: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 86,
     right: 20,
     flexDirection: 'row',
     alignItems: 'center',

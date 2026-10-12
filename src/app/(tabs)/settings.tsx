@@ -18,6 +18,11 @@ import { AppButton } from '../../components/AppButton';
 import { AppTextInput } from '../../components/AppTextInput';
 import { Badge } from '../../components/Badge';
 import { SupportedLanguage } from '../../i18n/translations';
+import {
+  getCurrentSupabaseConfig,
+  saveCustomSupabaseConfig,
+  clearCustomSupabaseConfig,
+} from '../../lib/supabase';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -27,6 +32,7 @@ export default function SettingsScreen() {
     user,
     profile,
     isConfigured,
+    reloadConfig,
     signOut,
     updateBusinessProfile,
   } = useAuth();
@@ -37,6 +43,64 @@ export default function SettingsScreen() {
   const [bizOwner, setBizOwner] = useState(profile.owner_name);
   const [bizPhone, setBizPhone] = useState(profile.phone || '');
   const [savingProfile, setSavingProfile] = useState(false);
+
+  // Supabase Cloud Config Modal State
+  const [sbModalVisible, setSbModalVisible] = useState(false);
+  const [sbUrl, setSbUrl] = useState('');
+  const [sbKey, setSbKey] = useState('');
+  const [savingSb, setSavingSb] = useState(false);
+
+  const handleOpenSbModal = () => {
+    const current = getCurrentSupabaseConfig();
+    setSbUrl(current.url);
+    setSbKey(current.anonKey);
+    setSbModalVisible(true);
+  };
+
+  const handleSaveSbConfig = async () => {
+    if (!sbUrl.trim() || !sbKey.trim()) {
+      Alert.alert('Required', 'Please enter both Supabase Project URL and Anon Public Key.');
+      return;
+    }
+    setSavingSb(true);
+    try {
+      const success = await saveCustomSupabaseConfig(sbUrl, sbKey);
+      if (!success) {
+        Alert.alert(
+          'Invalid Configuration',
+          'Please verify that the URL starts with https:// and the Anon Key is valid.'
+        );
+        return;
+      }
+      await reloadConfig();
+      setSbModalVisible(false);
+      Alert.alert('Supabase Connected', 'Supabase credentials saved and initialized successfully!');
+    } catch (err: any) {
+      Alert.alert('Configuration Error', err?.message || 'Failed to apply credentials.');
+    } finally {
+      setSavingSb(false);
+    }
+  };
+
+  const handleResetSbConfig = async () => {
+    Alert.alert(
+      'Reset Credentials',
+      'Are you sure you want to clear saved Supabase credentials and revert to default .env?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: async () => {
+            await clearCustomSupabaseConfig();
+            await reloadConfig();
+            setSbModalVisible(false);
+            Alert.alert('Credentials Cleared', 'Reverted to default configuration.');
+          },
+        },
+      ]
+    );
+  };
 
   const languages: { code: SupportedLanguage; label: string; native: string }[] = [
     { code: 'en', label: 'English', native: 'English' },
@@ -108,7 +172,7 @@ export default function SettingsScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={[styles.content, { padding: spacing.md }]}
+        contentContainerStyle={[styles.content, { padding: spacing.md, paddingBottom: 110 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Business Profile Card */}
@@ -241,7 +305,25 @@ export default function SettingsScreen() {
                 iconName="cloud-upload"
                 iconFamily="material"
               />
+
+              <AppButton
+                title="Configure Supabase API Key & URL"
+                variant="outline"
+                onPress={handleOpenSbModal}
+                iconName="key"
+                style={{ marginTop: 8 }}
+              />
             </View>
+          )}
+
+          {user && (
+            <AppButton
+              title="View / Edit Supabase API Key"
+              variant="outline"
+              onPress={handleOpenSbModal}
+              iconName="key"
+              style={{ marginTop: 8 }}
+            />
           )}
         </View>
 
@@ -475,6 +557,75 @@ export default function SettingsScreen() {
                 title="Save Changes"
                 onPress={handleSaveProfile}
                 loading={savingProfile}
+                style={styles.modalBtn}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Supabase API Key & Cloud Config Modal */}
+      <Modal
+        visible={sbModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setSbModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View
+            style={[
+              styles.modalCard,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+                borderRadius: borderRadius.lg,
+              },
+            ]}
+          >
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
+                Supabase API Key & Cloud URL
+              </Text>
+              <TouchableOpacity onPress={() => setSbModalVisible(false)}>
+                <AppIcon name="x" size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={{ fontSize: 12, color: colors.textSecondary, lineHeight: 18 }}>
+              Enter your project URL and Anon key from supabase.com (Project Settings → API). Data will sync directly to your Postgres database.
+            </Text>
+
+            <View style={styles.modalForm}>
+              <AppTextInput
+                label="Supabase Project URL"
+                placeholder="https://xyzcompany.supabase.co"
+                value={sbUrl}
+                onChangeText={setSbUrl}
+                autoCapitalize="none"
+                iconName="globe"
+              />
+
+              <AppTextInput
+                label="Supabase Anon Public Key"
+                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                value={sbKey}
+                onChangeText={setSbKey}
+                autoCapitalize="none"
+                iconName="key"
+              />
+            </View>
+
+            <View style={styles.modalActions}>
+              <AppButton
+                title="Reset"
+                variant="outline"
+                onPress={handleResetSbConfig}
+                style={styles.modalBtn}
+              />
+              <AppButton
+                title="Save & Connect"
+                onPress={handleSaveSbConfig}
+                loading={savingSb}
                 style={styles.modalBtn}
               />
             </View>

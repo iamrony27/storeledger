@@ -16,6 +16,7 @@ interface AppTextInputProps extends TextInputProps {
   error?: string;
   iconName?: string;
   iconFamily?: IconFamily;
+  prefixText?: string;
   onClear?: () => void;
   containerStyle?: ViewStyle;
 }
@@ -25,6 +26,7 @@ export const AppTextInput: React.FC<AppTextInputProps> = ({
   error,
   iconName,
   iconFamily = 'feather',
+  prefixText,
   onClear,
   containerStyle,
   value,
@@ -65,6 +67,18 @@ export const AppTextInput: React.FC<AppTextInputProps> = ({
               size={18}
               color={isFocused ? colors.primary : colors.textSecondary}
             />
+          </View>
+        )}
+        {prefixText && (
+          <View style={styles.prefixContainer}>
+            <Text
+              style={[
+                styles.prefixText,
+                { color: isFocused ? colors.primary : colors.textPrimary },
+              ]}
+            >
+              {prefixText}
+            </Text>
           </View>
         )}
         <TextInput
@@ -119,6 +133,14 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     marginRight: 10,
+  },
+  prefixContainer: {
+    marginRight: 6,
+    justifyContent: 'center',
+  },
+  prefixText: {
+    fontSize: 18,
+    fontWeight: '800',
   },
   input: {
     flex: 1,

@@ -13,7 +13,10 @@ export function validateSupabaseConfig(url?: string, key?: string): boolean {
     cleanUrl.length === 0 ||
     cleanKey.length === 0 ||
     cleanUrl.includes('your-project-id') ||
+    cleanUrl.includes('placeholder') ||
     cleanKey.includes('your-public-anon-key') ||
+    cleanKey.includes('your-project-anon-key') ||
+    cleanKey.includes('placeholder') ||
     !cleanUrl.startsWith('https://') ||
     cleanKey.length < 20
   ) {

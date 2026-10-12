@@ -1,7 +1,12 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { supabase, isSupabaseConfigured, ProfileRow } from '../lib/supabase';
+import {
+  supabase,
+  isSupabaseConfigured,
+  loadInitialCustomSupabaseConfig,
+  ProfileRow,
+} from '../lib/supabase';
 
 interface LocalBusinessProfile {
   business_name: string;
@@ -27,6 +32,7 @@ interface AuthContextType {
   isLoading: boolean;
   isConfigured: boolean;
   isGuestMode: boolean;
+  reloadConfig: () => Promise<void>;
   signInWithEmail: (email: string, password: string) => Promise<{ error: string | null }>;
   signUpWithEmail: (
     email: string,
@@ -53,7 +59,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [profile, setProfile] = useState<LocalBusinessProfile | ProfileRow>(DEFAULT_PROFILE);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isGuestMode, setIsGuestModeState] = useState<boolean>(false);
-  const isConfigured = useMemo(() => isSupabaseConfigured(), []);
+  const [isConfiguredState, setIsConfiguredState] = useState<boolean>(isSupabaseConfigured());
+  const isConfigured = isConfiguredState;
 
   // 1. Initial Load: Load local profile and Supabase session
   useEffect(() => {
@@ -61,6 +68,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     async function initializeAuth() {
       try {
+        await loadInitialCustomSupabaseConfig();
+        const configured = isSupabaseConfigured();
+        if (isMounted) {
+          setIsConfiguredState(configured);
+        }
+
         // Load local profile cached in AsyncStorage
         const savedProfileRaw = await AsyncStorage.getItem(LOCAL_PROFILE_STORAGE_KEY);
         if (savedProfileRaw && isMounted) {
@@ -79,7 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         // If Supabase is configured, check active session
-        if (isConfigured) {
+        if (configured) {
           const { data, error } = await supabase.auth.getSession();
           if (!error && data?.session && isMounted) {
             setSession(data.session);
@@ -99,7 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initializeAuth();
 
     // 2. Listen to Supabase Auth state changes if configured
-    if (isConfigured) {
+    if (isConfiguredState) {
       const {
         data: { subscription },
       } = supabase.auth.onAuthStateChange(async (_event, newSession) => {
@@ -121,7 +134,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       isMounted = false;
     };
-  }, [isConfigured]);
+  }, [isConfiguredState]);
 
   // Fetch Cloud Profile from Supabase
   const fetchCloudProfile = async (userId: string) => {
@@ -295,6 +308,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await AsyncStorage.setItem(GUEST_MODE_STORAGE_KEY, enabled ? 'true' : 'false');
   };
 
+  const reloadConfig = async () => {
+    await loadInitialCustomSupabaseConfig();
+    const configured = isSupabaseConfigured();
+    setIsConfiguredState(configured);
+    if (configured) {
+      const { data } = await supabase.auth.getSession();
+      if (data?.session) {
+        setSession(data.session);
+        setUser(data.session.user);
+        await fetchCloudProfile(data.session.user.id);
+      }
+    } else {
+      setSession(null);
+      setUser(null);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -302,8 +332,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         session,
         profile,
         isLoading,
-        isConfigured,
+        isConfigured: isConfiguredState,
         isGuestMode,
+        reloadConfig,
         signInWithEmail,
         signUpWithEmail,
         signOut,

@@ -266,7 +266,7 @@ export default function ImportScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={[styles.content, { padding: spacing.md }]}
+        contentContainerStyle={[styles.content, { padding: spacing.md, paddingBottom: 110 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* ========================================================================= */}

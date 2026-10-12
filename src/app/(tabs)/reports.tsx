@@ -98,7 +98,7 @@ export default function ReportsScreen() {
       </View>
 
       <ScrollView
-        contentContainerStyle={[styles.content, { padding: spacing.md }]}
+        contentContainerStyle={[styles.content, { padding: spacing.md, paddingBottom: 110 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* Date Filter Tabs */}

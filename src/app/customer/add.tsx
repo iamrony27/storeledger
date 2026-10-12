@@ -168,7 +168,7 @@ export default function AddCustomerScreen() {
             <AppTextInput
               label={t.addCustomer.openingBalanceLabel}
               placeholder="0.00"
-              iconName="dollar-sign"
+              prefixText="₹"
               value={openingBalance}
               onChangeText={setOpeningBalance}
               keyboardType="decimal-pad"

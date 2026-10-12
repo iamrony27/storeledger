@@ -18,6 +18,7 @@ import { AppIcon } from '../../components/AppIcon';
 import { Badge } from '../../components/Badge';
 import { AppTextInput } from '../../components/AppTextInput';
 import { AppButton } from '../../components/AppButton';
+import { TransactionDatePicker } from '../../components/TransactionDatePicker';
 import {
   Customer,
   LedgerTransaction,
@@ -59,6 +60,7 @@ export default function CustomerDetailScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<'GAVE' | 'GOT'>('GAVE');
   const [txAmount, setTxAmount] = useState('');
+  const [txDate, setTxDate] = useState<string>(new Date().toISOString());
   const [txDesc, setTxDesc] = useState('');
   const [txBill, setTxBill] = useState('');
   const [amountError, setAmountError] = useState('');
@@ -163,6 +165,7 @@ export default function CustomerDetailScreen() {
   const openTxModal = (type: 'GAVE' | 'GOT') => {
     setModalType(type);
     setTxAmount('');
+    setTxDate(new Date().toISOString());
     setTxDesc('');
     setTxBill('');
     setAmountError('');
@@ -186,6 +189,7 @@ export default function CustomerDetailScreen() {
         type: modalType,
         description: txDesc || undefined,
         billNumber: txBill || undefined,
+        date: txDate,
       });
 
       setModalVisible(false);
@@ -583,9 +587,36 @@ export default function CustomerDetailScreen() {
                           },
                         ]}
                       >
-                        {isGave ? '-' : '+'}
                         {formatINR(tx.amountPaise)}
                       </Text>
+                      <View
+                        style={[
+                          styles.txTypeTag,
+                          {
+                            backgroundColor: isVoided
+                              ? colors.borderLight
+                              : isGave
+                              ? colors.youWillGiveBg
+                              : colors.youWillGetBg,
+                            borderRadius: borderRadius.sm,
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.txTypeTagText,
+                            {
+                              color: isVoided
+                                ? colors.textMuted
+                                : isGave
+                                ? colors.youWillGive
+                                : colors.youWillGet,
+                            },
+                          ]}
+                        >
+                          {isGave ? 'You Gave (বাকি)' : 'You Got (জমা)'}
+                        </Text>
+                      </View>
 
                       {!isVoided && !tx.isOpeningBalance && (
                         <View style={styles.txActionBtnsRow}>
@@ -644,8 +675,8 @@ export default function CustomerDetailScreen() {
             { backgroundColor: colors.danger, borderRadius: borderRadius.md },
           ]}
         >
-          <AppIcon name="minus-circle" size={18} color="#FFFFFF" />
-          <Text style={styles.actionBtnLabel}>YOU GAVE ₹ (Udhaar)</Text>
+          <AppIcon name="arrow-up-right" size={18} color="#FFFFFF" />
+          <Text style={styles.actionBtnLabel}>YOU GAVE ₹ (Udhaar / বাকি)</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -656,8 +687,8 @@ export default function CustomerDetailScreen() {
             { backgroundColor: colors.success, borderRadius: borderRadius.md },
           ]}
         >
-          <AppIcon name="plus-circle" size={18} color="#FFFFFF" />
-          <Text style={styles.actionBtnLabel}>YOU GOT ₹ (Jama)</Text>
+          <AppIcon name="arrow-down-left" size={18} color="#FFFFFF" />
+          <Text style={styles.actionBtnLabel}>YOU GOT ₹ (Jama / জমা)</Text>
         </TouchableOpacity>
       </View>
 
@@ -693,7 +724,7 @@ export default function CustomerDetailScreen() {
                   ]}
                 >
                   <AppIcon
-                    name={modalType === 'GAVE' ? 'minus-circle' : 'plus-circle'}
+                    name={modalType === 'GAVE' ? 'arrow-up-right' : 'arrow-down-left'}
                     size={20}
                     color={
                       modalType === 'GAVE'
@@ -702,13 +733,20 @@ export default function CustomerDetailScreen() {
                     }
                   />
                 </View>
-                <Text
-                  style={[styles.modalTitle, { color: colors.textPrimary }]}
-                >
-                  {modalType === 'GAVE'
-                    ? 'Record Credit (You Gave Udhaar)'
-                    : 'Record Payment (You Got Jama)'}
-                </Text>
+                <View>
+                  <Text
+                    style={[styles.modalTitle, { color: colors.textPrimary }]}
+                  >
+                    {modalType === 'GAVE'
+                      ? 'Record Udhaar (You Gave বাকি)'
+                      : 'Record Jama (You Got জমা)'}
+                  </Text>
+                  <Text style={{ fontSize: 11, color: colors.textSecondary }}>
+                    {modalType === 'GAVE'
+                      ? 'Customer takes goods on credit (adds to balance)'
+                      : 'Customer pays money (clears balance)'}
+                  </Text>
+                </View>
               </View>
 
               <TouchableOpacity
@@ -720,10 +758,16 @@ export default function CustomerDetailScreen() {
             </View>
 
             <View style={styles.modalBody}>
+              {/* Manually select transaction date */}
+              <TransactionDatePicker
+                date={txDate}
+                onDateChange={setTxDate}
+              />
+
               <AppTextInput
-                label="Amount (in Rupees ₹)"
+                label="Amount"
                 placeholder="0.00"
-                iconName="dollar-sign"
+                prefixText="₹"
                 value={txAmount}
                 onChangeText={(text) => {
                   setTxAmount(text);
@@ -736,7 +780,7 @@ export default function CustomerDetailScreen() {
 
               <AppTextInput
                 label="Description / Item (Optional)"
-                placeholder="e.g. 5x LED lights, UPI payment"
+                placeholder="e.g. 5x LED lights, Cash payment"
                 iconName="edit-3"
                 value={txDesc}
                 onChangeText={setTxDesc}
@@ -754,8 +798,8 @@ export default function CustomerDetailScreen() {
                 <AppButton
                   title={
                     modalType === 'GAVE'
-                      ? 'Save Credit Given'
-                      : 'Save Payment Received'
+                      ? 'Save (You Gave ₹)'
+                      : 'Save (You Got ₹)'
                   }
                   onPress={handleSaveTransaction}
                   variant={modalType === 'GAVE' ? 'danger' : 'success'}
@@ -1034,5 +1078,15 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  txTypeTag: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    alignSelf: 'flex-end',
+    marginTop: 2,
+  },
+  txTypeTagText: {
+    fontSize: 10,
+    fontWeight: '700',
   },
 });

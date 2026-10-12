@@ -24,6 +24,8 @@ interface AppButtonProps {
   style?: ViewStyle;
   textStyle?: TextStyle;
   size?: 'sm' | 'md' | 'lg';
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 export const AppButton: React.FC<AppButtonProps> = ({
@@ -37,6 +39,8 @@ export const AppButton: React.FC<AppButtonProps> = ({
   style,
   textStyle,
   size = 'md',
+  accessibilityLabel,
+  accessibilityHint,
 }) => {
   const { colors, borderRadius, spacing } = useTheme();
 
@@ -89,6 +93,10 @@ export const AppButton: React.FC<AppButtonProps> = ({
       onPress={onPress}
       disabled={disabled || loading}
       activeOpacity={0.8}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel || title}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
       style={[
         styles.button,
         {

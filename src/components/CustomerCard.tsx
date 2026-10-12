@@ -85,6 +85,9 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${customer.name}, Balance: ${formatINR(customer.currentBalancePaise)}, ${getBalanceLabel()}`}
+      accessibilityHint="Open customer ledger details"
       style={[
         styles.card,
         {
@@ -159,6 +162,9 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
         <View style={styles.actionsGroup}>
           <TouchableOpacity
             onPress={handleCall}
+            accessibilityRole="button"
+            accessibilityLabel={`Call ${customer.name}`}
+            accessibilityHint="Opens phone dialer"
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={[
               styles.actionButton,
@@ -170,6 +176,9 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
 
           <TouchableOpacity
             onPress={handleWhatsApp}
+            accessibilityRole="button"
+            accessibilityLabel={`Send WhatsApp reminder to ${customer.name}`}
+            accessibilityHint="Opens WhatsApp with pre-filled balance reminder"
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={[
               styles.actionButton,

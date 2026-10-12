@@ -8,6 +8,19 @@ export interface BusinessHeader {
 }
 
 /**
+ * Escapes dangerous HTML characters to prevent XSS / HTML injection in PDF generation.
+ */
+export function escapeHtml(str: string | null | undefined): string {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/**
  * Builds HTML template for a single customer's ledger account statement.
  * Strictly guarantees ZERO data leakage from other customers.
  */
@@ -64,14 +77,17 @@ export function generateCustomerStatementHtml(
 
       const gaveCol = t.type === 'GAVE' ? formatINR(t.amountPaise) : '-';
       const gotCol = t.type === 'GOT' ? formatINR(t.amountPaise) : '-';
+      const descEscaped = escapeHtml(t.description) || (t.isOpeningBalance ? 'Opening Balance' : 'Ledger Entry');
+      const billEscaped = t.billNumber ? `<br/><small style="color: #64748b;">Bill #: ${escapeHtml(t.billNumber)}</small>` : '';
+      const voidEscaped = t.isVoided ? `<br/><span style="color: #ef4444; font-weight: bold; font-size: 11px;">[VOIDED: ${escapeHtml(t.voidReason || 'Error')}]</span>` : '';
 
       return `
         <tr class="${t.isVoided ? 'voided-row' : ''}">
           <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px;">${txDateStr}</td>
           <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px;">
-            ${t.description || (t.isOpeningBalance ? 'Opening Balance' : 'Ledger Entry')}
-            ${t.billNumber ? `<br/><small style="color: #64748b;">Bill #: ${t.billNumber}</small>` : ''}
-            ${t.isVoided ? `<br/><span style="color: #ef4444; font-weight: bold; font-size: 11px;">[VOIDED: ${t.voidReason || 'Error'}]</span>` : ''}
+            ${descEscaped}
+            ${billEscaped}
+            ${voidEscaped}
           </td>
           <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; text-align: right; color: #dc2626; font-weight: 600; font-size: 13px;">
             ${gaveCol}
@@ -92,7 +108,7 @@ export function generateCustomerStatementHtml(
     <html>
       <head>
         <meta charset="utf-8" />
-        <title>Customer Statement - ${customer.name}</title>
+        <title>Customer Statement - ${escapeHtml(customer.name)}</title>
         <style>
           @page { size: A4; margin: 16mm; }
           body {
@@ -185,10 +201,10 @@ export function generateCustomerStatementHtml(
         <table class="header-table">
           <tr>
             <td style="vertical-align: top;">
-              <h1 class="biz-title">${business.business_name}</h1>
+              <h1 class="biz-title">${escapeHtml(business.business_name)}</h1>
               <p class="biz-sub">
-                ${business.owner_name ? `Proprietor: ${business.owner_name} | ` : ''}
-                ${business.phone ? `Phone: ${business.phone}` : ''}
+                ${business.owner_name ? `Proprietor: ${escapeHtml(business.owner_name)} | ` : ''}
+                ${business.phone ? `Phone: ${escapeHtml(business.phone)}` : ''}
               </p>
             </td>
             <td style="vertical-align: top;">
@@ -204,9 +220,9 @@ export function generateCustomerStatementHtml(
             <tr>
               <td style="width: 60%; vertical-align: top;">
                 <span style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Customer Details</span>
-                <div style="font-size: 17px; font-weight: 800; color: #0f172a; margin-top: 2px;">${customer.name}</div>
-                ${customer.phone ? `<div style="font-size: 13px; color: #475569; margin-top: 2px;">Phone: ${customer.phone}</div>` : ''}
-                ${customer.address ? `<div style="font-size: 12px; color: #64748b; margin-top: 2px;">Address: ${customer.address}</div>` : ''}
+                <div style="font-size: 17px; font-weight: 800; color: #0f172a; margin-top: 2px;">${escapeHtml(customer.name)}</div>
+                ${customer.phone ? `<div style="font-size: 13px; color: #475569; margin-top: 2px;">Phone: ${escapeHtml(customer.phone)}</div>` : ''}
+                ${customer.address ? `<div style="font-size: 12px; color: #64748b; margin-top: 2px;">Address: ${escapeHtml(customer.address)}</div>` : ''}
               </td>
               <td style="width: 40%; text-align: right; vertical-align: top;">
                 <span style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700;">Status</span>
@@ -310,11 +326,11 @@ export function generateBusinessReportHtml(
         <tr>
           <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px;">${idx + 1}</td>
           <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; font-weight: 700;">
-            ${c.name}
-            ${c.address ? `<br/><small style="color: #64748b; font-weight: normal;">${c.address}</small>` : ''}
+            ${escapeHtml(c.name)}
+            ${c.address ? `<br/><small style="color: #64748b; font-weight: normal;">${escapeHtml(c.address)}</small>` : ''}
           </td>
           <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 13px; color: #475569;">
-            ${c.phone || '-'}
+            ${escapeHtml(c.phone) || '-'}
           </td>
           <td style="padding: 10px; border-bottom: 1px solid #e2e8f0; font-size: 12px; font-weight: 600; color: ${balanceColor};">
             ${statusLabel}
@@ -399,15 +415,15 @@ export function generateBusinessReportHtml(
         <table class="header-table">
           <tr>
             <td style="vertical-align: top;">
-              <h1 class="biz-title">${business.business_name}</h1>
+              <h1 class="biz-title">${escapeHtml(business.business_name)}</h1>
               <p class="biz-sub">
-                ${business.owner_name ? `Proprietor: ${business.owner_name} | ` : ''}
-                ${business.phone ? `Phone: ${business.phone}` : ''}
+                ${business.owner_name ? `Proprietor: ${escapeHtml(business.owner_name)} | ` : ''}
+                ${business.phone ? `Phone: ${escapeHtml(business.phone)}` : ''}
               </p>
             </td>
             <td style="vertical-align: top;">
               <div class="statement-title">Master Ledger Report</div>
-              <div class="statement-meta">${filterTitle} | Generated: ${generatedDate}</div>
+              <div class="statement-meta">${escapeHtml(filterTitle)} | Generated: ${generatedDate}</div>
             </td>
           </tr>
         </table>

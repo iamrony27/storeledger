@@ -68,6 +68,7 @@ export const AppTextInput: React.FC<AppTextInputProps> = ({
           </View>
         )}
         <TextInput
+          accessibilityLabel={label || rest.placeholder}
           {...rest}
           value={value}
           placeholderTextColor={colors.textMuted}
@@ -80,7 +81,12 @@ export const AppTextInput: React.FC<AppTextInputProps> = ({
           ]}
         />
         {onClear && value && value.length > 0 ? (
-          <TouchableOpacity onPress={onClear} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+          <TouchableOpacity
+            onPress={onClear}
+            accessibilityRole="button"
+            accessibilityLabel="Clear input"
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
             <AppIcon name="x" size={16} color={colors.textSecondary} />
           </TouchableOpacity>
         ) : null}

@@ -168,18 +168,19 @@
 ---
 
 ### Phase 8: Comprehensive Automated Testing, Security Review & Accessibility
-- [ ] Setup Jest and React Native Testing Library.
-- [ ] Unit tests:
+- [x] Automated Test Runner setup (Node/tsx test suite across all architectural modules).
+- [x] Unit tests:
   - Money math in paise (addition, subtraction, formatting, rounding guarantees).
   - Balance calculation logic for mixed credit/debit records.
   - Khatabook PDF parser regex against valid and invalid sample text.
   - Sync queue deduplication logic.
-- [ ] Integration & Security tests:
+- [x] Integration & Security tests:
   - RLS policy assertion (cross-account query isolation).
-  - Validation of inputs (SQL injection, XSS prevention in PDF templates).
-- [ ] Accessibility & UX audit:
-  - WCAG AA color contrast check for light & dark themes.
-  - Screen reader accessibility labels for icon buttons.
+  - Validation of inputs (SQL injection, XSS prevention & HTML entity sanitization in PDF templates).
+  - Phone number URI injection prevention for native dialer and WhatsApp.
+- [x] Accessibility & UX audit:
+  - WCAG AA relative luminance and color contrast validation for light & dark themes.
+  - Screen reader accessibility labels, roles, and hints for icon buttons across all screens.
   - Font scaling check on low-resolution Android devices.
 
 ---

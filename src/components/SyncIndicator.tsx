@@ -135,6 +135,9 @@ export const SyncIndicator: React.FC<SyncIndicatorProps> = ({ compact = false })
     <TouchableOpacity
       onPress={handlePress}
       activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityLabel={`Cloud Sync: Status ${syncState.status}${syncState.pendingCount > 0 ? `, ${syncState.pendingCount} pending changes` : ''}`}
+      accessibilityHint="Tap to synchronize data with cloud immediately"
       style={[
         styles.container,
         {

@@ -156,6 +156,9 @@ export default function CustomersScreen() {
         <View style={styles.headerControls}>
           <TouchableOpacity
             onPress={cycleLanguage}
+            accessibilityRole="button"
+            accessibilityLabel={`Language selector. Current language is ${language.toUpperCase()}`}
+            accessibilityHint="Cycles between English, Bengali, and Hindi"
             style={[
               styles.headerControlBtn,
               {
@@ -172,6 +175,9 @@ export default function CustomersScreen() {
 
           <TouchableOpacity
             onPress={toggleTheme}
+            accessibilityRole="button"
+            accessibilityLabel={`Theme toggle. Currently ${isDark ? 'Dark mode' : 'Light mode'}`}
+            accessibilityHint="Toggles between dark and light appearance"
             style={[
               styles.headerControlBtn,
               {
@@ -331,6 +337,8 @@ export default function CustomersScreen() {
                   <TouchableOpacity
                     key={f.key}
                     onPress={() => setActiveFilter(f.key)}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Filter by ${f.label}`}
                     style={[
                       styles.filterChip,
                       {
@@ -380,6 +388,8 @@ export default function CustomersScreen() {
                         : 'RECENT'
                     )
                   }
+                  accessibilityRole="button"
+                  accessibilityLabel="Change sort order"
                   style={[
                     styles.sortButton,
                     {
@@ -448,6 +458,9 @@ export default function CustomersScreen() {
       <TouchableOpacity
         onPress={() => router.push('/customer/add' as any)}
         activeOpacity={0.85}
+        accessibilityRole="button"
+        accessibilityLabel={t.dashboard.addCustomer}
+        accessibilityHint="Opens screen to add a new customer"
         style={[
           styles.fab,
           {

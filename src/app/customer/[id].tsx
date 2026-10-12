@@ -240,6 +240,8 @@ export default function CustomerDetailScreen() {
       >
         <TouchableOpacity
           onPress={() => router.back()}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           style={styles.backTouch}
         >
@@ -261,6 +263,8 @@ export default function CustomerDetailScreen() {
         <View style={styles.headerRightActions}>
           <TouchableOpacity
             onPress={handleCall}
+            accessibilityRole="button"
+            accessibilityLabel={`Call ${customer.name}`}
             style={[
               styles.iconBtn,
               { backgroundColor: colors.borderLight, borderRadius: borderRadius.sm },
@@ -271,6 +275,8 @@ export default function CustomerDetailScreen() {
 
           <TouchableOpacity
             onPress={handleWhatsApp}
+            accessibilityRole="button"
+            accessibilityLabel={`Send WhatsApp reminder to ${customer.name}`}
             style={[
               styles.iconBtn,
               { backgroundColor: colors.youWillGetBg, borderRadius: borderRadius.sm },
@@ -286,6 +292,8 @@ export default function CustomerDetailScreen() {
 
           <TouchableOpacity
             onPress={handleSharePdf}
+            accessibilityRole="button"
+            accessibilityLabel="Share PDF account statement"
             disabled={isGeneratingPdf}
             style={[
               styles.iconBtn,
@@ -301,6 +309,8 @@ export default function CustomerDetailScreen() {
 
           <TouchableOpacity
             onPress={handleToggleArchive}
+            accessibilityRole="button"
+            accessibilityLabel={customer.isArchived ? 'Unarchive customer account' : 'Archive customer account'}
             style={[
               styles.iconBtn,
               { backgroundColor: colors.borderLight, borderRadius: borderRadius.sm },
@@ -581,6 +591,8 @@ export default function CustomerDetailScreen() {
                         <View style={styles.txActionBtnsRow}>
                           <TouchableOpacity
                             onPress={() => handleShareReceipt(tx)}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Share receipt for transaction of ${formatINR(tx.amountPaise)} on WhatsApp`}
                             hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                             style={styles.shareTxBtn}
                           >
@@ -589,6 +601,8 @@ export default function CustomerDetailScreen() {
 
                           <TouchableOpacity
                             onPress={() => handleVoidTx(tx.id)}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Void transaction of ${formatINR(tx.amountPaise)}`}
                             hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                             style={styles.voidBtn}
                           >

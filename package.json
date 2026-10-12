@@ -36,7 +36,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "test": "tsx src/utils/__tests__/ledgerMath.test.ts && tsx src/utils/__tests__/supabaseSecurity.test.ts && tsx src/utils/__tests__/syncEngine.test.ts && tsx src/utils/__tests__/communicationAndPdf.test.ts && tsx src/utils/__tests__/khatabookParser.test.ts"
+    "test": "tsx src/utils/__tests__/ledgerMath.test.ts && tsx src/utils/__tests__/supabaseSecurity.test.ts && tsx src/utils/__tests__/syncEngine.test.ts && tsx src/utils/__tests__/communicationAndPdf.test.ts && tsx src/utils/__tests__/khatabookParser.test.ts && tsx src/utils/__tests__/securityAndXss.test.ts && tsx src/utils/__tests__/accessibilityAndContrast.test.ts"
   },
   "private": true
 }

@@ -69,7 +69,11 @@ export default function AddCustomerScreen() {
         openingBalancePaise: openingPaise,
       });
 
-      router.back();
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace('/(tabs)');
+      }
     } catch (err) {
       console.error('Failed to create customer:', err);
     } finally {

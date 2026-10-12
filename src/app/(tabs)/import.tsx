@@ -718,7 +718,7 @@ export default function ImportScreen() {
               numberOfLines={6}
               value={pastedText}
               onChangeText={setPastedText}
-              placeholder="e.g. Subir Ghosh 9876543210 You'll Get ₹ 2,500.00"
+              placeholder="e.g. Subir Ghosh 9876543210 You'll Get ₹ 2,500"
               placeholderTextColor={colors.textMuted}
               style={[styles.textArea, { borderColor: colors.border, color: colors.textPrimary, backgroundColor: colors.inputBg }]}
             />
@@ -737,7 +737,7 @@ export default function ImportScreen() {
             <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>Edit Extracted Customer</Text>
             <AppTextInput label="Customer Name" value={editName} onChangeText={setEditName} />
             <AppTextInput label="Phone Number" value={editPhone} onChangeText={setEditPhone} keyboardType="phone-pad" />
-            <AppTextInput label="Balance (in Rupees ₹)" value={editBalance} onChangeText={setEditBalance} keyboardType="decimal-pad" />
+            <AppTextInput label="Balance (in Rupees ₹)" value={editBalance} onChangeText={(text) => setEditBalance(text.split('.')[0].replace(/[^0-9-]/g, ''))} keyboardType="number-pad" />
             <View style={styles.modalBtnRow}>
               <AppButton title="Cancel" variant="outline" onPress={() => setEditingRow(null)} style={styles.halfBtn} />
               <AppButton title="Save Changes" onPress={handleSaveEditedRow} style={styles.halfBtn} />

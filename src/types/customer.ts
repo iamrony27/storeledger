@@ -1,10 +1,11 @@
-export type { BalanceType, MinimalTransaction } from '../utils/ledgerMath';
+export type { BalanceType, MinimalTransaction, CustomerBreakdown } from '../utils/ledgerMath';
 export {
   rupeesToPaise,
   paiseToRupees,
   formatINR,
   getBalanceType,
   calculateCustomerBalance,
+  calculateCustomerBreakdown,
   calculateLedgerTotals,
 } from '../utils/ledgerMath';
 
@@ -18,6 +19,8 @@ export interface Customer {
   notes?: string;
   openingBalancePaise?: number;
   currentBalancePaise: number; // positive = you will get, negative = you will give, 0 = settled
+  totalGavePaise?: number;
+  totalGotPaise?: number;
   lastTransactionDate?: string;
   createdAt: string;
   updatedAt?: string;

@@ -61,9 +61,17 @@ assert(
   `Primary button text must meet WCAG AA large text (>= 3.0:1, got ${lightPrimaryBtnRatio})`
 );
 
-// You Will Give (Debit) Text on Card
+// You Will Get (Udhaar / Receivable) Text on Card
+const lightGetRatio = getContrastRatio(lightColors.surface, lightColors.youWillGet);
+console.log(` - Light You Will Get (#DC2626) vs Surface: ${lightGetRatio}:1`);
+assert(
+  meetsWcagAA(lightColors.surface, lightColors.youWillGet, false),
+  `Light youWillGet on surface must meet WCAG AA (>= 4.5:1, got ${lightGetRatio})`
+);
+
+// You Will Give (Jama / Payable) Text on Card
 const lightGiveRatio = getContrastRatio(lightColors.surface, lightColors.youWillGive);
-console.log(` - Light You Will Give (#DC2626) vs Surface: ${lightGiveRatio}:1`);
+console.log(` - Light You Will Give (#047857) vs Surface: ${lightGiveRatio}:1`);
 assert(
   meetsWcagAA(lightColors.surface, lightColors.youWillGive, false),
   `Light youWillGive on surface must meet WCAG AA (>= 4.5:1, got ${lightGiveRatio})`
@@ -98,10 +106,18 @@ assert(
 
 // Receivable text on Surface/Card
 const darkGetRatio = getContrastRatio(darkColors.surface, darkColors.youWillGet);
-console.log(` - Dark You Will Get (#10B981) vs Surface (#1E293B): ${darkGetRatio}:1`);
+console.log(` - Dark You Will Get (#F87171) vs Surface (#1E293B): ${darkGetRatio}:1`);
 assert(
   meetsWcagAA(darkColors.surface, darkColors.youWillGet, false),
   `Dark youWillGet on surface must pass WCAG AA (>= 4.5:1, got ${darkGetRatio})`
+);
+
+// Payable text on Surface/Card
+const darkGiveRatio = getContrastRatio(darkColors.surface, darkColors.youWillGive);
+console.log(` - Dark You Will Give (#10B981) vs Surface (#1E293B): ${darkGiveRatio}:1`);
+assert(
+  meetsWcagAA(darkColors.surface, darkColors.youWillGive, false),
+  `Dark youWillGive on surface must pass WCAG AA (>= 4.5:1, got ${darkGiveRatio})`
 );
 
 // Primary Action on Surface/Card

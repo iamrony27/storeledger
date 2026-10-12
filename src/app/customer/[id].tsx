@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -25,6 +25,7 @@ import {
   formatINR,
   getBalanceType,
   rupeesToPaise,
+  calculateCustomerBreakdown,
 } from '../../types/customer';
 import {
   getCustomerById,
@@ -66,6 +67,13 @@ export default function CustomerDetailScreen() {
   const [txBill, setTxBill] = useState('');
   const [amountError, setAmountError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const breakdown = useMemo(() => {
+    return calculateCustomerBreakdown(
+      customer?.openingBalancePaise || 0,
+      transactions
+    );
+  }, [customer?.openingBalancePaise, transactions]);
 
   const loadData = async () => {
     if (!id) return;
@@ -410,6 +418,82 @@ export default function CustomerDetailScreen() {
             {formatINR(customer.currentBalancePaise)}
           </Text>
 
+          {/* 3-Column Financial Breakdown: You Gave | You Got | Net Amount */}
+          <View
+            style={[
+              styles.customerKpiContainer,
+              {
+                backgroundColor: colors.background,
+                borderColor: colors.borderLight,
+                borderRadius: borderRadius.md,
+                padding: spacing.sm,
+                marginVertical: spacing.sm,
+              },
+            ]}
+          >
+            <View style={styles.customerKpiItem}>
+              <View style={styles.kpiHeaderRow}>
+                <AppIcon name="arrow-up-right" size={13} color={colors.youWillGet} />
+                <Text style={[styles.customerKpiLabel, { color: colors.textSecondary }]}>
+                  {t.customerDetail.totalGave}
+                </Text>
+              </View>
+              <Text
+                style={[
+                  styles.customerKpiValue,
+                  { color: colors.youWillGet },
+                ]}
+              >
+                {formatINR(breakdown.totalGavePaise)}
+              </Text>
+            </View>
+
+            <View style={[styles.kpiVerticalDivider, { backgroundColor: colors.border }]} />
+
+            <View style={styles.customerKpiItem}>
+              <View style={styles.kpiHeaderRow}>
+                <AppIcon name="arrow-down-left" size={13} color={colors.youWillGive} />
+                <Text style={[styles.customerKpiLabel, { color: colors.textSecondary }]}>
+                  {t.customerDetail.totalGot}
+                </Text>
+              </View>
+              <Text
+                style={[
+                  styles.customerKpiValue,
+                  { color: colors.youWillGive },
+                ]}
+              >
+                {formatINR(breakdown.totalGotPaise)}
+              </Text>
+            </View>
+
+            <View style={[styles.kpiVerticalDivider, { backgroundColor: colors.border }]} />
+
+            <View style={[styles.customerKpiItem, { alignItems: 'flex-end' }]}>
+              <View style={styles.kpiHeaderRow}>
+                <Text style={[styles.customerKpiLabel, { color: colors.textSecondary }]}>
+                  {t.customerDetail.netAmount}
+                </Text>
+              </View>
+              <Text
+                style={[
+                  styles.customerKpiValue,
+                  styles.netHighlight,
+                  {
+                    color:
+                      balanceType === 'GET'
+                        ? colors.youWillGet
+                        : balanceType === 'GIVE'
+                        ? colors.youWillGive
+                        : colors.settled,
+                  },
+                ]}
+              >
+                {formatINR(breakdown.netBalancePaise)}
+              </Text>
+            </View>
+          </View>
+
           {customer.address && (
             <View style={styles.addressRow}>
               <AppIcon name="map-pin" size={13} color={colors.textSecondary} />
@@ -542,8 +626,8 @@ export default function CustomerDetailScreen() {
                             backgroundColor: isVoided
                               ? colors.borderLight
                               : isGave
-                              ? colors.youWillGiveBg
-                              : colors.youWillGetBg,
+                              ? colors.youWillGetBg
+                              : colors.youWillGiveBg,
                           },
                         ]}
                       >
@@ -560,8 +644,8 @@ export default function CustomerDetailScreen() {
                             isVoided
                               ? colors.textMuted
                               : isGave
-                              ? colors.youWillGive
-                              : colors.youWillGet
+                              ? colors.youWillGet
+                              : colors.youWillGive
                           }
                         />
                       </View>
@@ -608,8 +692,8 @@ export default function CustomerDetailScreen() {
                             color: isVoided
                               ? colors.textMuted
                               : isGave
-                              ? colors.youWillGive
-                              : colors.youWillGet,
+                              ? colors.youWillGet
+                              : colors.youWillGive,
                             textDecorationLine: isVoided
                               ? 'line-through'
                               : 'none',
@@ -625,8 +709,8 @@ export default function CustomerDetailScreen() {
                             backgroundColor: isVoided
                               ? colors.borderLight
                               : isGave
-                              ? colors.youWillGiveBg
-                              : colors.youWillGetBg,
+                              ? colors.youWillGetBg
+                              : colors.youWillGiveBg,
                             borderRadius: borderRadius.sm,
                           },
                         ]}
@@ -638,8 +722,8 @@ export default function CustomerDetailScreen() {
                               color: isVoided
                                 ? colors.textMuted
                                 : isGave
-                                ? colors.youWillGive
-                                : colors.youWillGet,
+                                ? colors.youWillGet
+                                : colors.youWillGive,
                             },
                           ]}
                         >
@@ -836,15 +920,17 @@ export default function CustomerDetailScreen() {
 
               <AppTextInput
                 label="Amount"
-                placeholder="0.00"
+                placeholder="0"
                 prefixText="₹"
                 value={txAmount}
                 onChangeText={(text) => {
-                  setTxAmount(text);
+                  const withoutDecimals = text.split('.')[0];
+                  const filtered = withoutDecimals.replace(/[^0-9]/g, '');
+                  setTxAmount(filtered);
                   if (amountError) setAmountError('');
                 }}
                 error={amountError}
-                keyboardType="decimal-pad"
+                keyboardType="number-pad"
                 autoFocus
               />
 
@@ -958,6 +1044,41 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: -0.5,
     marginBottom: 8,
+  },
+  customerKpiContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+  },
+  customerKpiItem: {
+    flex: 1,
+    alignItems: 'flex-start',
+  },
+  kpiHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    marginBottom: 2,
+  },
+  customerKpiLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    letterSpacing: -0.1,
+  },
+  customerKpiValue: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  netHighlight: {
+    fontSize: 14,
+    fontWeight: '800',
+  },
+  kpiVerticalDivider: {
+    width: 1,
+    height: 24,
+    marginHorizontal: 6,
+    opacity: 0.4,
   },
   addressRow: {
     flexDirection: 'row',

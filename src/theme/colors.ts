@@ -42,11 +42,13 @@ export const lightColors: ColorTheme = {
   textSecondary: '#64748B',
   textMuted: '#94A3B8',
   textInverse: '#FFFFFF',
-  // Financial Semantics
-  youWillGet: '#059669',
-  youWillGetBg: '#ECFDF5',
-  youWillGive: '#DC2626',
-  youWillGiveBg: '#FEF2F2',
+  // Financial Semantics (Khatabook & OkCredit standard)
+  // Udhaar / Receivable (Credit given, customer owes money, pending collection) -> RED
+  youWillGet: '#DC2626',
+  youWillGetBg: '#FEF2F2',
+  // Jama / Payable / Advance (Payment collected, merchant owes goods/cash) -> GREEN
+  youWillGive: '#047857',
+  youWillGiveBg: '#ECFDF5',
   settled: '#64748B',
   settledBg: '#F1F5F9',
   // Alerts
@@ -73,11 +75,11 @@ export const darkColors: ColorTheme = {
   textSecondary: '#94A3B8',
   textMuted: '#64748B',
   textInverse: '#0F172A',
-  // Financial Semantics
-  youWillGet: '#10B981',
-  youWillGetBg: 'rgba(16, 185, 129, 0.15)',
-  youWillGive: '#EF4444',
-  youWillGiveBg: 'rgba(239, 68, 68, 0.15)',
+  // Financial Semantics (Khatabook standard)
+  youWillGet: '#F87171',
+  youWillGetBg: 'rgba(248, 113, 113, 0.15)',
+  youWillGive: '#10B981',
+  youWillGiveBg: 'rgba(16, 185, 129, 0.15)',
   settled: '#94A3B8',
   settledBg: 'rgba(148, 163, 184, 0.12)',
   // Alerts

@@ -7,6 +7,7 @@ import {
   Linking,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
+import { useLanguage } from '../i18n/LanguageContext';
 import { Customer, formatINR, getBalanceType } from '../types/customer';
 import { AppIcon } from './AppIcon';
 import { Badge } from './Badge';
@@ -27,7 +28,15 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
   onWhatsApp,
 }) => {
   const { colors, borderRadius, spacing } = useTheme();
+  const { t } = useLanguage();
   const balanceType = getBalanceType(customer.currentBalancePaise);
+
+  const totalGave =
+    customer.totalGavePaise ??
+    (customer.currentBalancePaise > 0 ? customer.currentBalancePaise : 0);
+  const totalGot =
+    customer.totalGotPaise ??
+    (customer.currentBalancePaise < 0 ? Math.abs(customer.currentBalancePaise) : 0);
 
   const getInitials = (name: string) => {
     const parts = name.trim().split(' ');
@@ -52,12 +61,12 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
   const getBalanceLabel = () => {
     switch (balanceType) {
       case 'GET':
-        return "You'll Get";
+        return t.dashboard.filterGet;
       case 'GIVE':
-        return "You'll Give";
+        return t.dashboard.filterGive;
       case 'SETTLED':
       default:
-        return 'Settled';
+        return t.dashboard.filterSettled;
     }
   };
 
@@ -88,7 +97,6 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
       activeOpacity={0.7}
       onPress={onPress}
       onLongPress={onLongPress}
-      accessibilityRole="button"
       accessibilityLabel={`${customer.name}, Balance: ${formatINR(customer.currentBalancePaise)}, ${getBalanceLabel()}`}
       accessibilityHint="Open customer ledger details"
       style={[
@@ -131,17 +139,71 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
           </Text>
         </View>
 
-        {/* Balance Col */}
-        <View style={styles.balanceCol}>
+        {/* Status Badge */}
+        <View style={styles.badgeCol}>
+          <Badge type={balanceType} label={getBalanceLabel()} />
+        </View>
+      </View>
+
+      {/* 3-Column Financial Breakdown Row: You Gave | You Got | Net Amount */}
+      <View
+        style={[
+          styles.breakdownBar,
+          {
+            backgroundColor: colors.background,
+            borderColor: colors.borderLight,
+            borderRadius: borderRadius.md,
+            marginTop: spacing.sm,
+            paddingVertical: spacing.xs + 2,
+            paddingHorizontal: spacing.sm,
+          },
+        ]}
+      >
+        <View style={styles.breakdownCol}>
+          <Text style={[styles.breakdownLabel, { color: colors.textSecondary }]}>
+            {t.customerDetail.totalGave}
+          </Text>
           <Text
             style={[
-              styles.balanceAmount,
+              styles.breakdownValue,
+              { color: colors.youWillGet },
+            ]}
+          >
+            {formatINR(totalGave)}
+          </Text>
+        </View>
+
+        <View style={[styles.verticalDivider, { backgroundColor: colors.border }]} />
+
+        <View style={styles.breakdownCol}>
+          <Text style={[styles.breakdownLabel, { color: colors.textSecondary }]}>
+            {t.customerDetail.totalGot}
+          </Text>
+          <Text
+            style={[
+              styles.breakdownValue,
+              { color: colors.youWillGive },
+            ]}
+          >
+            {formatINR(totalGot)}
+          </Text>
+        </View>
+
+        <View style={[styles.verticalDivider, { backgroundColor: colors.border }]} />
+
+        <View style={[styles.breakdownCol, { alignItems: 'flex-end' }]}>
+          <Text style={[styles.breakdownLabel, { color: colors.textSecondary }]}>
+            {t.customerDetail.netAmount}
+          </Text>
+          <Text
+            style={[
+              styles.breakdownValue,
+              styles.netBoldValue,
               { color: getBalanceColor() },
             ]}
           >
             {formatINR(customer.currentBalancePaise)}
           </Text>
-          <Badge type={balanceType} label={getBalanceLabel()} />
         </View>
       </View>
 
@@ -185,14 +247,14 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             style={[
               styles.actionButton,
-              { backgroundColor: colors.youWillGetBg, borderRadius: borderRadius.sm },
+              { backgroundColor: 'rgba(37, 211, 102, 0.12)', borderRadius: borderRadius.sm },
             ]}
           >
             <AppIcon
               family="material"
               name="whatsapp"
               size={15}
-              color={colors.youWillGet}
+              color="#25D366"
             />
           </TouchableOpacity>
         </View>
@@ -234,6 +296,40 @@ const styles = StyleSheet.create({
   phoneText: {
     fontSize: 12,
     fontWeight: '500',
+  },
+  badgeCol: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  breakdownBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+  },
+  breakdownCol: {
+    flex: 1,
+    alignItems: 'flex-start',
+  },
+  breakdownLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    marginBottom: 2,
+    letterSpacing: -0.1,
+  },
+  breakdownValue: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  netBoldValue: {
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  verticalDivider: {
+    width: 1,
+    height: 22,
+    marginHorizontal: 6,
+    opacity: 0.4,
   },
   balanceCol: {
     alignItems: 'flex-end',

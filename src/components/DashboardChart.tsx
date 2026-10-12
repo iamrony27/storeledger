@@ -192,19 +192,19 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
       <View style={styles.legendRow}>
         <View style={styles.legendItem}>
           <View
-            style={[styles.legendDot, { backgroundColor: colors.youWillGive }]}
+            style={[styles.legendDot, { backgroundColor: colors.youWillGet }]}
           />
           <Text style={[styles.legendText, { color: colors.textSecondary }]}>
-            Udhaar: <Text style={{ color: colors.youWillGive, fontWeight: '700' }}>{formatINR(totalGavePaise)}</Text>
+            Udhaar: <Text style={{ color: colors.youWillGet, fontWeight: '700' }}>{formatINR(totalGavePaise)}</Text>
           </Text>
         </View>
 
         <View style={styles.legendItem}>
           <View
-            style={[styles.legendDot, { backgroundColor: colors.youWillGet }]}
+            style={[styles.legendDot, { backgroundColor: colors.youWillGive }]}
           />
           <Text style={[styles.legendText, { color: colors.textSecondary }]}>
-            Jama: <Text style={{ color: colors.youWillGet, fontWeight: '700' }}>{formatINR(totalGotPaise)}</Text>
+            Jama: <Text style={{ color: colors.youWillGive, fontWeight: '700' }}>{formatINR(totalGotPaise)}</Text>
           </Text>
         </View>
 
@@ -272,7 +272,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                     width={barWidth}
                     height={gaveHeight}
                     rx={3}
-                    fill={colors.youWillGive}
+                    fill={colors.youWillGet}
                   />
 
                   {/* Got (Jama) Bar */}
@@ -282,7 +282,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                     width={barWidth}
                     height={gotHeight}
                     rx={3}
-                    fill={colors.youWillGet}
+                    fill={colors.youWillGive}
                   />
 
                   {/* Day Label */}
@@ -307,16 +307,16 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
           <View
             style={[
               styles.summaryCard,
-              { backgroundColor: colors.youWillGiveBg, borderColor: colors.youWillGive },
+              { backgroundColor: colors.youWillGetBg, borderColor: colors.youWillGet },
             ]}
           >
             <View style={styles.summaryCardHeader}>
-              <AppIcon name="arrow-up-right" size={16} color={colors.youWillGive} />
-              <Text style={[styles.summaryCardTitle, { color: colors.youWillGive }]}>
+              <AppIcon name="arrow-up-right" size={16} color={colors.youWillGet} />
+              <Text style={[styles.summaryCardTitle, { color: colors.youWillGet }]}>
                 Credit Given (Udhaar)
               </Text>
             </View>
-            <Text style={[styles.summaryCardAmount, { color: colors.youWillGive }]}>
+            <Text style={[styles.summaryCardAmount, { color: colors.youWillGet }]}>
               {formatINR(totalGavePaise)}
             </Text>
             <Text style={[styles.summaryCardNote, { color: colors.textSecondary }]}>
@@ -327,16 +327,16 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
           <View
             style={[
               styles.summaryCard,
-              { backgroundColor: colors.youWillGetBg, borderColor: colors.youWillGet },
+              { backgroundColor: colors.youWillGiveBg, borderColor: colors.youWillGive },
             ]}
           >
             <View style={styles.summaryCardHeader}>
-              <AppIcon name="arrow-down-left" size={16} color={colors.youWillGet} />
-              <Text style={[styles.summaryCardTitle, { color: colors.youWillGet }]}>
+              <AppIcon name="arrow-down-left" size={16} color={colors.youWillGive} />
+              <Text style={[styles.summaryCardTitle, { color: colors.youWillGive }]}>
                 Payment Collected (Jama)
               </Text>
             </View>
-            <Text style={[styles.summaryCardAmount, { color: colors.youWillGet }]}>
+            <Text style={[styles.summaryCardAmount, { color: colors.youWillGive }]}>
               {formatINR(totalGotPaise)}
             </Text>
             <Text style={[styles.summaryCardNote, { color: colors.textSecondary }]}>

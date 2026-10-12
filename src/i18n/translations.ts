@@ -51,6 +51,9 @@ export interface Translations {
     transactions: string;
     noTransactions: string;
     currentBalance: string;
+    totalGave: string;
+    totalGot: string;
+    netAmount: string;
   };
   addCustomer: {
     title: string;
@@ -144,6 +147,9 @@ export const translations: Record<SupportedLanguage, Translations> = {
       transactions: 'Transaction History',
       noTransactions: 'No transactions recorded yet.',
       currentBalance: 'Net Balance',
+      totalGave: 'Total You Gave',
+      totalGot: 'Total You Got',
+      netAmount: 'Net Amount',
     },
     addCustomer: {
       title: 'Add New Customer',
@@ -235,6 +241,9 @@ export const translations: Record<SupportedLanguage, Translations> = {
       transactions: 'লেনদেনের বিবরণ',
       noTransactions: 'এখনও কোনো লেনদেন লিপিবদ্ধ করা হয়নি।',
       currentBalance: 'বর্তমান ব্যালেন্স',
+      totalGave: 'মোট দিয়েছেন',
+      totalGot: 'মোট পেয়েছেন',
+      netAmount: 'নিট ব্যালেন্স',
     },
     addCustomer: {
       title: 'নতুন গ্রাহক যোগ',
@@ -326,6 +335,9 @@ export const translations: Record<SupportedLanguage, Translations> = {
       transactions: 'लेन-देन इतिहास',
       noTransactions: 'अभी तक कोई लेन-देन दर्ज नहीं है।',
       currentBalance: 'वर्तमान बैलेंस',
+      totalGave: 'कुल दिया',
+      totalGot: 'कुल मिला',
+      netAmount: 'कुल शेष',
     },
     addCustomer: {
       title: 'नया ग्राहक जोड़ें',

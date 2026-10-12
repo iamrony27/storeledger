@@ -15,9 +15,9 @@ export type BalanceType = 'GET' | 'GIVE' | 'SETTLED';
 
 /**
  * Safely parse a currency input string or number into exact integer paise
- * e.g. "150.50" -> 15050
- * e.g. "100" -> 10000
- * e.g. 50.25 -> 5025
+ * e.g. "150" -> 15000
+ * e.g. "100.50" -> 10050
+ * e.g. "1,500" -> 150000
  */
 export function rupeesToPaise(input: string | number): number {
   if (typeof input === 'number') {
@@ -53,7 +53,8 @@ export function paiseToRupees(paise: number): number {
 }
 
 /**
- * Formats integer paise into Indian Numbering System string (e.g. ₹1,50,000.50)
+ * Formats integer paise into Indian Numbering System string without any .00
+ * Whole rupee amounts never show .00 (e.g. 150000 -> ₹1,500, 0 -> ₹0, -85000 -> -₹850)
  */
 export function formatINR(paise: number): string {
   const isNegative = paise < 0;
@@ -63,7 +64,7 @@ export function formatINR(paise: number): string {
 
   // Format Indian numbering grouping: 12,34,567
   const rupeesStr = wholeRupees.toLocaleString('en-IN');
-  const paiseStr = remainingPaise > 0 ? `.${remainingPaise.toString().padStart(2, '0')}` : '.00';
+  const paiseStr = remainingPaise > 0 ? `.${remainingPaise.toString().padStart(2, '0')}` : '';
 
   return `${isNegative ? '-' : ''}₹${rupeesStr}${paiseStr}`;
 }
@@ -83,6 +84,12 @@ export interface MinimalTransaction {
   type: 'GAVE' | 'GOT';
 }
 
+export interface CustomerBreakdown {
+  totalGavePaise: number;
+  totalGotPaise: number;
+  netBalancePaise: number;
+}
+
 /**
  * Calculate customer's net balance from opening balance and transaction array
  * Formula: Opening Balance + Sum(GAVE) - Sum(GOT)
@@ -91,18 +98,48 @@ export function calculateCustomerBalance(
   openingBalancePaise: number,
   transactions: MinimalTransaction[]
 ): number {
-  let netPaise = Math.round(openingBalancePaise);
+  return calculateCustomerBreakdown(openingBalancePaise, transactions).netBalancePaise;
+}
 
-  for (const tx of transactions) {
+/**
+ * Calculate complete customer financial breakdown: Total You Gave, Total You Got, and Net Balance
+ * Handles opening balance idempotency and voided transactions cleanly.
+ */
+export function calculateCustomerBreakdown(
+  openingBalancePaise: number = 0,
+  transactions: (MinimalTransaction & { isVoided?: boolean; isOpeningBalance?: boolean })[] = []
+): CustomerBreakdown {
+  let totalGavePaise = 0;
+  let totalGotPaise = 0;
+
+  const validTx = transactions.filter((t) => !t.isVoided);
+  const hasOpeningTx = validTx.some((t) => t.isOpeningBalance);
+
+  for (const tx of validTx) {
     const txAmount = Math.abs(Math.round(tx.amountPaise));
     if (tx.type === 'GAVE') {
-      netPaise += txAmount;
+      totalGavePaise += txAmount;
     } else if (tx.type === 'GOT') {
-      netPaise -= txAmount;
+      totalGotPaise += txAmount;
     }
   }
 
-  return netPaise;
+  // If opening balance was provided but no explicit opening transaction exists in list
+  if (!hasOpeningTx && openingBalancePaise !== 0) {
+    if (openingBalancePaise > 0) {
+      totalGavePaise += Math.round(openingBalancePaise);
+    } else {
+      totalGotPaise += Math.abs(Math.round(openingBalancePaise));
+    }
+  }
+
+  const netBalancePaise = totalGavePaise - totalGotPaise;
+
+  return {
+    totalGavePaise,
+    totalGotPaise,
+    netBalancePaise,
+  };
 }
 
 export interface CustomerBalanceItem {

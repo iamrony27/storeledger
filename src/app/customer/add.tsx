@@ -171,11 +171,11 @@ export default function AddCustomerScreen() {
             {/* Opening Balance (Optional) */}
             <AppTextInput
               label={t.addCustomer.openingBalanceLabel}
-              placeholder="0.00"
+              placeholder="0"
               prefixText="₹"
               value={openingBalance}
-              onChangeText={setOpeningBalance}
-              keyboardType="decimal-pad"
+              onChangeText={(text) => setOpeningBalance(text.split('.')[0].replace(/[^0-9]/g, ''))}
+              keyboardType="number-pad"
             />
 
             {/* Opening Balance Type Selector */}

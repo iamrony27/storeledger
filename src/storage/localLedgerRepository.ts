@@ -5,6 +5,7 @@ import {
   CreateCustomerInput,
   AddTransactionInput,
   calculateCustomerBalance,
+  calculateCustomerBreakdown,
 } from '../types/customer';
 import { INITIAL_CUSTOMERS, INITIAL_TRANSACTIONS } from '../data/mockStore';
 import { syncEngine } from '../sync/syncEngine';
@@ -108,7 +109,18 @@ async function persist(): Promise<void> {
  */
 export async function getAllCustomers(): Promise<Customer[]> {
   await initializeIfNeeded();
-  return customersCache || [];
+  if (!customersCache) return [];
+
+  return customersCache.map((c) => {
+    const txs = (transactionsCache && transactionsCache[c.id]) || [];
+    const breakdown = calculateCustomerBreakdown(c.openingBalancePaise || 0, txs);
+    return {
+      ...c,
+      currentBalancePaise: breakdown.netBalancePaise,
+      totalGavePaise: breakdown.totalGavePaise,
+      totalGotPaise: breakdown.totalGotPaise,
+    };
+  });
 }
 
 export const getCustomers = getAllCustomers;
@@ -119,7 +131,17 @@ export const getCustomers = getAllCustomers;
 export async function getCustomerById(id: string): Promise<Customer | null> {
   await initializeIfNeeded();
   if (!customersCache) return null;
-  return customersCache.find((c) => c.id === id) || null;
+  const c = customersCache.find((item) => item.id === id);
+  if (!c) return null;
+
+  const txs = (transactionsCache && transactionsCache[c.id]) || [];
+  const breakdown = calculateCustomerBreakdown(c.openingBalancePaise || 0, txs);
+  return {
+    ...c,
+    currentBalancePaise: breakdown.netBalancePaise,
+    totalGavePaise: breakdown.totalGavePaise,
+    totalGotPaise: breakdown.totalGotPaise,
+  };
 }
 
 /**
@@ -150,6 +172,8 @@ export async function addCustomer(
   const now = new Date().toISOString();
   const openingPaise = input.openingBalancePaise || 0;
 
+  const breakdown = calculateCustomerBreakdown(openingPaise, []);
+
   const newCustomer: Customer = {
     id,
     name: input.name.trim(),
@@ -157,7 +181,9 @@ export async function addCustomer(
     address: input.address?.trim() || undefined,
     notes: input.notes?.trim() || undefined,
     openingBalancePaise: openingPaise,
-    currentBalancePaise: openingPaise,
+    currentBalancePaise: breakdown.netBalancePaise,
+    totalGavePaise: breakdown.totalGavePaise,
+    totalGotPaise: breakdown.totalGotPaise,
     createdAt: now,
     updatedAt: now,
     isArchived: false,
@@ -341,7 +367,7 @@ export async function addTransaction(
 
   // Recalculate customer's balance using exact integer paise arithmetic
   const allTx = transactionsCache[input.customerId].filter((t) => !t.isVoided);
-  const newBalance = calculateCustomerBalance(
+  const breakdown = calculateCustomerBreakdown(
     customersCache[customerIndex].openingBalancePaise || 0,
     allTx
   );
@@ -354,7 +380,9 @@ export async function addTransaction(
 
   const updatedCustomer: Customer = {
     ...customersCache[customerIndex],
-    currentBalancePaise: newBalance,
+    currentBalancePaise: breakdown.netBalancePaise,
+    totalGavePaise: breakdown.totalGavePaise,
+    totalGotPaise: breakdown.totalGotPaise,
     lastTransactionDate: formattedDate,
     updatedAt: now,
     syncStatus: 'pending_update',
@@ -410,14 +438,16 @@ export async function voidTransaction(
 
   // Recalculate balance excluding voided transactions
   const activeTx = customerTx.filter((t) => !t.isVoided);
-  const newBalance = calculateCustomerBalance(
+  const breakdown = calculateCustomerBreakdown(
     customersCache[customerIndex].openingBalancePaise || 0,
     activeTx
   );
 
   const updatedCustomer: Customer = {
     ...customersCache[customerIndex],
-    currentBalancePaise: newBalance,
+    currentBalancePaise: breakdown.netBalancePaise,
+    totalGavePaise: breakdown.totalGavePaise,
+    totalGotPaise: breakdown.totalGotPaise,
     updatedAt: now,
     syncStatus: 'pending_update',
   };

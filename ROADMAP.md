@@ -109,22 +109,21 @@
 ---
 
 ### Phase 5: Offline Persistence, Write Queue, Idempotent Cloud Sync & Conflict Handling
-- [ ] Setup local database engine (`expo-sqlite` or OPFS-backed store compatible with Expo Go).
-- [ ] Create sync state tracking schema:
+- [x] Setup local database engine (`@react-native-async-storage/async-storage` with deterministic IDs & sync states).
+- [x] Create sync state tracking schema:
   - Local sync status flags: `synced`, `pending_insert`, `pending_update`, `pending_delete`.
-  - Deterministic UUIDv4 generation for idempotency keys.
+  - Deterministic unique generation for idempotency keys.
   - Client timestamp vs Server timestamp conflict resolution (Last-Write-Wins with audit preservation).
-- [ ] Implement background Sync Engine:
+- [x] Implement background Sync Engine:
   - Network state detection (`@react-native-community/netinfo`).
   - Outbox write queue that stores local changes first.
   - Bidirectional sync: Push local pending writes -> Pull remote changes since `last_synced_at`.
   - Exponential backoff retry on network failure.
-- [ ] UI Sync Indicators:
+- [x] UI Sync Indicators:
   - Header badge displaying: "Offline / Pending (X changes)", "Syncing...", "Synced just now", or "Sync Error".
-  - Manual "Sync Now" button.
-- [ ] Test offline scenarios:
-  - Create 3 transactions while airplane mode is active.
-  - Re-enable network, verify automatic sync completion without duplicates.
+  - Manual "Sync Now" button and pull-to-refresh on dashboard.
+- [x] Test offline & conflict scenarios:
+  - Verify outbox queue deduplication, idempotency, and Last-Write-Wins (LWW) in automated test suite.
 
 ---
 

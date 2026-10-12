@@ -6,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
   ScrollView,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -15,6 +16,8 @@ import { AppIcon } from '../../components/AppIcon';
 import { AppTextInput } from '../../components/AppTextInput';
 import { CustomerCard } from '../../components/CustomerCard';
 import { EmptyState } from '../../components/EmptyState';
+import { SyncIndicator } from '../../components/SyncIndicator';
+import { syncEngine } from '../../sync/syncEngine';
 import {
   Customer,
   formatINR,
@@ -37,6 +40,18 @@ export default function CustomersScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterType>('ALL');
   const [activeSort, setActiveSort] = useState<SortType>('RECENT');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await syncEngine.syncNow();
+      const data = await getCustomers();
+      setCustomers(data);
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -131,11 +146,8 @@ export default function CustomersScreen() {
             <Text style={[styles.brandTitle, { color: colors.textPrimary }]}>
               {t.common.appName}
             </Text>
-            <View style={styles.syncRow}>
-              <AppIcon name="check" size={12} color={colors.success} />
-              <Text style={[styles.syncText, { color: colors.success }]}>
-                {t.common.synced}
-              </Text>
+            <View style={{ marginTop: 2, alignItems: 'flex-start' }}>
+              <SyncIndicator />
             </View>
           </View>
         </View>
@@ -420,6 +432,14 @@ export default function CustomersScreen() {
                 ? undefined
                 : () => router.push('/customer/add' as any)
             }
+          />
+        }
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            colors={[colors.primary]}
+            tintColor={colors.primary}
           />
         }
       />

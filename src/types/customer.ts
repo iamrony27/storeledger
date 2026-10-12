@@ -8,6 +8,8 @@ export {
   calculateLedgerTotals,
 } from '../utils/ledgerMath';
 
+export type SyncStatus = 'synced' | 'pending_insert' | 'pending_update' | 'pending_delete';
+
 export interface Customer {
   id: string;
   name: string;
@@ -20,6 +22,8 @@ export interface Customer {
   createdAt: string;
   updatedAt?: string;
   isArchived: boolean;
+  syncStatus?: SyncStatus;
+  syncedAt?: string;
 }
 
 export type TransactionType = 'GAVE' | 'GOT';
@@ -34,7 +38,11 @@ export interface LedgerTransaction {
   billNumber?: string;
   isOpeningBalance?: boolean;
   isVoided?: boolean;
+  voidReason?: string;
   createdAt: string;
+  updatedAt?: string;
+  syncStatus?: SyncStatus;
+  syncedAt?: string;
 }
 
 export interface CreateCustomerInput {
@@ -53,3 +61,23 @@ export interface AddTransactionInput {
   billNumber?: string;
   date?: string;
 }
+
+export interface SyncQueueItem {
+  id: string; // deterministic or unique queue id
+  entity: 'customer' | 'transaction';
+  action: 'insert' | 'update' | 'delete';
+  recordId: string;
+  payload: any;
+  retryCount: number;
+  createdAt: string;
+  lastAttemptAt?: string;
+  errorMessage?: string;
+}
+
+export interface SyncState {
+  status: 'idle' | 'syncing' | 'synced' | 'offline' | 'error';
+  pendingCount: number;
+  lastSyncedAt: string | null;
+  errorMessage: string | null;
+}
+

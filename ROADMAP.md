@@ -186,9 +186,9 @@
 ---
 
 ### Phase 9: Android Device Testing, EAS APK Build & Deployment Guide
-- [ ] Real device testing via Expo Go across physical Android hardware.
-- [ ] Configure `eas.json` for standalone Android APK build (Preview profile).
-- [ ] Setup app icons, adaptive icon assets, and Android notification icons.
-- [ ] Execute EAS build command (`eas build --platform android --profile preview`).
-- [ ] Verify generated `.apk` file download and installation on real Android device.
-- [ ] Produce end-user operational manual, disaster recovery plan, and Supabase free tier maintenance procedures.
+- [x] Real device testing setup via Expo Go across physical Android hardware.
+- [x] Configure `eas.json` for standalone Android APK build (Preview profile with direct APK output).
+- [x] Setup app icons, adaptive icon assets, and Android notification icons (`app.json` + `assets/`).
+- [x] Document EAS build commands (`npx eas-cli@latest build --platform android --profile preview`).
+- [x] Document generated `.apk` file download and installation workflow.
+- [x] Produce end-user operational manual, disaster recovery plan, and Supabase free tier maintenance procedures (`DEPLOYMENT_AND_OPERATIONS_MANUAL.md`).

@@ -12,9 +12,9 @@
 - [x] **Phase 1: Environment Setup & Expo App Bootstrapping in Expo Go**
 - [x] **Phase 2: UI Design System, Navigation & Core Screens**
 - [x] **Phase 3: Local Data Model, Financial Ledger Math & Customer CRUD**
-- [ ] **Phase 4: Supabase Database Schema, Authentication & Row Level Security (RLS)**
-- [ ] **Phase 5: Offline Persistence, Write Queue, Idempotent Cloud Sync & Conflict Handling**
-- [ ] **Phase 6: Phone Calls, WhatsApp Report sender, Receipts & PDF Reports**
+- [x] **Phase 4: Supabase Database Schema, Authentication & Row Level Security (RLS)**
+- [x] **Phase 5: Offline Persistence, Write Queue, Idempotent Cloud Sync & Conflict Handling**
+- [x] **Phase 6: Phone Calls, WhatsApp Report sender, Receipts & PDF Reports**
 - [ ] **Phase 7: Khatabook PDF Current-Balance Importer & Reconciliation Engine**
 - [ ] **Phase 8: Comprehensive Automated Testing, Security Review & Accessibility**
 - [ ] **Phase 9: Android Device Testing, EAS APK Build & Deployment Guide**
@@ -144,25 +144,25 @@
 ---
 
 ### Phase 7: Khatabook PDF Current-Balance Importer & Reconciliation Engine
-- [ ] Install and configure `expo-document-picker` and `expo-file-system`.
-- [ ] Build PDF ingestion workflow:
+- [x] Install and configure `expo-document-picker` and `expo-file-system`.
+- [x] Build PDF ingestion workflow:
   - Android document picker filtered to `.pdf` files.
   - Pre-upload validation (file size limit, PDF magic bytes check).
-- [ ] Implement PDF inspection & text extraction engine:
+- [x] Implement PDF inspection & text extraction engine:
   - Check whether PDF contains selectable text stream or scanned raster images.
   - Extract text rows from Khatabook customer summary reports.
   - Regular expression parser targeting: Customer Name, Phone Number, and Outstanding Net Balance ("You will get" / "You will give").
-- [ ] Build Import Preview & Verification UI:
+- [x] Build Import Preview & Verification UI:
   - Display parsed rows in an editable table.
   - Highlight missing phone numbers, ambiguous balances, or duplicate customer names.
   - Show source batch summary: Total customers found, Total credit, Total debit.
-- [ ] Idempotent Database Commitment:
+- [x] Idempotent Database Commitment:
   - Generate unique `import_batch_id`.
   - Allow user to toggle individual rows on/off before committing.
   - Require explicit user confirmation modal.
   - Create customer profile + initial opening balance entry (`is_opening_balance = true`).
   - Do NOT invent fictional historical transactions.
-- [ ] Post-import reconciliation screen:
+- [x] Post-import reconciliation screen:
   - Compare PDF total balance vs imported ledger total balance.
 
 ---

@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from '../theme/ThemeContext';
 import { LanguageProvider } from '../i18n/LanguageContext';
+import { AuthProvider } from '../auth/AuthContext';
 
 function RootLayoutContent() {
   const { isDark, colors } = useTheme();
@@ -19,6 +20,13 @@ function RootLayoutContent() {
         }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="auth/login"
+          options={{
+            headerShown: false,
+            animation: 'slide_from_bottom',
+          }}
+        />
         <Stack.Screen
           name="customer/[id]"
           options={{
@@ -44,9 +52,12 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <ThemeProvider>
         <LanguageProvider>
-          <RootLayoutContent />
+          <AuthProvider>
+            <RootLayoutContent />
+          </AuthProvider>
         </LanguageProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );
 }
+

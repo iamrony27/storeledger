@@ -1,26 +1,88 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Modal,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { useAuth } from '../../auth/AuthContext';
 import { AppIcon } from '../../components/AppIcon';
+import { AppButton } from '../../components/AppButton';
+import { AppTextInput } from '../../components/AppTextInput';
+import { Badge } from '../../components/Badge';
 import { SupportedLanguage } from '../../i18n/translations';
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const { colors, spacing, borderRadius, mode, setThemeMode } = useTheme();
   const { t, language, setLanguage } = useLanguage();
+  const {
+    user,
+    profile,
+    isConfigured,
+    signOut,
+    updateBusinessProfile,
+  } = useAuth();
+
+  // Profile Edit Modal State
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [bizName, setBizName] = useState(profile.business_name);
+  const [bizOwner, setBizOwner] = useState(profile.owner_name);
+  const [bizPhone, setBizPhone] = useState(profile.phone || '');
+  const [savingProfile, setSavingProfile] = useState(false);
 
   const languages: { code: SupportedLanguage; label: string; native: string }[] = [
     { code: 'en', label: 'English', native: 'English' },
     { code: 'bn', label: 'Bengali', native: 'বাংলা' },
     { code: 'hi', label: 'Hindi', native: 'हिन्दी' },
   ];
+
+  const handleOpenEditModal = () => {
+    setBizName(profile.business_name);
+    setBizOwner(profile.owner_name);
+    setBizPhone(profile.phone || '');
+    setEditModalVisible(true);
+  };
+
+  const handleSaveProfile = async () => {
+    if (!bizName.trim()) {
+      Alert.alert('Required', 'Business name cannot be empty');
+      return;
+    }
+    setSavingProfile(true);
+    try {
+      await updateBusinessProfile(bizName, bizOwner, bizPhone);
+      setEditModalVisible(false);
+    } catch {
+      Alert.alert('Error', 'Failed to save business profile');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const handleSignOut = () => {
+    Alert.alert(
+      'Sign Out',
+      'Are you sure you want to sign out from your Supabase cloud account?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Sign Out',
+          style: 'destructive',
+          onPress: async () => {
+            await signOut();
+          },
+        },
+      ]
+    );
+  };
 
   return (
     <SafeAreaView
@@ -60,9 +122,26 @@ export default function SettingsScreen() {
             },
           ]}
         >
-          <Text style={[styles.sectionHeading, { color: colors.textPrimary }]}>
-            {t.settings.businessProfile}
-          </Text>
+          <View style={styles.cardHeaderRow}>
+            <Text style={[styles.sectionHeading, { color: colors.textPrimary }]}>
+              {t.settings.businessProfile}
+            </Text>
+            <TouchableOpacity
+              onPress={handleOpenEditModal}
+              style={[
+                styles.editBtn,
+                {
+                  backgroundColor: colors.primaryLight,
+                  borderRadius: borderRadius.sm,
+                },
+              ]}
+            >
+              <AppIcon name="edit" size={14} color={colors.primary} />
+              <Text style={[styles.editBtnText, { color: colors.primary }]}>
+                Edit
+              </Text>
+            </TouchableOpacity>
+          </View>
 
           <View style={styles.profileRow}>
             <View
@@ -80,16 +159,90 @@ export default function SettingsScreen() {
             </View>
             <View style={styles.profileInfo}>
               <Text style={[styles.profileName, { color: colors.textPrimary }]}>
-                GWD Trading Enterprise
+                {profile.business_name}
               </Text>
               <Text style={[styles.profileSub, { color: colors.textSecondary }]}>
-                Kolkata, West Bengal
+                Owner: {profile.owner_name}
               </Text>
-              <Text style={[styles.profilePhone, { color: colors.primary }]}>
-                +91 98765 43210
-              </Text>
+              {profile.phone ? (
+                <Text style={[styles.profilePhone, { color: colors.primary }]}>
+                  {profile.phone}
+                </Text>
+              ) : null}
             </View>
           </View>
+        </View>
+
+        {/* Supabase Cloud Sync & Account Card */}
+        <View
+          style={[
+            styles.sectionCard,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+              borderRadius: borderRadius.lg,
+            },
+          ]}
+        >
+          <View style={styles.cardHeaderRow}>
+            <Text style={[styles.sectionHeading, { color: colors.textPrimary }]}>
+              Cloud Backup & Sync
+            </Text>
+            {user ? (
+              <Badge
+                type="GET"
+                label="Connected"
+              />
+            ) : isConfigured ? (
+              <Badge
+                type="sync"
+                label="Cloud Ready"
+              />
+            ) : (
+              <Badge
+                type="info"
+                label="Offline Only"
+              />
+            )}
+          </View>
+
+          {user ? (
+            <View style={styles.accountContent}>
+              <View style={styles.accountRow}>
+                <AppIcon name="mail" size={16} color={colors.textSecondary} />
+                <Text style={[styles.accountEmail, { color: colors.textPrimary }]}>
+                  {user.email}
+                </Text>
+              </View>
+
+              <Text style={[styles.accountDesc, { color: colors.textSecondary }]}>
+                Your customer ledger and transactions are synchronized with PostgreSQL Row Level Security.
+              </Text>
+
+              <AppButton
+                title="Sign Out"
+                variant="outline"
+                onPress={handleSignOut}
+                iconName="log-out"
+                style={styles.signOutBtn}
+              />
+            </View>
+          ) : (
+            <View style={styles.accountContent}>
+              <Text style={[styles.accountDesc, { color: colors.textSecondary }]}>
+                {isConfigured
+                  ? 'Sign in to automatically backup ledger records to Supabase cloud.'
+                  : 'Supabase credentials are not added to .env. All your data is saved locally on this device.'}
+              </Text>
+
+              <AppButton
+                title={isConfigured ? 'Sign In / Register Business' : 'Configure Cloud Account'}
+                onPress={() => router.push('/auth/login')}
+                iconName="cloud-upload"
+                iconFamily="material"
+              />
+            </View>
+          )}
         </View>
 
         {/* Language Selection Card */}
@@ -228,7 +381,7 @@ export default function SettingsScreen() {
           })}
         </View>
 
-        {/* Backup & Architecture Card */}
+        {/* Local Security & Architecture Card */}
         <View
           style={[
             styles.sectionCard,
@@ -246,9 +399,7 @@ export default function SettingsScreen() {
           <View style={styles.backupInfoRow}>
             <AppIcon name="shield" size={18} color={colors.primary} />
             <Text style={[styles.backupDesc, { color: colors.textSecondary }]}>
-              Local offline storage is prioritized for instant access. Sync to
-              Supabase cloud database is scheduled in Phase 5 with idempotent
-              queue retry.
+              All balances are stored locally in integer paise (₹1 = 100 paise) to prevent rounding errors. Row Level Security guarantees multi-tenant database isolation.
             </Text>
           </View>
         </View>
@@ -263,6 +414,73 @@ export default function SettingsScreen() {
           </Text>
         </View>
       </ScrollView>
+
+      {/* Edit Profile Modal */}
+      <Modal
+        visible={editModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setEditModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View
+            style={[
+              styles.modalCard,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+                borderRadius: borderRadius.lg,
+              },
+            ]}
+          >
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
+                Edit Business Profile
+              </Text>
+              <TouchableOpacity onPress={() => setEditModalVisible(false)}>
+                <AppIcon name="x" size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalForm}>
+              <AppTextInput
+                label="Business / Store Name"
+                placeholder="Store Name"
+                value={bizName}
+                onChangeText={setBizName}
+              />
+              <AppTextInput
+                label="Owner Name"
+                placeholder="Owner Name"
+                value={bizOwner}
+                onChangeText={setBizOwner}
+              />
+              <AppTextInput
+                label="Phone Number"
+                placeholder="+91 98765 43210"
+                keyboardType="phone-pad"
+                value={bizPhone}
+                onChangeText={setBizPhone}
+              />
+            </View>
+
+            <View style={styles.modalActions}>
+              <AppButton
+                title="Cancel"
+                variant="outline"
+                onPress={() => setEditModalVisible(false)}
+                style={styles.modalBtn}
+              />
+              <AppButton
+                title="Save Changes"
+                onPress={handleSaveProfile}
+                loading={savingProfile}
+                style={styles.modalBtn}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -294,12 +512,28 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: 16,
   },
+  cardHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
   sectionHeading: {
     fontSize: 13,
     fontWeight: '700',
-    marginBottom: 12,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+  },
+  editBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    gap: 4,
+  },
+  editBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
   },
   profileRow: {
     flexDirection: 'row',
@@ -328,6 +562,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     marginTop: 2,
+  },
+  accountContent: {
+    gap: 10,
+  },
+  accountRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  accountEmail: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  accountDesc: {
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  signOutBtn: {
+    marginTop: 4,
   },
   optionRow: {
     flexDirection: 'row',
@@ -379,5 +632,36 @@ const styles = StyleSheet.create({
   versionSub: {
     fontSize: 11,
     marginTop: 2,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  modalCard: {
+    borderWidth: 1,
+    padding: 20,
+    gap: 16,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  modalForm: {
+    gap: 12,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 8,
+  },
+  modalBtn: {
+    flex: 1,
   },
 });

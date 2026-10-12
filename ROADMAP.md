@@ -89,20 +89,22 @@
 ---
 
 ### Phase 4: Supabase Database Schema, Authentication & Row Level Security (RLS)
-- [ ] Provide step-by-step Supabase cloud project setup instructions in `SETUP_GUIDE.md`.
-- [ ] Install `@supabase/supabase-js`, `@react-native-async-storage/async-storage`, and `react-native-url-polyfill`.
-- [ ] Configure Supabase client with environment variables (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`).
-- [ ] Write versioned PostgreSQL SQL migrations:
+- [x] Provide step-by-step Supabase cloud project setup instructions in `SETUP_GUIDE.md`.
+- [x] Install `@supabase/supabase-js`, `@react-native-async-storage/async-storage`, and `react-native-url-polyfill`.
+- [x] Configure Supabase client with environment variables (`EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`).
+- [x] Write versioned PostgreSQL SQL migrations:
   - `001_create_businesses_and_profiles.sql`
   - `002_create_customers_table.sql`
   - `003_create_ledger_transactions_table.sql`
   - `004_create_import_batches_table.sql`
   - `005_row_level_security_policies.sql` (Multi-tenant business isolation).
-- [ ] Implement Supabase Auth flow:
+  - `000_full_schema.sql` (Convenient all-in-one execution file).
+- [x] Implement Supabase Auth flow:
   - Sign in / Sign up with Email or Phone OTP.
   - Session restoration on app open.
   - Auth token auto-refresh and network failure resilience.
-- [ ] Test cross-tenant security: Confirm Account A cannot query or mutate Account B's customers or ledgers.
+  - Auth state context (`AuthContext`) and local offline guest mode fallback.
+- [x] Test cross-tenant security: Confirm Account A cannot query or mutate Account B's customers or ledgers.
 
 ---
 

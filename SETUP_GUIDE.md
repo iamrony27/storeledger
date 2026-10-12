@@ -84,11 +84,22 @@ The `anon` (publishable) key only provides access permitted by your Supabase **R
 4. Copy **Project API Keys -> `anon` `public`** -> paste as `EXPO_PUBLIC_SUPABASE_ANON_KEY`.
 
 ### Step 3: Run Database Migrations
-Migrations will be located in `supabase/migrations/`. In Phase 4, you can execute them directly in the Supabase Dashboard:
-1. Go to **SQL Editor** in the left sidebar.
-2. Open the migration file from your project.
-3. Paste into the SQL Editor and click **Run**.
-4. RLS will immediately protect your tables.
+All PostgreSQL migrations are generated in `supabase/migrations/`. You have two options:
+
+#### Option A (Recommended - 1-Click Setup):
+1. Open [`supabase/migrations/000_full_schema.sql`](file:///media/NVME/GWD%20Book/supabase/migrations/000_full_schema.sql).
+2. Copy the entire file content.
+3. In the Supabase Dashboard, click **SQL Editor** in the left navigation sidebar.
+4. Paste the SQL script and click the green **Run** button.
+5. All 4 tables (`profiles`, `customers`, `ledger_transactions`, `import_batches`), triggers, and Row Level Security (RLS) policies are active!
+
+#### Option B (Versioned Step-by-Step):
+Execute each migration file in order:
+1. `001_create_businesses_and_profiles.sql`
+2. `002_create_customers_table.sql`
+3. `003_create_ledger_transactions_table.sql`
+4. `004_create_import_batches_table.sql`
+5. `005_row_level_security_policies.sql`
 
 ---
 

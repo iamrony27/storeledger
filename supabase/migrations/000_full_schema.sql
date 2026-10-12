@@ -1,0 +1,219 @@
+-- ==============================================================================
+-- GWD BOOK: ALL-IN-ONE SUPABASE DATABASE SCHEMA & ROW LEVEL SECURITY (RLS)
+-- Copy and paste this complete script into your Supabase SQL Editor and click RUN.
+-- Safe to re-run: Uses IF NOT EXISTS, OR REPLACE, and IF EXISTS guards.
+-- ==============================================================================
+
+-- ------------------------------------------------------------------------------
+-- 1. PROFILES & BUSINESSES TABLE
+-- ------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    business_name TEXT NOT NULL DEFAULT 'My Business',
+    owner_name TEXT NOT NULL DEFAULT 'Owner',
+    phone TEXT,
+    currency TEXT NOT NULL DEFAULT 'INR',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+-- Trigger function for updated_at
+CREATE OR REPLACE FUNCTION public.handle_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = timezone('utc'::text, now());
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS set_profiles_updated_at ON public.profiles;
+CREATE TRIGGER set_profiles_updated_at
+    BEFORE UPDATE ON public.profiles
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
+
+-- Automatically create profile row when user signs up
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO public.profiles (id, business_name, owner_name, phone)
+    VALUES (
+        NEW.id,
+        COALESCE(NEW.raw_user_meta_data->>'business_name', 'GWD Book Business'),
+        COALESCE(NEW.raw_user_meta_data->>'owner_name', 'Business Owner'),
+        COALESCE(NEW.phone, NEW.raw_user_meta_data->>'phone', '')
+    )
+    ON CONFLICT (id) DO NOTHING;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_new_user();
+
+-- ------------------------------------------------------------------------------
+-- 2. CUSTOMERS TABLE
+-- ------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.customers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    business_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    phone TEXT,
+    address TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+CREATE INDEX IF NOT EXISTS idx_customers_business_id ON public.customers(business_id);
+CREATE INDEX IF NOT EXISTS idx_customers_business_phone ON public.customers(business_id, phone);
+CREATE INDEX IF NOT EXISTS idx_customers_business_active ON public.customers(business_id, is_active);
+
+DROP TRIGGER IF EXISTS set_customers_updated_at ON public.customers;
+CREATE TRIGGER set_customers_updated_at
+    BEFORE UPDATE ON public.customers
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
+
+-- ------------------------------------------------------------------------------
+-- 3. LEDGER TRANSACTIONS TABLE
+-- ------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.ledger_transactions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    business_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    customer_id UUID NOT NULL REFERENCES public.customers(id) ON DELETE CASCADE,
+    type TEXT NOT NULL CHECK (type IN ('GAVE', 'GOT')),
+    amount_paise BIGINT NOT NULL CHECK (amount_paise > 0),
+    description TEXT,
+    transaction_date TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    bill_photo_url TEXT,
+    is_void BOOLEAN NOT NULL DEFAULT false,
+    void_reason TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+CREATE INDEX IF NOT EXISTS idx_transactions_biz_cust_date 
+    ON public.ledger_transactions(business_id, customer_id, transaction_date DESC);
+
+CREATE INDEX IF NOT EXISTS idx_transactions_cust_void 
+    ON public.ledger_transactions(customer_id, is_void);
+
+CREATE INDEX IF NOT EXISTS idx_transactions_business_id 
+    ON public.ledger_transactions(business_id);
+
+DROP TRIGGER IF EXISTS set_transactions_updated_at ON public.ledger_transactions;
+CREATE TRIGGER set_transactions_updated_at
+    BEFORE UPDATE ON public.ledger_transactions
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
+
+-- ------------------------------------------------------------------------------
+-- 4. IMPORT BATCHES TABLE (KHATABOOK PDF AUDIT)
+-- ------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.import_batches (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    business_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    source_filename TEXT NOT NULL,
+    total_records INTEGER NOT NULL DEFAULT 0,
+    total_amount_paise BIGINT NOT NULL DEFAULT 0,
+    status TEXT NOT NULL DEFAULT 'committed' CHECK (status IN ('pending', 'committed', 'failed')),
+    notes TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+CREATE INDEX IF NOT EXISTS idx_import_batches_business_id 
+    ON public.import_batches(business_id);
+
+DROP TRIGGER IF EXISTS set_import_batches_updated_at ON public.import_batches;
+CREATE TRIGGER set_import_batches_updated_at
+    BEFORE UPDATE ON public.import_batches
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
+
+-- ------------------------------------------------------------------------------
+-- 5. ROW LEVEL SECURITY (RLS) POLICIES - STRICT MULTI-TENANT ISOLATION
+-- ------------------------------------------------------------------------------
+
+-- Enable RLS
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ledger_transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.import_batches ENABLE ROW LEVEL SECURITY;
+
+-- Profiles Policies
+DROP POLICY IF EXISTS "profiles_select_own" ON public.profiles;
+CREATE POLICY "profiles_select_own" ON public.profiles FOR SELECT TO authenticated USING (auth.uid() = id);
+
+DROP POLICY IF EXISTS "profiles_insert_own" ON public.profiles;
+CREATE POLICY "profiles_insert_own" ON public.profiles FOR INSERT TO authenticated WITH CHECK (auth.uid() = id);
+
+DROP POLICY IF EXISTS "profiles_update_own" ON public.profiles;
+CREATE POLICY "profiles_update_own" ON public.profiles FOR UPDATE TO authenticated USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+
+DROP POLICY IF EXISTS "profiles_delete_own" ON public.profiles;
+CREATE POLICY "profiles_delete_own" ON public.profiles FOR DELETE TO authenticated USING (auth.uid() = id);
+
+-- Customers Policies
+DROP POLICY IF EXISTS "customers_select_own_business" ON public.customers;
+CREATE POLICY "customers_select_own_business" ON public.customers FOR SELECT TO authenticated USING (auth.uid() = business_id);
+
+DROP POLICY IF EXISTS "customers_insert_own_business" ON public.customers;
+CREATE POLICY "customers_insert_own_business" ON public.customers FOR INSERT TO authenticated WITH CHECK (auth.uid() = business_id);
+
+DROP POLICY IF EXISTS "customers_update_own_business" ON public.customers;
+CREATE POLICY "customers_update_own_business" ON public.customers FOR UPDATE TO authenticated USING (auth.uid() = business_id) WITH CHECK (auth.uid() = business_id);
+
+DROP POLICY IF EXISTS "customers_delete_own_business" ON public.customers;
+CREATE POLICY "customers_delete_own_business" ON public.customers FOR DELETE TO authenticated USING (auth.uid() = business_id);
+
+-- Ledger Transactions Policies
+DROP POLICY IF EXISTS "transactions_select_own_business" ON public.ledger_transactions;
+CREATE POLICY "transactions_select_own_business" ON public.ledger_transactions FOR SELECT TO authenticated USING (auth.uid() = business_id);
+
+DROP POLICY IF EXISTS "transactions_insert_own_business" ON public.ledger_transactions;
+CREATE POLICY "transactions_insert_own_business" ON public.ledger_transactions FOR INSERT TO authenticated WITH CHECK (auth.uid() = business_id);
+
+DROP POLICY IF EXISTS "transactions_update_own_business" ON public.ledger_transactions;
+CREATE POLICY "transactions_update_own_business" ON public.ledger_transactions FOR UPDATE TO authenticated USING (auth.uid() = business_id) WITH CHECK (auth.uid() = business_id);
+
+DROP POLICY IF EXISTS "transactions_delete_own_business" ON public.ledger_transactions;
+CREATE POLICY "transactions_delete_own_business" ON public.ledger_transactions FOR DELETE TO authenticated USING (auth.uid() = business_id);
+
+-- Import Batches Policies
+DROP POLICY IF EXISTS "import_batches_select_own_business" ON public.import_batches;
+CREATE POLICY "import_batches_select_own_business" ON public.import_batches FOR SELECT TO authenticated USING (auth.uid() = business_id);
+
+DROP POLICY IF EXISTS "import_batches_insert_own_business" ON public.import_batches;
+CREATE POLICY "import_batches_insert_own_business" ON public.import_batches FOR INSERT TO authenticated WITH CHECK (auth.uid() = business_id);
+
+DROP POLICY IF EXISTS "import_batches_update_own_business" ON public.import_batches;
+CREATE POLICY "import_batches_update_own_business" ON public.import_batches FOR UPDATE TO authenticated USING (auth.uid() = business_id) WITH CHECK (auth.uid() = business_id);
+
+DROP POLICY IF EXISTS "import_batches_delete_own_business" ON public.import_batches;
+CREATE POLICY "import_batches_delete_own_business" ON public.import_batches FOR DELETE TO authenticated USING (auth.uid() = business_id);
+
+-- ------------------------------------------------------------------------------
+-- 6. SECURE VIEW FOR BALANCES (SECURITY INVOKER)
+-- ------------------------------------------------------------------------------
+CREATE OR REPLACE VIEW public.customer_balance_summaries
+WITH (security_invoker = true) AS
+SELECT 
+    c.id AS customer_id,
+    c.business_id,
+    c.name,
+    c.phone,
+    COALESCE(SUM(CASE WHEN t.type = 'GAVE' AND t.is_void = false THEN t.amount_paise ELSE 0 END), 0) AS total_gave_paise,
+    COALESCE(SUM(CASE WHEN t.type = 'GOT' AND t.is_void = false THEN t.amount_paise ELSE 0 END), 0) AS total_got_paise,
+    (
+        COALESCE(SUM(CASE WHEN t.type = 'GAVE' AND t.is_void = false THEN t.amount_paise ELSE 0 END), 0) -
+        COALESCE(SUM(CASE WHEN t.type = 'GOT' AND t.is_void = false THEN t.amount_paise ELSE 0 END), 0)
+    ) AS net_balance_paise,
+    COUNT(CASE WHEN t.is_void = false THEN 1 ELSE NULL END) AS active_tx_count
+FROM public.customers c
+LEFT JOIN public.ledger_transactions t ON c.id = t.customer_id AND c.business_id = t.business_id
+GROUP BY c.id, c.business_id, c.name, c.phone;

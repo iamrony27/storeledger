@@ -9,8 +9,8 @@
 ## Progress Overview
 
 - [x] **Phase 0: Repository Inspection & Safe Architecture Plan**
-- [ ] **Phase 1: Environment Setup & Expo App Bootstrapping in Expo Go**
-- [ ] **Phase 2: UI Design System, Navigation & Core Screens**
+- [x] **Phase 1: Environment Setup & Expo App Bootstrapping in Expo Go**
+- [x] **Phase 2: UI Design System, Navigation & Core Screens**
 - [ ] **Phase 3: Local Data Model, Financial Ledger Math & Customer CRUD**
 - [ ] **Phase 4: Supabase Database Schema, Authentication & Row Level Security (RLS)**
 - [ ] **Phase 5: Offline Persistence, Write Queue, Idempotent Cloud Sync & Conflict Handling**
@@ -48,22 +48,24 @@
 ---
 
 ### Phase 2: UI Design System, Navigation & Core Screens
-- [ ] Establish design tokens (HSL color system, light/dark themes, spacing, typography, elevation).
-- [ ] Implement theme provider and system color-scheme detection (Light & Dark modes).
-- [ ] Create reusable UI components:
-  - `ScreenWrapper` (safe area, Android hardware back handling, keyboard avoidance).
-  - `AppHeader`, `AppCard`, `AppButton`, `AppTextInput`, `Badge`, `EmptyState`, `LoadingSpinner`.
-  - Icon system wrapper using modern vector icons (Feather / MaterialCommunityIcons).
-- [ ] Set up bottom navigation tabs:
+- [x] Establish design tokens (HSL color system, light/dark themes, spacing, typography, elevation).
+- [x] Implement theme provider and system color-scheme detection (Light & Dark modes).
+- [x] Create reusable UI components:
+  - AppIcon system wrapper using modern vector icons (Feather, MaterialCommunityIcons, zero emojis).
+  - AppCard, AppButton, AppTextInput, Badge, EmptyState, CustomerCard.
+- [x] Set up bottom navigation tabs with Expo Router:
   - **Customers (Ledger)**
   - **Reports / Analytics**
   - **Import / Tools**
   - **Settings / Business Profile**
-- [ ] Build Customer List dashboard:
-  - Search bar by name or phone.
-  - Filter by balance status (You will give / You will get / Settled).
-  - Sorting options (Recent activity, Highest balance, Alphabetical).
-- [ ] Ensure full responsive layout across varied Android screen sizes without horizontal clipping.
+- [x] Build Customer List dashboard:
+  - Khatabook-style summary card (You'll Get, You'll Give, Net Balance).
+  - Search bar by name or phone with instant clearing.
+  - Filter chips (All / You'll Get / You'll Give / Settled).
+  - Sorting options (Recent, Highest Amount, Name A-Z).
+  - Floating Action Button (FAB) for adding customers.
+- [x] Support multi-lingual architecture with runtime switching (English, Bengali, Hindi).
+- [x] Ensure full responsive layout across varied Android screen sizes without horizontal clipping.
 
 ---
 

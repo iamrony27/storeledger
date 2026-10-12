@@ -5,14 +5,15 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Linking,
   Modal,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { useAuth } from '../../auth/AuthContext';
 import { AppIcon } from '../../components/AppIcon';
 import { Badge } from '../../components/Badge';
 import { AppTextInput } from '../../components/AppTextInput';
@@ -32,15 +33,27 @@ import {
   voidTransaction,
   subscribeToRepository,
 } from '../../storage/localLedgerRepository';
+import {
+  makePhoneCall,
+  openWhatsAppReminder,
+  openWhatsAppMessage,
+} from '../../utils/communication';
+import { formatTransactionReceiptText } from '../../utils/receiptGenerator';
+import {
+  generateCustomerStatementPdf,
+  sharePdfFile,
+} from '../../utils/pdfGenerator';
 
 export default function CustomerDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { colors, spacing, borderRadius } = useTheme();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { profile } = useAuth();
 
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [transactions, setTransactions] = useState<LedgerTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   // Transaction Modal State
   const [modalVisible, setModalVisible] = useState(false);
@@ -108,20 +121,43 @@ export default function CustomerDetailScreen() {
 
   const handleCall = () => {
     if (customer.phone) {
-      Linking.openURL(`tel:${customer.phone}`).catch(() => {});
+      makePhoneCall(customer.phone);
+    } else {
+      Alert.alert('No Phone', 'No phone number is recorded for this customer.');
     }
   };
 
   const handleWhatsApp = () => {
     if (customer.phone) {
-      const cleanPhone = customer.phone.replace(/[^0-9]/g, '');
-      const msg = encodeURIComponent(
-        `Dear ${customer.name}, your account balance on GWD Book is ${formatINR(
-          customer.currentBalancePaise
-        )}. Please review.`
-      );
-      Linking.openURL(`whatsapp://send?phone=${cleanPhone}&text=${msg}`).catch(() => {});
+      openWhatsAppReminder({
+        phoneNumber: customer.phone,
+        customerName: customer.name,
+        balancePaise: customer.currentBalancePaise,
+        businessName: profile.business_name,
+        language,
+      });
+    } else {
+      Alert.alert('No Phone', 'Please add a phone number for this customer first.');
     }
+  };
+
+  const handleSharePdf = async () => {
+    if (!customer) return;
+    setIsGeneratingPdf(true);
+    try {
+      const uri = await generateCustomerStatementPdf(customer, transactions, profile);
+      await sharePdfFile(uri, `${customer.name} - Statement`);
+    } catch (err: any) {
+      Alert.alert('PDF Error', err?.message || 'Failed to generate PDF statement.');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
+
+  const handleShareReceipt = (tx: LedgerTransaction) => {
+    if (!customer) return;
+    const receiptText = formatTransactionReceiptText(tx, customer, profile);
+    openWhatsAppMessage(customer.phone, receiptText);
   };
 
   const openTxModal = (type: 'GAVE' | 'GOT') => {
@@ -249,6 +285,21 @@ export default function CustomerDetailScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
+            onPress={handleSharePdf}
+            disabled={isGeneratingPdf}
+            style={[
+              styles.iconBtn,
+              { backgroundColor: colors.primaryLight, borderRadius: borderRadius.sm },
+            ]}
+          >
+            {isGeneratingPdf ? (
+              <ActivityIndicator size="small" color={colors.primary} />
+            ) : (
+              <AppIcon name="file-text" size={16} color={colors.primary} />
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
             onPress={handleToggleArchive}
             style={[
               styles.iconBtn,
@@ -326,6 +377,70 @@ export default function CustomerDetailScreen() {
               </Text>
             </View>
           )}
+
+          {/* Quick Actions Row */}
+          <View style={styles.quickActionRow}>
+            <TouchableOpacity
+              onPress={handleCall}
+              style={[
+                styles.quickActionBtn,
+                {
+                  backgroundColor: colors.borderLight,
+                  borderColor: colors.border,
+                  borderRadius: borderRadius.md,
+                },
+              ]}
+            >
+              <AppIcon name="phone" size={14} color={colors.primary} />
+              <Text style={[styles.quickActionText, { color: colors.primary }]}>
+                Call
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={handleWhatsApp}
+              style={[
+                styles.quickActionBtn,
+                {
+                  backgroundColor: colors.youWillGetBg,
+                  borderColor: colors.youWillGet,
+                  borderRadius: borderRadius.md,
+                },
+              ]}
+            >
+              <AppIcon
+                family="material"
+                name="whatsapp"
+                size={16}
+                color={colors.youWillGet}
+              />
+              <Text style={[styles.quickActionText, { color: colors.youWillGet }]}>
+                WhatsApp
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={handleSharePdf}
+              disabled={isGeneratingPdf}
+              style={[
+                styles.quickActionBtn,
+                {
+                  backgroundColor: colors.primaryLight,
+                  borderColor: colors.primary,
+                  borderRadius: borderRadius.md,
+                },
+              ]}
+            >
+              {isGeneratingPdf ? (
+                <ActivityIndicator size="small" color={colors.primary} />
+              ) : (
+                <AppIcon name="download" size={14} color={colors.primary} />
+              )}
+              <Text style={[styles.quickActionText, { color: colors.primary }]}>
+                Statement
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Transaction History Section */}
@@ -463,20 +578,30 @@ export default function CustomerDetailScreen() {
                       </Text>
 
                       {!isVoided && !tx.isOpeningBalance && (
-                        <TouchableOpacity
-                          onPress={() => handleVoidTx(tx.id)}
-                          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
-                          style={styles.voidBtn}
-                        >
-                          <Text
-                            style={[
-                              styles.voidText,
-                              { color: colors.textMuted },
-                            ]}
+                        <View style={styles.txActionBtnsRow}>
+                          <TouchableOpacity
+                            onPress={() => handleShareReceipt(tx)}
+                            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                            style={styles.shareTxBtn}
                           >
-                            Void
-                          </Text>
-                        </TouchableOpacity>
+                            <AppIcon name="share-2" size={13} color={colors.primary} />
+                          </TouchableOpacity>
+
+                          <TouchableOpacity
+                            onPress={() => handleVoidTx(tx.id)}
+                            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                            style={styles.voidBtn}
+                          >
+                            <Text
+                              style={[
+                                styles.voidText,
+                                { color: colors.textMuted },
+                              ]}
+                            >
+                              Void
+                            </Text>
+                          </TouchableOpacity>
+                        </View>
                       )}
                     </View>
                   </View>
@@ -861,5 +986,39 @@ const styles = StyleSheet.create({
   },
   modalBtnRow: {
     marginTop: 10,
+  },
+  quickActionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 14,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#E2E8F0',
+  },
+  quickActionBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 8,
+    borderWidth: 1,
+    gap: 6,
+  },
+  quickActionText: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  txActionBtnsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+  },
+  shareTxBtn: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

@@ -128,17 +128,18 @@
 ---
 
 ### Phase 6: Phone Calls, WhatsApp Integration, Receipts & PDF Reports
-- [ ] Add native communication integrations:
+- [x] Add native communication integrations:
   - Direct phone calling (`expo-linking` / `tel:phone_number`).
-  - WhatsApp click-to-chat (`whatsapp://send?phone=...&text=...`) with localized pre-formatted polite ledger reminders.
+  - WhatsApp click-to-chat (`whatsapp://send?phone=...&text=...`) with localized pre-formatted polite ledger reminders in Bengali, Hindi, and English.
   - Graceful fallbacks when WhatsApp is not installed or phone number format is invalid.
-- [ ] Build Receipt & Statement sharing:
-  - Transaction-level digital payment receipt generator.
-  - Single customer statement report (date range selectable).
-  - General business report (total credit given, total collected, net market outstanding).
-- [ ] Integrate PDF generation (`expo-print`) and sharing (`expo-sharing`):
+- [x] Build Receipt & Statement sharing:
+  - Transaction-level digital payment receipt generator (`formatTransactionReceiptText`).
+  - Single customer statement report with zero cross-customer data leakage.
+  - General business master report (total credit given, total collected, net market outstanding).
+- [x] Integrate PDF generation (`expo-print`) and sharing (`expo-sharing`):
   - Clean HTML-to-PDF templates with business header, customer details, and itemized ledger table.
-  - Verify zero leakage of other customers' data in individual statements.
+  - Native Android share sheet integration (`sharePdfFile`).
+  - Automated tests verifying HTML rendering, zero data leakage, and integer paise accuracy.
 
 ---
 

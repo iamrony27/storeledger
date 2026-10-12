@@ -5,10 +5,12 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { useAuth } from '../../auth/AuthContext';
 import { AppIcon } from '../../components/AppIcon';
 import { AppButton } from '../../components/AppButton';
 import {
@@ -20,18 +22,44 @@ import {
   getCustomers,
   subscribeToRepository,
 } from '../../storage/localLedgerRepository';
+import {
+  generateBusinessReportPdf,
+  sharePdfFile,
+} from '../../utils/pdfGenerator';
 
 type DateFilter = 'TODAY' | 'WEEK' | 'MONTH' | 'ALL';
 
 export default function ReportsScreen() {
   const { colors, spacing, borderRadius } = useTheme();
   const { t } = useLanguage();
+  const { profile } = useAuth();
   const [dateFilter, setDateFilter] = useState<DateFilter>('ALL');
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   const loadData = async () => {
     const list = await getCustomers();
     setCustomers(list);
+  };
+
+  const handleExportPdf = async () => {
+    if (customers.length === 0) {
+      Alert.alert('No Records', 'Add customer accounts before generating a ledger report.');
+      return;
+    }
+    setIsGeneratingPdf(true);
+    try {
+      const uri = await generateBusinessReportPdf(
+        customers,
+        profile,
+        `Ledger Report (${dateFilter})`
+      );
+      await sharePdfFile(uri, `${profile.business_name} - Master Ledger`);
+    } catch (err: any) {
+      Alert.alert('PDF Error', err?.message || 'Failed to generate PDF report.');
+    } finally {
+      setIsGeneratingPdf(false);
+    }
   };
 
   useEffect(() => {
@@ -206,7 +234,8 @@ export default function ReportsScreen() {
             <AppButton
               title={t.reports.downloadPdf}
               iconName="download"
-              onPress={() => {}}
+              onPress={handleExportPdf}
+              loading={isGeneratingPdf}
               variant="outline"
               size="md"
             />
@@ -215,7 +244,8 @@ export default function ReportsScreen() {
             <AppButton
               title={t.reports.shareStatement}
               iconName="share-2"
-              onPress={() => {}}
+              onPress={handleExportPdf}
+              loading={isGeneratingPdf}
               variant="primary"
               size="md"
             />

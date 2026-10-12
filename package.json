@@ -11,7 +11,9 @@
     "expo-constants": "~57.0.21",
     "expo-font": "~57.0.4",
     "expo-linking": "~57.0.12",
+    "expo-print": "^57.0.2",
     "expo-router": "~57.0.25",
+    "expo-sharing": "^57.0.22",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
     "react-native": "0.86.3",
@@ -32,7 +34,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "test": "tsx src/utils/__tests__/ledgerMath.test.ts && tsx src/utils/__tests__/supabaseSecurity.test.ts && tsx src/utils/__tests__/syncEngine.test.ts"
+    "test": "tsx src/utils/__tests__/ledgerMath.test.ts && tsx src/utils/__tests__/supabaseSecurity.test.ts && tsx src/utils/__tests__/syncEngine.test.ts && tsx src/utils/__tests__/communicationAndPdf.test.ts"
   },
   "private": true
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,8 @@ import {
   ScrollView,
   TouchableOpacity,
   Linking,
+  Modal,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -13,27 +15,82 @@ import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { AppIcon } from '../../components/AppIcon';
 import { Badge } from '../../components/Badge';
+import { AppTextInput } from '../../components/AppTextInput';
+import { AppButton } from '../../components/AppButton';
 import {
-  INITIAL_CUSTOMERS,
-  INITIAL_TRANSACTIONS,
-} from '../../data/mockStore';
-import { formatINR, getBalanceType } from '../../types/customer';
+  Customer,
+  LedgerTransaction,
+  formatINR,
+  getBalanceType,
+  rupeesToPaise,
+} from '../../types/customer';
+import {
+  getCustomerById,
+  getCustomerTransactions,
+  addTransaction,
+  archiveCustomer,
+  voidTransaction,
+  subscribeToRepository,
+} from '../../storage/localLedgerRepository';
 
 export default function CustomerDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { colors, spacing, borderRadius } = useTheme();
   const { t } = useLanguage();
 
-  const customer = INITIAL_CUSTOMERS.find((c) => c.id === id);
-  const transactions = (id && INITIAL_TRANSACTIONS[id]) || [];
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [transactions, setTransactions] = useState<LedgerTransaction[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Transaction Modal State
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalType, setModalType] = useState<'GAVE' | 'GOT'>('GAVE');
+  const [txAmount, setTxAmount] = useState('');
+  const [txDesc, setTxDesc] = useState('');
+  const [txBill, setTxBill] = useState('');
+  const [amountError, setAmountError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const loadData = async () => {
+    if (!id) return;
+    const cust = await getCustomerById(id);
+    const txs = await getCustomerTransactions(id);
+    setCustomer(cust);
+    setTransactions([...txs].reverse()); // newest first
+    setIsLoading(false);
+  };
+
+  useEffect(() => {
+    loadData();
+    const unsubscribe = subscribeToRepository(() => {
+      loadData();
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <SafeAreaView
+        style={[styles.safeArea, { backgroundColor: colors.background }]}
+      >
+        <View style={styles.centerContainer}>
+          <Text style={[styles.infoText, { color: colors.textSecondary }]}>
+            {t.common.loading}
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (!customer) {
     return (
       <SafeAreaView
         style={[styles.safeArea, { backgroundColor: colors.background }]}
       >
-        <View style={styles.notFoundContainer}>
-          <Text style={[styles.notFoundText, { color: colors.textPrimary }]}>
+        <View style={styles.centerContainer}>
+          <Text style={[styles.infoText, { color: colors.textPrimary }]}>
             Customer not found.
           </Text>
           <TouchableOpacity
@@ -59,12 +116,75 @@ export default function CustomerDetailScreen() {
     if (customer.phone) {
       const cleanPhone = customer.phone.replace(/[^0-9]/g, '');
       const msg = encodeURIComponent(
-        `Dear ${customer.name}, your outstanding balance on GWD Book is ${formatINR(
+        `Dear ${customer.name}, your account balance on GWD Book is ${formatINR(
           customer.currentBalancePaise
-        )}. Please check.`
+        )}. Please review.`
       );
       Linking.openURL(`whatsapp://send?phone=${cleanPhone}&text=${msg}`).catch(() => {});
     }
+  };
+
+  const openTxModal = (type: 'GAVE' | 'GOT') => {
+    setModalType(type);
+    setTxAmount('');
+    setTxDesc('');
+    setTxBill('');
+    setAmountError('');
+    setModalVisible(true);
+  };
+
+  const handleSaveTransaction = async () => {
+    if (!customer) return;
+    const parsedPaise = rupeesToPaise(txAmount);
+    if (parsedPaise <= 0) {
+      setAmountError('Enter a valid amount greater than 0');
+      return;
+    }
+    setAmountError('');
+    setIsSubmitting(true);
+
+    try {
+      await addTransaction({
+        customerId: customer.id,
+        amountPaise: parsedPaise,
+        type: modalType,
+        description: txDesc || undefined,
+        billNumber: txBill || undefined,
+      });
+
+      setModalVisible(false);
+      await loadData();
+    } catch (err) {
+      console.error('Failed to add transaction:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleVoidTx = (txId: string) => {
+    Alert.alert(
+      'Void Transaction',
+      'Are you sure you want to void this entry? It will be marked void without deleting the audit history.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Confirm Void',
+          style: 'destructive',
+          onPress: async () => {
+            if (!customer) return;
+            await voidTransaction(customer.id, txId);
+            await loadData();
+          },
+        },
+      ]
+    );
+  };
+
+  const handleToggleArchive = async () => {
+    if (!customer) return;
+    const shouldArchive = !customer.isArchived;
+    await archiveCustomer(customer.id, shouldArchive);
+    router.back();
   };
 
   return (
@@ -125,6 +245,20 @@ export default function CustomerDetailScreen() {
               name="whatsapp"
               size={18}
               color={colors.youWillGet}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleToggleArchive}
+            style={[
+              styles.iconBtn,
+              { backgroundColor: colors.borderLight, borderRadius: borderRadius.sm },
+            ]}
+          >
+            <AppIcon
+              name={customer.isArchived ? 'refresh-cw' : 'archive'}
+              size={16}
+              color={colors.textSecondary}
             />
           </TouchableOpacity>
         </View>
@@ -227,6 +361,7 @@ export default function CustomerDetailScreen() {
           ) : (
             transactions.map((tx) => {
               const isGave = tx.type === 'GAVE';
+              const isVoided = !!tx.isVoided;
               return (
                 <View
                   key={tx.id}
@@ -234,8 +369,9 @@ export default function CustomerDetailScreen() {
                     styles.txCard,
                     {
                       backgroundColor: colors.surface,
-                      borderColor: colors.border,
+                      borderColor: isVoided ? colors.borderLight : colors.border,
                       borderRadius: borderRadius.md,
+                      opacity: isVoided ? 0.5 : 1,
                     },
                   ]}
                 >
@@ -245,26 +381,48 @@ export default function CustomerDetailScreen() {
                         style={[
                           styles.txIconBox,
                           {
-                            backgroundColor: isGave
+                            backgroundColor: isVoided
+                              ? colors.borderLight
+                              : isGave
                               ? colors.youWillGiveBg
                               : colors.youWillGetBg,
                           },
                         ]}
                       >
                         <AppIcon
-                          name={isGave ? 'arrow-up-right' : 'arrow-down-left'}
+                          name={
+                            isVoided
+                              ? 'slash'
+                              : isGave
+                              ? 'arrow-up-right'
+                              : 'arrow-down-left'
+                          }
                           size={16}
-                          color={isGave ? colors.youWillGive : colors.youWillGet}
+                          color={
+                            isVoided
+                              ? colors.textMuted
+                              : isGave
+                              ? colors.youWillGive
+                              : colors.youWillGet
+                          }
                         />
                       </View>
-                      <View>
+                      <View style={styles.txTextContainer}>
                         <Text
                           style={[
                             styles.txDescription,
-                            { color: colors.textPrimary },
+                            {
+                              color: isVoided
+                                ? colors.textMuted
+                                : colors.textPrimary,
+                              textDecorationLine: isVoided
+                                ? 'line-through'
+                                : 'none',
+                            },
                           ]}
                         >
-                          {tx.description || (isGave ? 'Credit Given' : 'Payment Received')}
+                          {tx.description ||
+                            (isGave ? 'Credit Given (Udhaar)' : 'Payment Received (Jama)')}
                         </Text>
                         <Text
                           style={[
@@ -277,24 +435,50 @@ export default function CustomerDetailScreen() {
                             month: 'short',
                             year: 'numeric',
                           })}
-                          {tx.billNumber ? ` • #${tx.billNumber}` : ''}
+                          {tx.billNumber ? ` • Bill #${tx.billNumber}` : ''}
+                          {tx.isOpeningBalance ? ' • Opening' : ''}
+                          {isVoided ? ' • [VOIDED]' : ''}
                         </Text>
                       </View>
                     </View>
 
-                    <Text
-                      style={[
-                        styles.txAmount,
-                        {
-                          color: isGave
-                            ? colors.youWillGive
-                            : colors.youWillGet,
-                        },
-                      ]}
-                    >
-                      {isGave ? '-' : '+'}
-                      {formatINR(tx.amountPaise)}
-                    </Text>
+                    <View style={styles.txRightCol}>
+                      <Text
+                        style={[
+                          styles.txAmount,
+                          {
+                            color: isVoided
+                              ? colors.textMuted
+                              : isGave
+                              ? colors.youWillGive
+                              : colors.youWillGet,
+                            textDecorationLine: isVoided
+                              ? 'line-through'
+                              : 'none',
+                          },
+                        ]}
+                      >
+                        {isGave ? '-' : '+'}
+                        {formatINR(tx.amountPaise)}
+                      </Text>
+
+                      {!isVoided && !tx.isOpeningBalance && (
+                        <TouchableOpacity
+                          onPress={() => handleVoidTx(tx.id)}
+                          hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                          style={styles.voidBtn}
+                        >
+                          <Text
+                            style={[
+                              styles.voidText,
+                              { color: colors.textMuted },
+                            ]}
+                          >
+                            Void
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
                   </View>
                 </View>
               );
@@ -314,6 +498,7 @@ export default function CustomerDetailScreen() {
         ]}
       >
         <TouchableOpacity
+          onPress={() => openTxModal('GAVE')}
           activeOpacity={0.85}
           style={[
             styles.actionButtonSplit,
@@ -325,6 +510,7 @@ export default function CustomerDetailScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
+          onPress={() => openTxModal('GOT')}
           activeOpacity={0.85}
           style={[
             styles.actionButtonSplit,
@@ -335,6 +521,113 @@ export default function CustomerDetailScreen() {
           <Text style={styles.actionBtnLabel}>YOU GOT ₹ (Jama)</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Interactive Modal to Record Transaction */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View
+            style={[
+              styles.modalSheet,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+                borderRadius: borderRadius.xl,
+              },
+            ]}
+          >
+            <View style={styles.modalHeader}>
+              <View style={styles.modalTitleRow}>
+                <View
+                  style={[
+                    styles.modalIconBox,
+                    {
+                      backgroundColor:
+                        modalType === 'GAVE'
+                          ? colors.youWillGiveBg
+                          : colors.youWillGetBg,
+                    },
+                  ]}
+                >
+                  <AppIcon
+                    name={modalType === 'GAVE' ? 'minus-circle' : 'plus-circle'}
+                    size={20}
+                    color={
+                      modalType === 'GAVE'
+                        ? colors.youWillGive
+                        : colors.youWillGet
+                    }
+                  />
+                </View>
+                <Text
+                  style={[styles.modalTitle, { color: colors.textPrimary }]}
+                >
+                  {modalType === 'GAVE'
+                    ? 'Record Credit (You Gave Udhaar)'
+                    : 'Record Payment (You Got Jama)'}
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <AppIcon name="x" size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.modalBody}>
+              <AppTextInput
+                label="Amount (in Rupees ₹)"
+                placeholder="0.00"
+                iconName="dollar-sign"
+                value={txAmount}
+                onChangeText={(text) => {
+                  setTxAmount(text);
+                  if (amountError) setAmountError('');
+                }}
+                error={amountError}
+                keyboardType="decimal-pad"
+                autoFocus
+              />
+
+              <AppTextInput
+                label="Description / Item (Optional)"
+                placeholder="e.g. 5x LED lights, UPI payment"
+                iconName="edit-3"
+                value={txDesc}
+                onChangeText={setTxDesc}
+              />
+
+              <AppTextInput
+                label="Bill / Invoice Number (Optional)"
+                placeholder="e.g. INV-1042"
+                iconName="tag"
+                value={txBill}
+                onChangeText={setTxBill}
+              />
+
+              <View style={styles.modalBtnRow}>
+                <AppButton
+                  title={
+                    modalType === 'GAVE'
+                      ? 'Save Credit Given'
+                      : 'Save Payment Received'
+                  }
+                  onPress={handleSaveTransaction}
+                  variant={modalType === 'GAVE' ? 'danger' : 'success'}
+                  loading={isSubmitting}
+                  size="lg"
+                />
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -342,6 +635,16 @@ export default function CustomerDetailScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+  },
+  centerContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  infoText: {
+    fontSize: 15,
+    fontWeight: '600',
   },
   header: {
     flexDirection: 'row',
@@ -462,6 +765,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  txTextContainer: {
+    flex: 1,
+  },
   txDescription: {
     fontSize: 13,
     fontWeight: '600',
@@ -470,9 +776,20 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 2,
   },
+  txRightCol: {
+    alignItems: 'flex-end',
+    gap: 2,
+  },
   txAmount: {
     fontSize: 14,
     fontWeight: '700',
+  },
+  voidBtn: {
+    paddingVertical: 2,
+  },
+  voidText: {
+    fontSize: 10,
+    fontWeight: '600',
   },
   bottomActionBar: {
     flexDirection: 'row',
@@ -495,24 +812,54 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.3,
   },
-  notFoundContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  notFoundText: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 16,
-  },
   backBtn: {
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
+    marginTop: 12,
   },
   backBtnText: {
     color: '#FFFFFF',
     fontWeight: '600',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    padding: 20,
+    paddingBottom: 36,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  modalTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  modalIconBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  modalBody: {
+    gap: 4,
+  },
+  modalBtnRow: {
+    marginTop: 10,
   },
 });

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -16,10 +16,15 @@ import { AppTextInput } from '../../components/AppTextInput';
 import { CustomerCard } from '../../components/CustomerCard';
 import { EmptyState } from '../../components/EmptyState';
 import {
-  INITIAL_CUSTOMERS,
-  calculateSummaryTotals,
-} from '../../data/mockStore';
-import { Customer, formatINR, getBalanceType } from '../../types/customer';
+  Customer,
+  formatINR,
+  getBalanceType,
+  calculateLedgerTotals,
+} from '../../types/customer';
+import {
+  getCustomers,
+  subscribeToRepository,
+} from '../../storage/localLedgerRepository';
 
 type FilterType = 'ALL' | 'GET' | 'GIVE' | 'SETTLED';
 type SortType = 'RECENT' | 'AMOUNT' | 'NAME';
@@ -28,13 +33,29 @@ export default function CustomersScreen() {
   const { colors, spacing, borderRadius, toggleTheme, isDark } = useTheme();
   const { t, language, setLanguage } = useLanguage();
 
-  const [customers] = useState<Customer[]>(INITIAL_CUSTOMERS);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterType>('ALL');
   const [activeSort, setActiveSort] = useState<SortType>('RECENT');
 
+  useEffect(() => {
+    let isMounted = true;
+    const load = async () => {
+      const data = await getCustomers();
+      if (isMounted) setCustomers(data);
+    };
+    load();
+    const unsubscribe = subscribeToRepository(() => {
+      load();
+    });
+    return () => {
+      isMounted = false;
+      unsubscribe();
+    };
+  }, []);
+
   // Calculate summary totals
-  const summary = useMemo(() => calculateSummaryTotals(customers), [customers]);
+  const summary = useMemo(() => calculateLedgerTotals(customers), [customers]);
 
   // Filter and sort customer list
   const filteredCustomers = useMemo(() => {

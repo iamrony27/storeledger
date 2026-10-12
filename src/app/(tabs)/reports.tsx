@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,8 +11,15 @@ import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { AppIcon } from '../../components/AppIcon';
 import { AppButton } from '../../components/AppButton';
-import { INITIAL_CUSTOMERS, calculateSummaryTotals } from '../../data/mockStore';
-import { formatINR } from '../../types/customer';
+import {
+  Customer,
+  formatINR,
+  calculateLedgerTotals,
+} from '../../types/customer';
+import {
+  getCustomers,
+  subscribeToRepository,
+} from '../../storage/localLedgerRepository';
 
 type DateFilter = 'TODAY' | 'WEEK' | 'MONTH' | 'ALL';
 
@@ -20,8 +27,24 @@ export default function ReportsScreen() {
   const { colors, spacing, borderRadius } = useTheme();
   const { t } = useLanguage();
   const [dateFilter, setDateFilter] = useState<DateFilter>('ALL');
+  const [customers, setCustomers] = useState<Customer[]>([]);
 
-  const summary = calculateSummaryTotals(INITIAL_CUSTOMERS);
+  const loadData = async () => {
+    const list = await getCustomers();
+    setCustomers(list);
+  };
+
+  useEffect(() => {
+    loadData();
+    const unsubscribe = subscribeToRepository(() => {
+      loadData();
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  const summary = calculateLedgerTotals(customers);
 
   return (
     <SafeAreaView
@@ -135,7 +158,7 @@ export default function ReportsScreen() {
               {formatINR(summary.youWillGetPaise)}
             </Text>
             <Text style={[styles.metricFootnote, { color: colors.textMuted }]}>
-              From {INITIAL_CUSTOMERS.filter((c) => c.currentBalancePaise > 0).length} customers
+              From {customers.filter((c) => c.currentBalancePaise > 0).length} customers
             </Text>
           </View>
 
@@ -172,7 +195,7 @@ export default function ReportsScreen() {
               {formatINR(summary.youWillGivePaise)}
             </Text>
             <Text style={[styles.metricFootnote, { color: colors.textMuted }]}>
-              To {INITIAL_CUSTOMERS.filter((c) => c.currentBalancePaise < 0).length} customers
+              To {customers.filter((c) => c.currentBalancePaise < 0).length} customers
             </Text>
           </View>
         </View>
@@ -214,14 +237,14 @@ export default function ReportsScreen() {
             Ledger Customer Breakdown
           </Text>
 
-          {INITIAL_CUSTOMERS.map((cust, idx) => (
+          {customers.map((cust, idx) => (
             <View
               key={cust.id}
               style={[
                 styles.customerRow,
                 {
                   borderBottomColor:
-                    idx === INITIAL_CUSTOMERS.length - 1
+                    idx === customers.length - 1
                       ? 'transparent'
                       : colors.borderLight,
                 },

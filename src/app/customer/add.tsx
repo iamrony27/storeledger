@@ -15,6 +15,8 @@ import { useLanguage } from '../../i18n/LanguageContext';
 import { AppIcon } from '../../components/AppIcon';
 import { AppTextInput } from '../../components/AppTextInput';
 import { AppButton } from '../../components/AppButton';
+import { rupeesToPaise } from '../../types/customer';
+import { createCustomer } from '../../storage/localLedgerRepository';
 
 export default function AddCustomerScreen() {
   const { colors, spacing, borderRadius } = useTheme();
@@ -25,6 +27,7 @@ export default function AddCustomerScreen() {
   const [address, setAddress] = useState('');
   const [openingBalance, setOpeningBalance] = useState('');
   const [balanceType, setBalanceType] = useState<'GET' | 'GIVE'>('GET');
+  const [isSaving, setIsSaving] = useState(false);
 
   const [nameError, setNameError] = useState('');
   const [phoneError, setPhoneError] = useState('');
@@ -49,10 +52,29 @@ export default function AddCustomerScreen() {
     return isValid;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validate()) return;
-    // In Phase 2, this verifies the UI and validation flow. In Phase 3, this persists to local SQLite.
-    router.back();
+    setIsSaving(true);
+    try {
+      let openingPaise = 0;
+      if (openingBalance.trim()) {
+        const absPaise = rupeesToPaise(openingBalance);
+        openingPaise = balanceType === 'GET' ? absPaise : -absPaise;
+      }
+
+      await createCustomer({
+        name,
+        phone,
+        address: address || undefined,
+        openingBalancePaise: openingPaise,
+      });
+
+      router.back();
+    } catch (err) {
+      console.error('Failed to create customer:', err);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (

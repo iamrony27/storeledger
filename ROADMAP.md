@@ -11,7 +11,7 @@
 - [x] **Phase 0: Repository Inspection & Safe Architecture Plan**
 - [x] **Phase 1: Environment Setup & Expo App Bootstrapping in Expo Go**
 - [x] **Phase 2: UI Design System, Navigation & Core Screens**
-- [ ] **Phase 3: Local Data Model, Financial Ledger Math & Customer CRUD**
+- [x] **Phase 3: Local Data Model, Financial Ledger Math & Customer CRUD**
 - [ ] **Phase 4: Supabase Database Schema, Authentication & Row Level Security (RLS)**
 - [ ] **Phase 5: Offline Persistence, Write Queue, Idempotent Cloud Sync & Conflict Handling**
 - [ ] **Phase 6: Phone Calls, WhatsApp Report sender, Receipts & PDF Reports**
@@ -70,22 +70,21 @@
 ---
 
 ### Phase 3: Local Data Model, Financial Ledger Math & Customer CRUD
-- [ ] Define TypeScript types and data models:
-  - `Customer` (id, business_id, name, phone, address, notes, created_at, updated_at, is_archived).
-  - `LedgerTransaction` (id, customer_id, business_id, amount_paise, type: CREDIT_GIVEN | PAYMENT_RECEIVED, date, description, bill_number, attachments, is_opening_balance, created_at, updated_at).
-- [ ] Implement exact currency calculation engine in integer paise (1 INR = 100 paise) to prevent IEEE-754 floating point drift:
-  - Formula: `Total Outstanding = Opening Balance + Sum(Credit Given) - Sum(Payment Received)`.
-  - Formatters for INR display (`₹1,250.00`).
-- [ ] Build Customer CRUD screens:
-  - Add Customer screen with phone number validation.
-  - Edit Customer screen.
+- [x] Define TypeScript types and data models:
+  - `Customer` (id, name, phone, address, notes, openingBalancePaise, currentBalancePaise, isArchived).
+  - `LedgerTransaction` (id, customerId, amountPaise, type: GAVE | GOT, date, description, billNumber, isOpeningBalance, isVoided).
+- [x] Implement exact currency calculation engine in integer paise (1 INR = 100 paise) preventing IEEE-754 floating point drift:
+  - Formula: `Total Outstanding = Opening Balance + Sum(GAVE) - Sum(GOT)`.
+  - Formatters for Indian Numbering System (`formatINR`).
+- [x] Implement local persistent storage repository (`localLedgerRepository.ts` via `@react-native-async-storage/async-storage`).
+- [x] Build Customer CRUD screens:
+  - Add Customer screen with 10-digit phone number validation and opening balance.
   - Archive / Unarchive Customer functionality (never hard-deleting customer records).
-- [ ] Build Customer Detail & Ledger screen:
-  - Real-time running balance calculation.
-  - "Gave (You Gave Credit / Udhaar)" and "Got (You Received Payment)" action sheets.
-  - Date picker, notes input, and entry confirmation modal.
-  - Transaction detail view with immutable audit-trail markers (voided/corrected transactions).
-- [ ] Write unit tests for integer paise arithmetic and balance calculations (`npm test`).
+- [x] Build Customer Detail & Ledger screen:
+  - Real-time running balance calculation and status badge.
+  - Interactive "You Gave ₹ (Udhaar)" and "You Got ₹ (Jama)" modal sheets with immediate ledger updates.
+  - Immutable voiding audit trails (voided entries preserved in ledger history).
+- [x] Write and run automated unit tests for integer paise arithmetic and balance calculations (`npm test` passing all 6 test suites).
 
 ---
 

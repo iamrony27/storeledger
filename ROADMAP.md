@@ -14,7 +14,7 @@
 - [ ] **Phase 3: Local Data Model, Financial Ledger Math & Customer CRUD**
 - [ ] **Phase 4: Supabase Database Schema, Authentication & Row Level Security (RLS)**
 - [ ] **Phase 5: Offline Persistence, Write Queue, Idempotent Cloud Sync & Conflict Handling**
-- [ ] **Phase 6: Phone Calls, WhatsApp Integration, Receipts & PDF Reports**
+- [ ] **Phase 6: Phone Calls, WhatsApp Report sender, Receipts & PDF Reports**
 - [ ] **Phase 7: Khatabook PDF Current-Balance Importer & Reconciliation Engine**
 - [ ] **Phase 8: Comprehensive Automated Testing, Security Review & Accessibility**
 - [ ] **Phase 9: Android Device Testing, EAS APK Build & Deployment Guide**

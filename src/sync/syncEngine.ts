@@ -209,7 +209,21 @@ class SyncEngine {
 
     for (const item of outbox) {
       try {
-        if (item.entity === 'customer') {
+        if (item.action === 'delete') {
+          if (item.entity === 'customer') {
+            const { error } = await supabase
+              .from('customers')
+              .delete()
+              .eq('id', item.recordId);
+            if (error) throw error;
+          } else if (item.entity === 'transaction') {
+            const { error } = await supabase
+              .from('ledger_transactions')
+              .delete()
+              .eq('id', item.recordId);
+            if (error) throw error;
+          }
+        } else if (item.entity === 'customer') {
           const cust = item.payload as Customer;
           const { error } = await supabase.from('customers').upsert(
             {

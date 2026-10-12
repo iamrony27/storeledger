@@ -31,6 +31,7 @@ import {
   getCustomerTransactions,
   addTransaction,
   archiveCustomer,
+  deleteCustomer,
   voidTransaction,
   subscribeToRepository,
 } from '../../storage/localLedgerRepository';
@@ -227,6 +228,38 @@ export default function CustomerDetailScreen() {
     router.back();
   };
 
+  const handleDeleteCustomer = () => {
+    if (!customer) return;
+
+    const balanceWarning =
+      customer.currentBalancePaise !== 0
+        ? `\n\nNotice: This customer has an active balance of ${formatINR(
+            customer.currentBalancePaise
+          )} (${getBalanceType(customer.currentBalancePaise) === 'GET' ? "You'll Get" : "You'll Give"}).`
+        : '';
+
+    Alert.alert(
+      'Delete Customer',
+      `Are you sure you want to permanently delete ${customer.name}? All ${transactions.length} recorded transaction(s) will be permanently deleted.${balanceWarning}\n\nThis action cannot be undone.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete Permanently',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteCustomer(customer.id);
+              Alert.alert('Customer Deleted', `${customer.name} was removed from your ledger.`);
+              router.replace('/(tabs)');
+            } catch (err: any) {
+              Alert.alert('Error', err?.message || 'Failed to delete customer.');
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <SafeAreaView
       edges={['top', 'left', 'right', 'bottom']}
@@ -312,19 +345,15 @@ export default function CustomerDetailScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={handleToggleArchive}
+            onPress={handleDeleteCustomer}
             accessibilityRole="button"
-            accessibilityLabel={customer.isArchived ? 'Unarchive customer account' : 'Archive customer account'}
+            accessibilityLabel={`Delete ${customer.name}`}
             style={[
               styles.iconBtn,
-              { backgroundColor: colors.borderLight, borderRadius: borderRadius.sm },
+              { backgroundColor: colors.dangerBg, borderRadius: borderRadius.sm },
             ]}
           >
-            <AppIcon
-              name={customer.isArchived ? 'refresh-cw' : 'archive'}
-              size={16}
-              color={colors.textSecondary}
-            />
+            <AppIcon name="trash-2" size={16} color={colors.danger} />
           </TouchableOpacity>
         </View>
       </View>
@@ -654,6 +683,47 @@ export default function CustomerDetailScreen() {
               );
             })
           )}
+        </View>
+
+        {/* Customer Account Management & Danger Zone */}
+        <View
+          style={[
+            styles.dangerCard,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+              borderRadius: borderRadius.lg,
+            },
+          ]}
+        >
+          <View style={styles.dangerHeaderRow}>
+            <AppIcon name="shield-alert" family="material" size={18} color={colors.danger} />
+            <Text style={[styles.dangerCardTitle, { color: colors.textPrimary }]}>
+              Customer Account Management
+            </Text>
+          </View>
+
+          <Text style={[styles.dangerCardDesc, { color: colors.textSecondary }]}>
+            Permanently delete this customer and remove all {transactions.length} transaction entries from your ledger records.
+          </Text>
+
+          <View style={styles.dangerBtnRow}>
+            <AppButton
+              title="Delete Customer"
+              variant="outline"
+              iconName="trash-2"
+              onPress={handleDeleteCustomer}
+              style={{ borderColor: colors.danger, flex: 1 }}
+              textStyle={{ color: colors.danger }}
+            />
+            <AppButton
+              title={customer.isArchived ? 'Unarchive' : 'Archive'}
+              variant="outline"
+              iconName={customer.isArchived ? 'refresh-cw' : 'archive'}
+              onPress={handleToggleArchive}
+              style={{ flex: 1 }}
+            />
+          </View>
         </View>
       </ScrollView>
 
@@ -1088,5 +1158,30 @@ const styles = StyleSheet.create({
   txTypeTagText: {
     fontSize: 10,
     fontWeight: '700',
+  },
+  dangerCard: {
+    borderWidth: 1,
+    padding: 16,
+    marginTop: 16,
+    marginBottom: 20,
+    gap: 10,
+  },
+  dangerHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  dangerCardTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  dangerCardDesc: {
+    fontSize: 12,
+    lineHeight: 18,
+  },
+  dangerBtnRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 6,
   },
 });

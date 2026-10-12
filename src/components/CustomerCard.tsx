@@ -14,6 +14,7 @@ import { Badge } from './Badge';
 interface CustomerCardProps {
   customer: Customer;
   onPress: () => void;
+  onLongPress?: () => void;
   onCall?: () => void;
   onWhatsApp?: () => void;
 }
@@ -21,6 +22,7 @@ interface CustomerCardProps {
 export const CustomerCard: React.FC<CustomerCardProps> = ({
   customer,
   onPress,
+  onLongPress,
   onCall,
   onWhatsApp,
 }) => {
@@ -85,6 +87,7 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onPress}
+      onLongPress={onLongPress}
       accessibilityRole="button"
       accessibilityLabel={`${customer.name}, Balance: ${formatINR(customer.currentBalancePaise)}, ${getBalanceLabel()}`}
       accessibilityHint="Open customer ledger details"

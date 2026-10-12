@@ -166,4 +166,24 @@ assert(
   'Amount in paise must strictly be an integer'
 );
 
+// 4. Testing Deletion Action Outbox Invariant
+console.log('4. Testing Outbox Deletion Queue Invariants...');
+let deleteTestQueue: SyncQueueItem[] = [];
+deleteTestQueue = simulateAddToOutbox(deleteTestQueue, {
+  entity: 'customer',
+  action: 'insert',
+  recordId: 'cust-101',
+  payload: { id: 'cust-101' },
+});
+deleteTestQueue = simulateAddToOutbox(deleteTestQueue, {
+  entity: 'customer',
+  action: 'delete',
+  recordId: 'cust-101',
+  payload: { id: 'cust-101' },
+});
+assertEquals(deleteTestQueue.length, 2, 'deleteTestQueue should have 2 items (insert and delete)');
+const deleteItem = deleteTestQueue.find((q) => q.action === 'delete');
+assert(Boolean(deleteItem), 'Queue must contain delete action');
+assertEquals(deleteItem?.recordId, 'cust-101', 'Delete item must target cust-101');
+
 console.log('\nAll Sync Engine & Conflict Resolution test suites passed successfully!\n');

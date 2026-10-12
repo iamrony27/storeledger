@@ -256,6 +256,38 @@ export async function archiveCustomer(
 }
 
 /**
+ * Permanently delete a customer and all their ledger transactions.
+ */
+export async function deleteCustomer(id: string): Promise<void> {
+  await initializeIfNeeded();
+  if (!customersCache || !transactionsCache) {
+    throw new Error('Repository not initialized');
+  }
+
+  const index = customersCache.findIndex((c) => c.id === id);
+  if (index === -1) {
+    throw new Error(`Customer with ID ${id} not found`);
+  }
+
+  // Remove customer from cache
+  customersCache.splice(index, 1);
+
+  // Remove all ledger transactions for this customer
+  delete transactionsCache[id];
+
+  // Enqueue deletion in sync engine
+  await syncEngine.addToOutbox({
+    entity: 'customer',
+    action: 'delete',
+    recordId: id,
+    payload: { id },
+  });
+
+  await persist();
+  notifyListeners();
+}
+
+/**
  * Retrieve transactions for a specific customer
  */
 export async function getCustomerTransactions(

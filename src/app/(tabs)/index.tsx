@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -27,6 +28,7 @@ import {
 } from '../../types/customer';
 import {
   getCustomers,
+  deleteCustomer,
   subscribeToRepository,
 } from '../../storage/localLedgerRepository';
 
@@ -106,6 +108,40 @@ export default function CustomersScreen() {
         return 0;
       });
   }, [customers, searchQuery, activeFilter, activeSort]);
+
+  const handleCustomerLongPress = (cust: Customer) => {
+    Alert.alert(
+      cust.name,
+      `Phone: ${cust.phone || 'N/A'}\nBalance: ${formatINR(cust.currentBalancePaise)} (${getBalanceType(cust.currentBalancePaise) === 'GET' ? "You'll Get" : "You'll Give"})`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Open Ledger',
+          onPress: () => router.push(`/customer/${cust.id}` as any),
+        },
+        {
+          text: 'Delete Customer',
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              'Delete Customer',
+              `Are you sure you want to permanently delete ${cust.name}? All ledger records for this customer will be removed.`,
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Delete Permanently',
+                  style: 'destructive',
+                  onPress: async () => {
+                    await deleteCustomer(cust.id);
+                  },
+                },
+              ]
+            );
+          },
+        },
+      ]
+    );
+  };
 
   // Language cycle toggle
   const cycleLanguage = () => {
@@ -425,6 +461,7 @@ export default function CustomersScreen() {
           <CustomerCard
             customer={item}
             onPress={() => router.push(`/customer/${item.id}` as any)}
+            onLongPress={() => handleCustomerLongPress(item)}
           />
         )}
         ListEmptyComponent={

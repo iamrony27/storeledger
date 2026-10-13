@@ -1,6 +1,7 @@
 import 'react-native-url-polyfill/auto';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { validateSupabaseConfig } from './supabaseConfig';
 
 // Database Row Types
 export interface ProfileRow {
@@ -50,8 +51,6 @@ export interface ImportBatchRow {
   created_at: string;
   updated_at: string;
 }
-
-import { validateSupabaseConfig } from './supabaseConfig';
 
 const STORAGE_KEY_CONFIG = '@gwd_book:custom_supabase_config_v1';
 

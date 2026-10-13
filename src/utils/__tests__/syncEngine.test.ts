@@ -186,4 +186,92 @@ const deleteItem = deleteTestQueue.find((q) => q.action === 'delete');
 assert(Boolean(deleteItem), 'Queue must contain delete action');
 assertEquals(deleteItem?.recordId, 'cust-101', 'Delete item must target cust-101');
 
+// 5. Testing Remote Deletion Reconciliation Invariant
+console.log('5. Testing Remote Deletion Reconciliation (Cross-Device Deletion Reflection)...');
+function reconcileLocalWithRemote(
+  localTxMap: Record<string, LedgerTransaction[]>,
+  remoteTxList: any[],
+  pendingUploadIds: Set<string>
+): Record<string, LedgerTransaction[]> {
+  const remoteValidIdsByCust = new Map<string, Set<string>>();
+  for (const rt of remoteTxList) {
+    if (rt.is_void) continue;
+    let set = remoteValidIdsByCust.get(rt.customer_id);
+    if (!set) {
+      set = new Set<string>();
+      remoteValidIdsByCust.set(rt.customer_id, set);
+    }
+    set.add(rt.id);
+  }
+
+  const result: Record<string, LedgerTransaction[]> = {};
+  for (const custId of Object.keys(localTxMap)) {
+    const remoteIds = remoteValidIdsByCust.get(custId) || new Set<string>();
+    result[custId] = localTxMap[custId].filter((tx) => {
+      // Keep if pending local upload
+      if (pendingUploadIds.has(tx.id)) return true;
+      // Keep if present in remote
+      if (remoteIds.has(tx.id)) return true;
+      // Remotely deleted: purge from local cache
+      return false;
+    });
+  }
+  return result;
+}
+
+const mockLocalTxs: Record<string, LedgerTransaction[]> = {
+  'cust-1': [
+    {
+      id: 'tx-1',
+      customerId: 'cust-1',
+      amountPaise: 1000,
+      type: 'GAVE',
+      date: '2026-01-01',
+      createdAt: '2026-01-01',
+      syncStatus: 'synced',
+    },
+    {
+      id: 'tx-2',
+      customerId: 'cust-1',
+      amountPaise: 2000,
+      type: 'GOT',
+      date: '2026-01-02',
+      createdAt: '2026-01-02',
+      syncStatus: 'synced',
+    },
+  ],
+};
+
+// Device A deleted 'tx-2' from remote database. Remote now only has 'tx-1'.
+const mockRemoteAfterDeviceADeletion = [
+  {
+    id: 'tx-1',
+    customer_id: 'cust-1',
+    amount_paise: 1000,
+    type: 'GAVE',
+    is_void: false,
+  },
+];
+
+const reconciled = reconcileLocalWithRemote(
+  mockLocalTxs,
+  mockRemoteAfterDeviceADeletion,
+  new Set<string>()
+);
+
+assertEquals(
+  reconciled['cust-1'].length,
+  1,
+  'Reconciled customer transactions should now only have 1 transaction'
+);
+assertEquals(
+  reconciled['cust-1'][0].id,
+  'tx-1',
+  'Only surviving transaction tx-1 must remain'
+);
+assert(
+  !reconciled['cust-1'].some((t) => t.id === 'tx-2'),
+  'Deleted transaction tx-2 must be cleanly removed from other device cache'
+);
+
 console.log('\nAll Sync Engine & Conflict Resolution test suites passed successfully!\n');

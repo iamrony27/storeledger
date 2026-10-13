@@ -21,17 +21,20 @@ interface AppTextInputProps extends TextInputProps {
   containerStyle?: ViewStyle;
 }
 
-export const AppTextInput: React.FC<AppTextInputProps> = ({
-  label,
-  error,
-  iconName,
-  iconFamily = 'feather',
-  prefixText,
-  onClear,
-  containerStyle,
-  value,
-  ...rest
-}) => {
+export const AppTextInput = React.forwardRef<TextInput, AppTextInputProps>((
+  {
+    label,
+    error,
+    iconName,
+    iconFamily = 'feather',
+    prefixText,
+    onClear,
+    containerStyle,
+    value,
+    ...rest
+  },
+  ref
+) => {
   const { colors, borderRadius, spacing, typography } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
 
@@ -82,6 +85,7 @@ export const AppTextInput: React.FC<AppTextInputProps> = ({
           </View>
         )}
         <TextInput
+          ref={ref}
           accessibilityLabel={label || rest.placeholder}
           {...rest}
           value={value}
@@ -112,7 +116,9 @@ export const AppTextInput: React.FC<AppTextInputProps> = ({
       )}
     </View>
   );
-};
+});
+
+AppTextInput.displayName = 'AppTextInput';
 
 const styles = StyleSheet.create({
   container: {

@@ -29,19 +29,19 @@ if (Platform.OS === 'web' && typeof window !== 'undefined') {
 }
 
 function RootLayoutContent() {
-  const { isDark, colors } = useTheme();
+  const { colors } = useTheme();
 
   return (
     <>
-      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <StatusBar style="light" />
       <Stack
         screenOptions={{
           headerShown: false,
           contentStyle: { backgroundColor: colors.background },
-          animation: 'fade_from_bottom',
+          animation: 'slide_from_right',
         }}
       >
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="(tabs)" options={{ headerShown: false, animation: 'fade' }} />
         <Stack.Screen
           name="auth/login"
           options={{
@@ -62,6 +62,13 @@ function RootLayoutContent() {
             headerShown: false,
             presentation: 'modal',
             animation: 'slide_from_bottom',
+          }}
+        />
+        <Stack.Screen
+          name="import"
+          options={{
+            headerShown: false,
+            animation: 'slide_from_right',
           }}
         />
       </Stack>

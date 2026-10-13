@@ -3,9 +3,20 @@ import { SupportedLanguage } from '../i18n/translations';
 import {
   cleanPhoneNumber,
   getLocalizedReminderText,
+  formatCustomerDueShareMessage,
+  findCustomerLastPayment,
+  LastPaymentInfo,
+  DueReminderShareOptions,
 } from './reminderMessages';
 
-export { cleanPhoneNumber, getLocalizedReminderText };
+export {
+  cleanPhoneNumber,
+  getLocalizedReminderText,
+  formatCustomerDueShareMessage,
+  findCustomerLastPayment,
+  LastPaymentInfo,
+  DueReminderShareOptions,
+};
 
 /**
  * Initiates a phone call using native phone dialer.
@@ -34,7 +45,8 @@ export async function makePhoneCall(phoneNumber: string): Promise<boolean> {
 }
 
 /**
- * Opens WhatsApp Click-to-Chat with the pre-formatted reminder text.
+ * Opens WhatsApp Click-to-Chat with the pre-formatted executive reminder text
+ * including customer total due, last paid amount & payment date, and multi-lingual greeting.
  * Falls back to WhatsApp Web if the native app cannot be invoked.
  */
 export async function openWhatsAppReminder(options: {
@@ -42,6 +54,8 @@ export async function openWhatsAppReminder(options: {
   customerName: string;
   balancePaise: number;
   businessName: string;
+  businessPhone?: string | null;
+  lastPayment?: LastPaymentInfo | null;
   language?: SupportedLanguage;
 }): Promise<boolean> {
   const clean = cleanPhoneNumber(options.phoneNumber);
@@ -50,12 +64,14 @@ export async function openWhatsAppReminder(options: {
     return false;
   }
 
-  const message = getLocalizedReminderText(
-    options.customerName,
-    options.balancePaise,
-    options.businessName,
-    options.language || 'en'
-  );
+  const message = formatCustomerDueShareMessage({
+    customerName: options.customerName,
+    balancePaise: options.balancePaise,
+    businessName: options.businessName,
+    businessPhone: options.businessPhone,
+    lastPayment: options.lastPayment,
+    language: options.language || 'en',
+  });
 
   const encodedMsg = encodeURIComponent(message);
   const nativeUrl = `whatsapp://send?phone=${clean}&text=${encodedMsg}`;

@@ -20,6 +20,7 @@ export interface Translations {
   tabs: {
     customers: string;
     reports: string;
+    transactions: string;
     import: string;
     settings: string;
   };
@@ -27,6 +28,9 @@ export interface Translations {
     netBalance: string;
     youWillGet: string;
     youWillGive: string;
+    todaysDue: string;
+    todaysDueSubtitle: string;
+    todaysCollected: string;
     searchPlaceholder: string;
     addCustomer: string;
     filterAll: string;
@@ -116,18 +120,22 @@ export const translations: Record<SupportedLanguage, Translations> = {
     tabs: {
       customers: 'Customers',
       reports: 'Reports',
+      transactions: 'History',
       import: 'Import',
       settings: 'Settings',
     },
     dashboard: {
       netBalance: 'Net Balance',
       youWillGet: "You'll Get",
-      youWillGive: "You'll Give",
+      youWillGive: "You Got",
+      todaysDue: "Today's Due",
+      todaysDueSubtitle: "Credit given today",
+      todaysCollected: "Collected",
       searchPlaceholder: 'Search customer name or phone...',
       addCustomer: 'Add Customer',
       filterAll: 'All',
       filterGet: "You'll Get",
-      filterGive: "You'll Give",
+      filterGive: "You Got",
       filterSettled: 'Settled',
       sortByRecent: 'Recent',
       sortByAmount: 'Amount',
@@ -142,13 +150,13 @@ export const translations: Record<SupportedLanguage, Translations> = {
       call: 'Call',
       whatsapp: 'WhatsApp',
       statement: 'Report',
-      youGave: 'You Gave ₹',
-      youGot: 'You Got ₹',
+      youGave: 'You Gave',
+      youGot: 'You Got',
       transactions: 'Transaction History',
       noTransactions: 'No transactions recorded yet.',
       currentBalance: 'Net Balance',
-      totalGave: 'Total You Gave',
-      totalGot: 'Total You Got',
+      totalGave: 'You Gave',
+      totalGot: 'You Got',
       netAmount: 'Net Amount',
     },
     addCustomer: {
@@ -172,10 +180,10 @@ export const translations: Record<SupportedLanguage, Translations> = {
       totalPayable: 'Total Payable',
     },
     importer: {
-      title: 'Khatabook PDF Import',
-      subtitle: 'Import customer balances directly from Khatabook PDF',
-      selectPdf: 'Select Khatabook PDF File',
-      previewTitle: 'Extracted Balances Preview',
+      title: 'Demo Data Import',
+      subtitle: 'Import Golden Weigh Bridge sample customer accounts',
+      selectPdf: 'Import Mock Dataset',
+      previewTitle: 'Sample Customer Balances Preview',
       importButton: 'Confirm & Import Customers',
     },
     settings: {
@@ -208,20 +216,24 @@ export const translations: Record<SupportedLanguage, Translations> = {
       error: 'ত্রুটি',
     },
     tabs: {
-      customers: 'গ্রাহক তালিকা',
+      customers: 'গ্রাহক',
       reports: 'রিপোর্ট',
+      transactions: 'লেনদেন',
       import: 'ইম্পোর্ট',
       settings: 'সেটিংস',
     },
     dashboard: {
       netBalance: 'মোট ব্যালেন্স',
       youWillGet: 'আপনি পাবেন',
-      youWillGive: 'আপনি দেবেন',
+      youWillGive: 'আপনি পেয়েছেন',
+      todaysDue: 'আজকের বাকি',
+      todaysDueSubtitle: 'আজকে দেওয়া বাকি',
+      todaysCollected: 'জমা',
       searchPlaceholder: 'নাম বা মোবাইল নম্বর দিয়ে খুঁজুন...',
       addCustomer: 'নতুন গ্রাহক যোগ করুন',
       filterAll: 'সব',
       filterGet: 'পাবেন',
-      filterGive: 'দেবেন',
+      filterGive: 'পেয়েছেন',
       filterSettled: 'পরিশোধিত',
       sortByRecent: 'সাম্প্রতিক',
       sortByAmount: 'টাকার পরিমাণ',
@@ -236,13 +248,13 @@ export const translations: Record<SupportedLanguage, Translations> = {
       call: 'কল করুন',
       whatsapp: 'হোয়াটসঅ্যাপ',
       statement: 'রিপোর্ট',
-      youGave: 'আপনি দিয়েছেন ₹',
-      youGot: 'আপনি পেয়েছেন ₹',
+      youGave: 'You Gave',
+      youGot: 'You Got',
       transactions: 'লেনদেনের বিবরণ',
       noTransactions: 'এখনও কোনো লেনদেন লিপিবদ্ধ করা হয়নি।',
       currentBalance: 'বর্তমান ব্যালেন্স',
-      totalGave: 'মোট দিয়েছেন',
-      totalGot: 'মোট পেয়েছেন',
+      totalGave: 'You Gave',
+      totalGot: 'You Got',
       netAmount: 'নিট ব্যালেন্স',
     },
     addCustomer: {
@@ -266,10 +278,10 @@ export const translations: Record<SupportedLanguage, Translations> = {
       totalPayable: 'মোট দেনা',
     },
     importer: {
-      title: 'খাতাবুক PDF ইম্পোর্ট',
-      subtitle: 'খাতাবুক রিপোর্ট থেকে সরাসরি গ্রাহক ব্যালেন্স আনুন',
-      selectPdf: 'খাতাবুক PDF ফাইল নির্বাচন করুন',
-      previewTitle: 'এক্সট্র্যাক্ট করা ব্যালেন্স প্রিভিউ',
+      title: 'ডেমো ডাটা ইম্পোর্ট',
+      subtitle: 'গোল্ডেন ওয়ে ব্রিজ ডেমো গ্রাহক অ্যাকাউন্ট যুক্ত করুন',
+      selectPdf: 'মক ডাটা ইম্পোর্ট',
+      previewTitle: 'গ্রাহক ব্যালেন্স প্রিভিউ',
       importButton: 'নিশ্চিত করুন এবং ইম্পোর্ট করুন',
     },
     settings: {
@@ -302,20 +314,24 @@ export const translations: Record<SupportedLanguage, Translations> = {
       error: 'त्रुटि',
     },
     tabs: {
-      customers: 'ग्राहक सूची',
+      customers: 'ग्राहक',
       reports: 'रिपोर्ट',
+      transactions: 'लेन-देन',
       import: 'इंपोर्ट',
       settings: 'सेटिंग्स',
     },
     dashboard: {
       netBalance: 'कुल बैलेंस',
       youWillGet: 'आपको मिलेगा',
-      youWillGive: 'आपको देना है',
+      youWillGive: 'आपको मिला',
+      todaysDue: 'आज का उधार',
+      todaysDueSubtitle: 'आज दिया गया उधार',
+      todaysCollected: 'वसूली',
       searchPlaceholder: 'ग्राहक का नाम या फोन नंबर खोजें...',
       addCustomer: 'नया ग्राहक जोड़ें',
       filterAll: 'सभी',
       filterGet: 'मिलेगा',
-      filterGive: 'देना है',
+      filterGive: 'मिला',
       filterSettled: 'हिसाब चुकता',
       sortByRecent: 'हाल के',
       sortByAmount: 'रकम अनुसार',
@@ -330,13 +346,13 @@ export const translations: Record<SupportedLanguage, Translations> = {
       call: 'कॉल करें',
       whatsapp: 'व्हाट्सएप',
       statement: 'रिपोर्ट',
-      youGave: 'आपने दिए ₹',
-      youGot: 'आपको मिले ₹',
+      youGave: 'You Gave',
+      youGot: 'You Got',
       transactions: 'लेन-देन इतिहास',
       noTransactions: 'अभी तक कोई लेन-देन दर्ज नहीं है।',
       currentBalance: 'वर्तमान बैलेंस',
-      totalGave: 'कुल दिया',
-      totalGot: 'कुल मिला',
+      totalGave: 'You Gave',
+      totalGot: 'You Got',
       netAmount: 'कुल शेष',
     },
     addCustomer: {
@@ -360,10 +376,10 @@ export const translations: Record<SupportedLanguage, Translations> = {
       totalPayable: 'कुल देना है',
     },
     importer: {
-      title: 'खाताबुक PDF इंपोर्ट',
-      subtitle: 'खाताबुक रिपोर्ट से सीधे ग्राहक बैलेंस लाएं',
-      selectPdf: 'खाताबुक PDF फ़ाइल चुनें',
-      previewTitle: 'निकाला गया बैलेंस पूर्वावलोकन',
+      title: 'डेमो डेटा इंपोर्ट',
+      subtitle: 'गोल्डन वे ब्रिज सैंपल ग्राहक खाते जोड़ें',
+      selectPdf: 'मॉक डेटा इंपोर्ट करें',
+      previewTitle: 'ग्राहक बैलेंस पूर्वावलोकन',
       importButton: 'पुष्टि करें और इंपोर्ट करें',
     },
     settings: {

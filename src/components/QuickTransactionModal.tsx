@@ -1,0 +1,788 @@
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Modal,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+  Keyboard,
+} from 'react-native';
+import { router } from 'expo-router';
+import { useTheme } from '../theme/ThemeContext';
+import { AppIcon } from './AppIcon';
+import { AppTextInput } from './AppTextInput';
+import { AppButton } from './AppButton';
+import { TransactionDatePicker } from './TransactionDatePicker';
+import {
+  Customer,
+  LedgerTransaction,
+  formatINR,
+  getBalanceType,
+  rupeesToPaise,
+} from '../types/customer';
+import {
+  getCustomers,
+  getAllTransactionsList,
+  addTransaction,
+} from '../storage/localLedgerRepository';
+
+interface QuickTransactionModalProps {
+  visible: boolean;
+  onClose: () => void;
+  onSuccess?: (customerId: string) => void;
+  initialCustomerId?: string;
+  initialType?: 'GAVE' | 'GOT';
+}
+
+export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
+  visible,
+  onClose,
+  onSuccess,
+  initialCustomerId,
+  initialType,
+}) => {
+  const { colors, spacing, borderRadius } = useTheme();
+
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [transactions, setTransactions] = useState<LedgerTransaction[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+
+  // Form State
+  const [txType, setTxType] = useState<'GAVE' | 'GOT'>('GAVE');
+  const [amount, setAmount] = useState('');
+  const [date, setDate] = useState<string>(new Date().toISOString());
+  const [description, setDescription] = useState('');
+  const [billNumber, setBillNumber] = useState('');
+  const [amountError, setAmountError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const amountInputRef = useRef<any>(null);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => setKeyboardVisible(true)
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => setKeyboardVisible(false)
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  // Load active customers and transactions
+  const loadCustomers = useCallback(async () => {
+    try {
+      const [custList, txList] = await Promise.all([
+        getCustomers(),
+        getAllTransactionsList(),
+      ]);
+      setCustomers(custList);
+      setTransactions(txList);
+
+      if (initialCustomerId) {
+        const found = custList.find((c) => c.id === initialCustomerId);
+        if (found) {
+          setSelectedCustomer(found);
+          setTimeout(() => amountInputRef.current?.focus(), 100);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load customers for quick transaction modal:', err);
+    }
+  }, [initialCustomerId]);
+
+  useEffect(() => {
+    if (visible) {
+      if (!initialCustomerId) {
+        Keyboard.dismiss();
+      }
+      loadCustomers();
+      // Reset form
+      setSearchQuery('');
+      setSelectedCustomer(null);
+      setTxType(initialType || 'GAVE');
+      setAmount('');
+      setDate(new Date().toISOString());
+      setDescription('');
+      setBillNumber('');
+      setAmountError('');
+    }
+  }, [visible, initialCustomerId, initialType, loadCustomers]);
+
+  // Recency map: latest transaction timestamp per customer
+  const latestTxByCustomer = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const tx of transactions) {
+      if (tx.isVoided) continue;
+      const createdTime = new Date(tx.createdAt || 0).getTime() || 0;
+      const dateVal = new Date(tx.date || 0).getTime() || 0;
+      const time = Math.max(createdTime, dateVal);
+      if (!isNaN(time) && time > 0) {
+        const existing = map.get(tx.customerId) || 0;
+        if (time > existing) {
+          map.set(tx.customerId, time);
+        }
+      }
+    }
+    return map;
+  }, [transactions]);
+
+  // Filter and sort customer list (recent activity first, full Bengali unicode search)
+  const filteredCustomers = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase().normalize('NFC');
+    return customers
+      .filter((c) => {
+        if (!q) return true;
+        const name = (c.name || '').toLowerCase().normalize('NFC');
+        const phone = (c.phone || '');
+        return name.includes(q) || phone.includes(q);
+      })
+      .sort((a, b) => {
+        const recencyA = Math.max(
+          latestTxByCustomer.get(a.id) || 0,
+          a.updatedAt ? new Date(a.updatedAt).getTime() : 0
+        );
+        const recencyB = Math.max(
+          latestTxByCustomer.get(b.id) || 0,
+          b.updatedAt ? new Date(b.updatedAt).getTime() : 0
+        );
+        if (recencyB !== recencyA) {
+          return recencyB - recencyA;
+        }
+        return a.name.localeCompare(b.name, ['en', 'bn'], { sensitivity: 'base' });
+      });
+  }, [customers, searchQuery, latestTxByCustomer]);
+
+  const getInitials = (name: string): string => {
+    if (!name) return '?';
+    const trimmed = name.trim();
+    if (!trimmed) return '?';
+    const parts = trimmed.split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) {
+      const first = Array.from(parts[0])[0] || '';
+      const second = Array.from(parts[1])[0] || '';
+      return `${first}${second}`.toUpperCase();
+    }
+    return Array.from(trimmed).slice(0, 2).join('').toUpperCase();
+  };
+
+  const handleSelectCustomer = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setAmountError('');
+    setTimeout(() => {
+      amountInputRef.current?.focus();
+    }, 100);
+  };
+
+  const handleSave = async () => {
+    if (!selectedCustomer) {
+      Alert.alert('Required', 'Please select a customer first.');
+      return;
+    }
+
+    const parsedPaise = rupeesToPaise(amount);
+    if (parsedPaise <= 0) {
+      setAmountError('Enter a valid amount greater than ₹0');
+      return;
+    }
+
+    setAmountError('');
+    setIsSubmitting(true);
+
+    try {
+      await addTransaction({
+        customerId: selectedCustomer.id,
+        amountPaise: parsedPaise,
+        type: txType,
+        description: description.trim() || undefined,
+        billNumber: billNumber.trim() || undefined,
+        date: date,
+      });
+
+      const customerId = selectedCustomer.id;
+      onClose();
+      if (onSuccess) {
+        onSuccess(customerId);
+      } else {
+        router.push(`/customer/${customerId}` as any);
+      }
+    } catch (err: any) {
+      console.error('Failed to save quick transaction:', err);
+      Alert.alert('Error', err?.message || 'Failed to save transaction.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleAddNewCustomer = () => {
+    onClose();
+    router.push('/customer/add' as any);
+  };
+
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="slide"
+      onShow={() => {
+        if (selectedCustomer) {
+          setTimeout(() => amountInputRef.current?.focus(), 80);
+        } else {
+          Keyboard.dismiss();
+        }
+      }}
+      onRequestClose={onClose}
+    >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        style={styles.overlay}
+      >
+        <View
+          style={[
+            styles.sheet,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+              borderRadius: borderRadius.xl,
+            },
+          ]}
+        >
+          {/* Header */}
+          <View
+            style={[
+              styles.header,
+              { borderBottomColor: colors.borderLight },
+            ]}
+          >
+            <View style={styles.headerTitleRow}>
+              <View
+                style={[
+                  styles.headerIconBox,
+                  { backgroundColor: colors.primaryLight, borderRadius: borderRadius.sm },
+                ]}
+              >
+                <AppIcon name="plus" size={18} color={colors.primary} />
+              </View>
+              <View>
+                <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
+                  Quick Transaction
+                </Text>
+                <Text style={[styles.headerSub, { color: colors.textSecondary }]}>
+                  {selectedCustomer
+                    ? `Recording for ${selectedCustomer.name}`
+                    : 'Select a customer to record entry'}
+                </Text>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              onPress={onClose}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              style={styles.closeBtn}
+            >
+              <AppIcon name="x" size={20} color={colors.textSecondary} />
+            </TouchableOpacity>
+          </View>
+
+          {/* Body Content */}
+          <ScrollView
+            style={styles.scrollBody}
+            contentContainerStyle={[
+              styles.scrollContent,
+              { paddingBottom: keyboardVisible ? 180 : 50 },
+            ]}
+            keyboardShouldPersistTaps="handled"
+            keyboardDismissMode="interactive"
+            showsVerticalScrollIndicator={true}
+          >
+            {/* STEP 1: If No Customer Selected -> Show Customer Search & Picker */}
+            {!selectedCustomer ? (
+              <View>
+                {/* Search Input */}
+                <AppTextInput
+                  placeholder="Search customer by name (বাংলা/EN) or phone..."
+                  iconName="search"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  onClear={() => setSearchQuery('')}
+                  autoFocus={false}
+                />
+
+                {/* Shortcut to Add New Customer */}
+                <TouchableOpacity
+                  onPress={handleAddNewCustomer}
+                  style={[
+                    styles.addNewRow,
+                    {
+                      backgroundColor: colors.primaryLight,
+                      borderColor: colors.primary,
+                      borderRadius: borderRadius.md,
+                    },
+                  ]}
+                >
+                  <AppIcon name="user-plus" size={16} color={colors.primary} />
+                  <Text style={[styles.addNewText, { color: colors.primary }]}>
+                    + Add New Customer
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Customer List */}
+                <Text
+                  style={[
+                    styles.listSectionTitle,
+                    { color: colors.textSecondary, marginTop: spacing.md },
+                  ]}
+                >
+                  Choose Customer ({filteredCustomers.length})
+                </Text>
+
+                {filteredCustomers.length === 0 ? (
+                  <View style={styles.emptyBox}>
+                    <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
+                      No customer found matching &quot;{searchQuery}&quot;
+                    </Text>
+                    <AppButton
+                      title="Add This Customer"
+                      variant="outline"
+                      size="sm"
+                      iconName="plus"
+                      onPress={handleAddNewCustomer}
+                      style={{ marginTop: 10 }}
+                    />
+                  </View>
+                ) : (
+                  filteredCustomers.map((cust) => {
+                    const balanceType = getBalanceType(cust.currentBalancePaise);
+                    return (
+                      <TouchableOpacity
+                        key={cust.id}
+                        onPress={() => handleSelectCustomer(cust)}
+                        activeOpacity={0.7}
+                        style={[
+                          styles.customerPickItem,
+                          {
+                            backgroundColor: colors.background,
+                            borderColor: colors.borderLight,
+                            borderRadius: borderRadius.md,
+                          },
+                        ]}
+                      >
+                        {/* Avatar */}
+                        <View
+                          style={[
+                            styles.avatarBox,
+                            {
+                              backgroundColor: colors.surface,
+                              borderColor: colors.border,
+                              borderRadius: borderRadius.full,
+                            },
+                          ]}
+                        >
+                          <Text style={[styles.avatarText, { color: colors.primary }]}>
+                            {getInitials(cust.name)}
+                          </Text>
+                        </View>
+
+                        {/* Info */}
+                        <View style={styles.custInfoCol}>
+                          <Text
+                            style={[styles.custName, { color: colors.textPrimary }]}
+                            numberOfLines={1}
+                          >
+                            {cust.name}
+                          </Text>
+                          <Text style={[styles.custPhone, { color: colors.textSecondary }]}>
+                            {cust.phone || 'No phone'}
+                          </Text>
+                        </View>
+
+                        {/* Balance Badge */}
+                        <View style={styles.custBalanceCol}>
+                          <Text
+                            style={[
+                              styles.custBalanceAmount,
+                              {
+                                color:
+                                  balanceType === 'GET'
+                                    ? colors.youWillGet
+                                    : balanceType === 'GIVE'
+                                    ? colors.youWillGive
+                                    : colors.settled,
+                              },
+                            ]}
+                          >
+                            {formatINR(cust.currentBalancePaise)}
+                          </Text>
+                          <Text style={[styles.custBalanceSub, { color: colors.textMuted }]}>
+                            {balanceType === 'GET'
+                              ? "You'll Get"
+                              : balanceType === 'GIVE'
+                              ? 'You Got'
+                              : 'Settled'}
+                          </Text>
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })
+                )}
+              </View>
+            ) : (
+              /* STEP 2: Customer is Selected -> Show Transaction Form */
+              <View>
+                {/* Selected Customer Card Chip */}
+                <View
+                  style={[
+                    styles.selectedCustCard,
+                    {
+                      backgroundColor: colors.background,
+                      borderColor: colors.primary,
+                      borderRadius: borderRadius.md,
+                    },
+                  ]}
+                >
+                  <View style={styles.selectedCustLeft}>
+                    <View
+                      style={[
+                        styles.avatarBox,
+                        {
+                          backgroundColor: colors.primaryLight,
+                          borderColor: colors.primary,
+                          borderRadius: borderRadius.full,
+                        },
+                      ]}
+                    >
+                      <Text style={[styles.avatarText, { color: colors.primary }]}>
+                        {getInitials(selectedCustomer.name)}
+                      </Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text
+                        style={[styles.custName, { color: colors.textPrimary }]}
+                        numberOfLines={1}
+                      >
+                        {selectedCustomer.name}
+                      </Text>
+                      <Text style={[styles.custPhone, { color: colors.textSecondary }]}>
+                        Current Balance: {formatINR(selectedCustomer.currentBalancePaise)}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <TouchableOpacity
+                    onPress={() => setSelectedCustomer(null)}
+                    style={[
+                      styles.changeCustBtn,
+                      {
+                        backgroundColor: colors.borderLight,
+                        borderRadius: borderRadius.sm,
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.changeCustText, { color: colors.primary }]}>
+                      Change
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Transaction Type Segmented Toggle */}
+                <View style={styles.typeToggleRow}>
+                  <TouchableOpacity
+                    onPress={() => setTxType('GAVE')}
+                    style={[
+                      styles.typeToggleBtn,
+                      {
+                        backgroundColor:
+                          txType === 'GAVE' ? colors.danger : colors.borderLight,
+                        borderColor:
+                          txType === 'GAVE' ? colors.danger : colors.border,
+                        borderRadius: borderRadius.md,
+                      },
+                    ]}
+                  >
+                    <AppIcon
+                      name="arrow-up-right"
+                      size={18}
+                      color={txType === 'GAVE' ? '#FFFFFF' : colors.textSecondary}
+                    />
+                    <Text
+                      style={[
+                        styles.typeToggleLabel,
+                        {
+                          color: txType === 'GAVE' ? '#FFFFFF' : colors.textPrimary,
+                        },
+                      ]}
+                    >
+                      YOU GAVE (Credit)
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    onPress={() => setTxType('GOT')}
+                    style={[
+                      styles.typeToggleBtn,
+                      {
+                        backgroundColor:
+                          txType === 'GOT' ? colors.success : colors.borderLight,
+                        borderColor:
+                          txType === 'GOT' ? colors.success : colors.border,
+                        borderRadius: borderRadius.md,
+                      },
+                    ]}
+                  >
+                    <AppIcon
+                      name="arrow-down-left"
+                      size={18}
+                      color={txType === 'GOT' ? '#FFFFFF' : colors.textSecondary}
+                    />
+                    <Text
+                      style={[
+                        styles.typeToggleLabel,
+                        {
+                          color: txType === 'GOT' ? '#FFFFFF' : colors.textPrimary,
+                        },
+                      ]}
+                    >
+                      YOU GOT (Payment)
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Date Picker */}
+                <TransactionDatePicker date={date} onDateChange={setDate} />
+
+                {/* Amount Input */}
+                <AppTextInput
+                  ref={amountInputRef}
+                  label="Amount"
+                  placeholder="0"
+                  prefixText="₹"
+                  value={amount}
+                  onChangeText={(text) => {
+                    const withoutDecimals = text.split('.')[0];
+                    const filtered = withoutDecimals.replace(/[^0-9]/g, '');
+                    setAmount(filtered);
+                    if (amountError) setAmountError('');
+                  }}
+                  error={amountError}
+                  keyboardType="number-pad"
+                  autoFocus
+                />
+
+                {/* Description Input */}
+                <AppTextInput
+                  label="Description / Note (Optional)"
+                  placeholder="e.g. Rice delivery, Weighment charges, নগদ জমা"
+                  iconName="edit-3"
+                  value={description}
+                  onChangeText={setDescription}
+                />
+
+                {/* Bill Number Input */}
+                <AppTextInput
+                  label="Bill / Invoice Number (Numbers Only)"
+                  placeholder="e.g. 1042"
+                  iconName="tag"
+                  value={billNumber}
+                  keyboardType="number-pad"
+                  onChangeText={(text) => setBillNumber(text.replace(/[^0-9]/g, ''))}
+                />
+
+                {/* Submit Button */}
+                <View style={{ marginTop: spacing.md }}>
+                  <AppButton
+                    title={
+                      txType === 'GAVE'
+                        ? `Save You Gave ${amount ? `₹${amount}` : ''}`
+                        : `Save You Got ${amount ? `₹${amount}` : ''}`
+                    }
+                    onPress={handleSave}
+                    variant={txType === 'GAVE' ? 'danger' : 'success'}
+                    loading={isSubmitting}
+                    size="lg"
+                  />
+                </View>
+              </View>
+            )}
+          </ScrollView>
+        </View>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+};
+
+const styles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    height: '95%',
+    maxHeight: '96%',
+    minHeight: '85%',
+    borderTopWidth: 1,
+    borderLeftWidth: 1,
+    borderRightWidth: 1,
+    paddingBottom: Platform.OS === 'ios' ? 24 : 12,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+  },
+  headerTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  headerIconBox: {
+    width: 34,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    letterSpacing: -0.2,
+  },
+  headerSub: {
+    fontSize: 11,
+    marginTop: 1,
+  },
+  closeBtn: {
+    padding: 6,
+  },
+  scrollBody: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 20,
+  },
+  addNewRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    gap: 8,
+    marginTop: 10,
+  },
+  addNewText: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  listSectionTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 8,
+  },
+  emptyBox: {
+    alignItems: 'center',
+    paddingVertical: 30,
+  },
+  emptyText: {
+    fontSize: 13,
+    textAlign: 'center',
+  },
+  customerPickItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderWidth: 1,
+    marginBottom: 8,
+  },
+  avatarBox: {
+    width: 38,
+    height: 38,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  avatarText: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  custInfoCol: {
+    flex: 1,
+    paddingRight: 8,
+  },
+  custName: {
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  custPhone: {
+    fontSize: 12,
+  },
+  custBalanceCol: {
+    alignItems: 'flex-end',
+  },
+  custBalanceAmount: {
+    fontSize: 13,
+    fontWeight: '700',
+  },
+  custBalanceSub: {
+    fontSize: 10,
+    marginTop: 1,
+  },
+  selectedCustCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderWidth: 1.5,
+    marginBottom: 14,
+  },
+  selectedCustLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  changeCustBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  changeCustText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  typeToggleRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 14,
+  },
+  typeToggleBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderWidth: 1.5,
+    gap: 6,
+  },
+  typeToggleLabel: {
+    fontSize: 12,
+    fontWeight: '800',
+  },
+});

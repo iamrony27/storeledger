@@ -23,6 +23,7 @@ class SyncEngine {
   private isOnline = true;
   private isSyncing = false;
   private netInfoUnsubscribe: (() => void) | null = null;
+  private realtimeChannel: any = null;
 
   constructor() {
     this.init();
@@ -69,6 +70,12 @@ class SyncEngine {
   public destroy() {
     if (this.netInfoUnsubscribe) {
       this.netInfoUnsubscribe();
+    }
+    if (this.realtimeChannel) {
+      try {
+        supabase.removeChannel(this.realtimeChannel);
+      } catch {}
+      this.realtimeChannel = null;
     }
     this.listeners.clear();
   }
@@ -175,6 +182,11 @@ class SyncEngine {
     this.isSyncing = true;
     this.updateState({ status: 'syncing', errorMessage: null });
 
+    // Ensure Realtime channel is connected to receive instant remote changes
+    if (!this.realtimeChannel) {
+      this.setupRealtimeSubscription(userId);
+    }
+
     try {
       // 1. Drain Outbox (Push)
       await this.pushPendingWrites(userId);
@@ -242,6 +254,11 @@ class SyncEngine {
           if (error) throw error;
         } else if (item.entity === 'transaction') {
           const tx = item.payload as LedgerTransaction;
+          const isOpening = Boolean(
+            tx.isOpeningBalance ||
+            tx.description?.toLowerCase().includes('opening') ||
+            tx.id.includes('init')
+          );
           const { error } = await supabase.from('ledger_transactions').upsert(
             {
               id: tx.id,
@@ -251,6 +268,7 @@ class SyncEngine {
               amount_paise: tx.amountPaise,
               description: tx.description || null,
               transaction_date: tx.date,
+              is_opening_balance: isOpening,
               is_void: Boolean(tx.isVoided),
               void_reason: tx.voidReason || null,
               created_at: tx.createdAt,
@@ -288,19 +306,56 @@ class SyncEngine {
       const { data: remoteTransactions, error: txError } = await supabase
         .from('ledger_transactions')
         .select('*')
-        .eq('business_id', userId);
+        .eq('business_id', userId)
+        .order('created_at', { ascending: true });
 
       if (txError) throw txError;
 
-      // Import into local repository if records exist
-      if (remoteCustomers && remoteCustomers.length > 0) {
-        // Trigger repository merge through external callback
-        if (this.onRemoteDataMerged) {
-          await this.onRemoteDataMerged(remoteCustomers, remoteTransactions || []);
-        }
+      // Import into local repository (always reconcile deletions even if empty)
+      if (this.onRemoteDataMerged) {
+        await this.onRemoteDataMerged(remoteCustomers || [], remoteTransactions || []);
       }
     } catch (err) {
       console.warn('Error pulling remote updates:', err);
+    }
+  }
+
+  // Set up live Realtime websocket subscription for cross-device synchronization
+  public setupRealtimeSubscription(userId?: string): void {
+    if (!isSupabaseConfigured()) return;
+    if (this.realtimeChannel) {
+      try {
+        supabase.removeChannel(this.realtimeChannel);
+      } catch {}
+      this.realtimeChannel = null;
+    }
+
+    try {
+      this.realtimeChannel = supabase
+        .channel('public:realtime_ledger_sync')
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'ledger_transactions' },
+          () => {
+            // Instant reflection: when another device adds or deletes a transaction, sync immediately!
+            if (!this.isSyncing) {
+              this.syncNow();
+            }
+          }
+        )
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'customers' },
+          () => {
+            // Instant reflection: when another device adds or deletes a customer, sync immediately!
+            if (!this.isSyncing) {
+              this.syncNow();
+            }
+          }
+        )
+        .subscribe();
+    } catch (e) {
+      console.warn('Failed to setup Realtime subscription:', e);
     }
   }
 

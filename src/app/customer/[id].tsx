@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   Modal,
   Alert,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -15,6 +17,7 @@ import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { useAuth } from '../../auth/AuthContext';
 import { AppIcon } from '../../components/AppIcon';
+import { AppTopBar, TopBarActionButton } from '../../components/AppTopBar';
 import { Badge } from '../../components/Badge';
 import { AppTextInput } from '../../components/AppTextInput';
 import { AppButton } from '../../components/AppButton';
@@ -25,27 +28,35 @@ import {
   formatINR,
   getBalanceType,
   rupeesToPaise,
+  paiseToRupees,
   calculateCustomerBreakdown,
 } from '../../types/customer';
 import {
   getCustomerById,
   getCustomerTransactions,
   addTransaction,
+  updateTransaction,
+  updateCustomer,
+  getCustomers,
   archiveCustomer,
   deleteCustomer,
   voidTransaction,
   subscribeToRepository,
 } from '../../storage/localLedgerRepository';
+import { findDuplicateCustomer } from '../../utils/customerValidation';
 import {
   makePhoneCall,
-  openWhatsAppReminder,
   openWhatsAppMessage,
 } from '../../utils/communication';
+import {
+  findCustomerLastPayment,
+} from '../../utils/reminderMessages';
 import { formatTransactionReceiptText } from '../../utils/receiptGenerator';
 import {
   generateCustomerStatementPdf,
   sharePdfFile,
 } from '../../utils/pdfGenerator';
+import { WhatsAppShareModal } from '../../components/WhatsAppShareModal';
 
 export default function CustomerDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -57,6 +68,13 @@ export default function CustomerDetailScreen() {
   const [transactions, setTransactions] = useState<LedgerTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [whatsAppModalVisible, setWhatsAppModalVisible] = useState(false);
+
+  // Compute most recent legitimate payment received from customer
+  const lastPayment = useMemo(
+    () => findCustomerLastPayment(transactions),
+    [transactions]
+  );
 
   // Transaction Modal State
   const [modalVisible, setModalVisible] = useState(false);
@@ -67,6 +85,18 @@ export default function CustomerDetailScreen() {
   const [txBill, setTxBill] = useState('');
   const [amountError, setAmountError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editingTx, setEditingTx] = useState<LedgerTransaction | null>(null);
+  const amountInputRef = useRef<any>(null);
+
+  // Customer Profile View/Edit Modal State
+  const [customerModalVisible, setCustomerModalVisible] = useState(false);
+  const [editCustName, setEditCustName] = useState('');
+  const [editCustPhone, setEditCustPhone] = useState('');
+  const [editCustAddress, setEditCustAddress] = useState('');
+  const [editCustNotes, setEditCustNotes] = useState('');
+  const [custNameError, setCustNameError] = useState('');
+  const [custPhoneError, setCustPhoneError] = useState('');
+  const [isSavingCustomer, setIsSavingCustomer] = useState(false);
 
   const breakdown = useMemo(() => {
     return calculateCustomerBreakdown(
@@ -75,14 +105,28 @@ export default function CustomerDetailScreen() {
     );
   }, [customer?.openingBalancePaise, transactions]);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     if (!id) return;
     const cust = await getCustomerById(id);
     const txs = await getCustomerTransactions(id);
     setCustomer(cust);
-    setTransactions([...txs].reverse()); // newest first
+    // Sort transactions so newly created entries (even with past dates) appear on top
+    const sortedTxs = [...txs].sort((a, b) => {
+      const createdA = new Date(a.createdAt || a.date).getTime();
+      const createdB = new Date(b.createdAt || b.date).getTime();
+      if (createdB !== createdA) {
+        return createdB - createdA;
+      }
+      const dateA = new Date(a.date || a.createdAt).getTime();
+      const dateB = new Date(b.date || b.createdAt).getTime();
+      if (dateB !== dateA) {
+        return dateB - dateA;
+      }
+      return (b.id || '').localeCompare(a.id || '');
+    });
+    setTransactions(sortedTxs);
     setIsLoading(false);
-  };
+  }, [id]);
 
   useEffect(() => {
     loadData();
@@ -92,7 +136,7 @@ export default function CustomerDetailScreen() {
     return () => {
       unsubscribe();
     };
-  }, [id]);
+  }, [loadData]);
 
   if (isLoading) {
     return (
@@ -139,17 +183,7 @@ export default function CustomerDetailScreen() {
   };
 
   const handleWhatsApp = () => {
-    if (customer.phone) {
-      openWhatsAppReminder({
-        phoneNumber: customer.phone,
-        customerName: customer.name,
-        balancePaise: customer.currentBalancePaise,
-        businessName: profile.business_name,
-        language,
-      });
-    } else {
-      Alert.alert('No Phone', 'Please add a phone number for this customer first.');
-    }
+    setWhatsAppModalVisible(true);
   };
 
   const handleSharePdf = async () => {
@@ -171,14 +205,100 @@ export default function CustomerDetailScreen() {
     openWhatsAppMessage(customer.phone, receiptText);
   };
 
-  const openTxModal = (type: 'GAVE' | 'GOT') => {
-    setModalType(type);
-    setTxAmount('');
-    setTxDate(new Date().toISOString());
-    setTxDesc('');
-    setTxBill('');
+  const openTxModal = (type: 'GAVE' | 'GOT', existingTx?: LedgerTransaction) => {
+    if (existingTx) {
+      setEditingTx(existingTx);
+      setModalType(existingTx.type);
+      setTxAmount(paiseToRupees(existingTx.amountPaise).toString());
+      setTxDate(existingTx.date || new Date().toISOString());
+      setTxDesc(existingTx.description || '');
+      setTxBill(existingTx.billNumber || '');
+    } else {
+      setEditingTx(null);
+      setModalType(type);
+      setTxAmount('');
+      setTxDate(new Date().toISOString());
+      setTxDesc('');
+      setTxBill('');
+    }
     setAmountError('');
     setModalVisible(true);
+    setTimeout(() => amountInputRef.current?.focus(), 80);
+  };
+
+  const handleOpenEditCustomer = () => {
+    if (!customer) return;
+    setEditCustName(customer.name);
+    setEditCustPhone(customer.phone || '');
+    setEditCustAddress(customer.address || '');
+    setEditCustNotes(customer.notes || '');
+    setCustNameError('');
+    setCustPhoneError('');
+    setCustomerModalVisible(true);
+  };
+
+  const handleSaveCustomer = async () => {
+    if (!customer) return;
+    let isValid = true;
+    if (!editCustName.trim()) {
+      setCustNameError('Customer name is required');
+      isValid = false;
+    } else {
+      setCustNameError('');
+    }
+
+    const cleanPhone = editCustPhone.trim().replace(/[^0-9]/g, '');
+    if (!cleanPhone || cleanPhone.length < 10) {
+      setCustPhoneError('Enter a valid 10-digit mobile number');
+      isValid = false;
+    } else {
+      setCustPhoneError('');
+    }
+
+    if (!isValid) return;
+
+    // Check for duplicate customer name or mobile number against other customers
+    try {
+      const allCustomers = await getCustomers();
+      const dupCheck = findDuplicateCustomer(
+        allCustomers,
+        editCustName,
+        cleanPhone,
+        customer.id
+      );
+      if (dupCheck.isDuplicate) {
+        if (dupCheck.duplicateField === 'name') {
+          setCustNameError(dupCheck.errorMessage || 'A customer with this name already exists');
+        } else if (dupCheck.duplicateField === 'phone') {
+          setCustPhoneError(dupCheck.errorMessage || 'A customer with this mobile number already exists');
+        } else {
+          setCustNameError('A customer with this name already exists');
+          setCustPhoneError('A customer with this mobile number already exists');
+        }
+        Alert.alert('Duplicate Customer', dupCheck.errorMessage);
+        return;
+      }
+    } catch (e) {
+      console.warn('Error checking duplicate customer:', e);
+    }
+
+    setIsSavingCustomer(true);
+    try {
+      const updated = await updateCustomer(customer.id, {
+        name: editCustName.trim().normalize('NFC'),
+        phone: cleanPhone,
+        address: editCustAddress.trim() || undefined,
+        notes: editCustNotes.trim() || undefined,
+      });
+      setCustomer(updated);
+      setCustomerModalVisible(false);
+      Alert.alert('Customer Updated', `${updated.name}'s details saved successfully.`);
+      await loadData();
+    } catch (err: any) {
+      Alert.alert('Update Error', err?.message || 'Failed to update customer details.');
+    } finally {
+      setIsSavingCustomer(false);
+    }
   };
 
   const handleSaveTransaction = async () => {
@@ -192,19 +312,34 @@ export default function CustomerDetailScreen() {
     setIsSubmitting(true);
 
     try {
-      await addTransaction({
-        customerId: customer.id,
-        amountPaise: parsedPaise,
-        type: modalType,
-        description: txDesc || undefined,
-        billNumber: txBill || undefined,
-        date: txDate,
-      });
+      if (editingTx) {
+        await updateTransaction({
+          customerId: customer.id,
+          transactionId: editingTx.id,
+          amountPaise: parsedPaise,
+          type: modalType,
+          description: txDesc || undefined,
+          billNumber: txBill || undefined,
+          date: txDate,
+        });
+        Alert.alert('Transaction Updated', 'Transaction details updated successfully.');
+      } else {
+        await addTransaction({
+          customerId: customer.id,
+          amountPaise: parsedPaise,
+          type: modalType,
+          description: txDesc || undefined,
+          billNumber: txBill || undefined,
+          date: txDate,
+        });
+      }
 
       setModalVisible(false);
+      setEditingTx(null);
       await loadData();
-    } catch (err) {
-      console.error('Failed to add transaction:', err);
+    } catch (err: any) {
+      console.error('Failed to save transaction:', err);
+      Alert.alert('Error', err?.message || 'Failed to record transaction.');
     } finally {
       setIsSubmitting(false);
     }
@@ -212,12 +347,12 @@ export default function CustomerDetailScreen() {
 
   const handleVoidTx = (txId: string) => {
     Alert.alert(
-      'Void Transaction',
-      'Are you sure you want to void this entry? It will be marked void without deleting the audit history.',
+      'Delete Transaction',
+      'Are you sure you want to permanently delete this transaction? It will be completely removed from the ledger, database, and backup files.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
-          text: 'Confirm Void',
+          text: 'Delete Permanently',
           style: 'destructive',
           onPress: async () => {
             if (!customer) return;
@@ -243,7 +378,7 @@ export default function CustomerDetailScreen() {
       customer.currentBalancePaise !== 0
         ? `\n\nNotice: This customer has an active balance of ${formatINR(
             customer.currentBalancePaise
-          )} (${getBalanceType(customer.currentBalancePaise) === 'GET' ? "You'll Get" : "You'll Give"}).`
+          )} (${getBalanceType(customer.currentBalancePaise) === 'GET' ? "You'll Get" : "You Got"}).`
         : '';
 
     Alert.alert(
@@ -270,101 +405,50 @@ export default function CustomerDetailScreen() {
 
   return (
     <SafeAreaView
-      edges={['top', 'left', 'right', 'bottom']}
+      edges={['bottom', 'left', 'right']}
       style={[styles.safeArea, { backgroundColor: colors.background }]}
     >
-      {/* Top Header */}
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: colors.surface,
-            borderBottomColor: colors.border,
-          },
-        ]}
-      >
-        <TouchableOpacity
-          onPress={() => router.back()}
-          accessibilityRole="button"
-          accessibilityLabel="Go back"
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-          style={styles.backTouch}
-        >
-          <AppIcon name="arrow-left" size={22} color={colors.textPrimary} />
-        </TouchableOpacity>
-
-        <View style={styles.headerTitleCol}>
-          <Text
-            style={[styles.headerName, { color: colors.textPrimary }]}
-            numberOfLines={1}
-          >
-            {customer.name}
-          </Text>
-          <Text style={[styles.headerPhone, { color: colors.textSecondary }]}>
-            {customer.phone}
-          </Text>
-        </View>
-
-        <View style={styles.headerRightActions}>
-          <TouchableOpacity
-            onPress={handleCall}
-            accessibilityRole="button"
-            accessibilityLabel={`Call ${customer.name}`}
-            style={[
-              styles.iconBtn,
-              { backgroundColor: colors.borderLight, borderRadius: borderRadius.sm },
-            ]}
-          >
-            <AppIcon name="phone" size={16} color={colors.primary} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={handleWhatsApp}
-            accessibilityRole="button"
-            accessibilityLabel={`Send WhatsApp reminder to ${customer.name}`}
-            style={[
-              styles.iconBtn,
-              { backgroundColor: colors.youWillGetBg, borderRadius: borderRadius.sm },
-            ]}
-          >
-            <AppIcon
-              family="material"
-              name="whatsapp"
-              size={18}
-              color={colors.youWillGet}
+      {/* Modern Executive Header Bar */}
+      <AppTopBar
+        showBack={true}
+        avatarInitials={customer.name}
+        title={customer.name}
+        subtitle={customer.phone}
+        rightActions={
+          <>
+            <TopBarActionButton
+              iconName="edit"
+              onPress={handleOpenEditCustomer}
+              accessibilityLabel={`View or edit ${customer.name}'s details`}
             />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={handleSharePdf}
-            accessibilityRole="button"
-            accessibilityLabel="Share PDF account statement"
-            disabled={isGeneratingPdf}
-            style={[
-              styles.iconBtn,
-              { backgroundColor: colors.primaryLight, borderRadius: borderRadius.sm },
-            ]}
-          >
-            {isGeneratingPdf ? (
-              <ActivityIndicator size="small" color={colors.primary} />
-            ) : (
-              <AppIcon name="file-text" size={16} color={colors.primary} />
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={handleDeleteCustomer}
-            accessibilityRole="button"
-            accessibilityLabel={`Delete ${customer.name}`}
-            style={[
-              styles.iconBtn,
-              { backgroundColor: colors.dangerBg, borderRadius: borderRadius.sm },
-            ]}
-          >
-            <AppIcon name="trash-2" size={16} color={colors.danger} />
-          </TouchableOpacity>
-        </View>
-      </View>
+            <TopBarActionButton
+              iconName="phone"
+              onPress={handleCall}
+              accessibilityLabel={`Call ${customer.name}`}
+            />
+            <TopBarActionButton
+              iconFamily="material"
+              iconName="whatsapp"
+              variant="default"
+              iconColor={colors.youWillGet}
+              onPress={handleWhatsApp}
+              accessibilityLabel={`Send WhatsApp reminder to ${customer.name}`}
+            />
+            <TopBarActionButton
+              iconName="file-text"
+              variant="primary"
+              onPress={handleSharePdf}
+              accessibilityLabel="Share PDF account statement"
+            />
+            <TopBarActionButton
+              iconName="trash-2"
+              variant="danger"
+              onPress={handleDeleteCustomer}
+              accessibilityLabel={`Delete ${customer.name}`}
+            />
+          </>
+        }
+      />
 
       <ScrollView
         contentContainerStyle={[styles.content, { padding: spacing.md }]}
@@ -494,16 +578,41 @@ export default function CustomerDetailScreen() {
             </View>
           </View>
 
-          {customer.address && (
-            <View style={styles.addressRow}>
-              <AppIcon name="map-pin" size={13} color={colors.textSecondary} />
-              <Text
-                style={[styles.addressText, { color: colors.textSecondary }]}
-              >
-                {customer.address}
-              </Text>
+          {/* Customer Details & Profile Summary */}
+          <View
+            style={[
+              styles.addressBox,
+              {
+                backgroundColor: colors.background,
+                borderColor: colors.borderLight,
+                borderRadius: borderRadius.md,
+                padding: spacing.sm,
+                marginVertical: spacing.xs,
+              },
+            ]}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <AppIcon name="user" size={13} color={colors.textSecondary} />
+                <Text style={{ fontSize: 12, fontWeight: '700', color: colors.textPrimary }}>
+                  Customer Profile
+                </Text>
+              </View>
+              <TouchableOpacity onPress={handleOpenEditCustomer} hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}>
+                <Text style={{ fontSize: 11, fontWeight: '700', color: colors.primary }}>
+                  View / Edit Details
+                </Text>
+              </TouchableOpacity>
             </View>
-          )}
+            <Text style={[styles.addressText, { color: colors.textSecondary }]}>
+              {customer.address ? `Address: ${customer.address}` : 'Address: Not specified'}
+            </Text>
+            {customer.notes ? (
+              <Text style={[styles.addressText, { color: colors.textMuted, marginTop: 2 }]}>
+                Notes: {customer.notes}
+              </Text>
+            ) : null}
+          </View>
 
           {/* Quick Actions Row */}
           <View style={styles.quickActionRow}>
@@ -601,102 +710,73 @@ export default function CustomerDetailScreen() {
               </Text>
             </View>
           ) : (
-            transactions.map((tx) => {
-              const isGave = tx.type === 'GAVE';
-              const isVoided = !!tx.isVoided;
-              return (
-                <View
-                  key={tx.id}
-                  style={[
-                    styles.txCard,
-                    {
-                      backgroundColor: colors.surface,
-                      borderColor: isVoided ? colors.borderLight : colors.border,
-                      borderRadius: borderRadius.md,
-                      opacity: isVoided ? 0.5 : 1,
-                    },
-                  ]}
-                >
-                  <View style={styles.txRow}>
-                    <View style={styles.txLeft}>
-                      <View
-                        style={[
-                          styles.txIconBox,
-                          {
-                            backgroundColor: isVoided
-                              ? colors.borderLight
-                              : isGave
-                              ? colors.youWillGetBg
-                              : colors.youWillGiveBg,
-                          },
-                        ]}
-                      >
-                        <AppIcon
-                          name={
-                            isVoided
-                              ? 'slash'
-                              : isGave
-                              ? 'arrow-up-right'
-                              : 'arrow-down-left'
-                          }
-                          size={16}
-                          color={
-                            isVoided
-                              ? colors.textMuted
-                              : isGave
-                              ? colors.youWillGet
-                              : colors.youWillGive
-                          }
-                        />
-                      </View>
-                      <View style={styles.txTextContainer}>
-                        <Text
+            transactions
+              .filter((tx) => !tx.isVoided)
+              .map((tx) => {
+                const isGave = tx.type === 'GAVE';
+                return (
+                  <View
+                    key={tx.id}
+                    style={[
+                      styles.txCard,
+                      {
+                        backgroundColor: colors.surface,
+                        borderColor: colors.border,
+                        borderRadius: borderRadius.md,
+                      },
+                    ]}
+                  >
+                    <View style={styles.txRow}>
+                      <View style={styles.txLeft}>
+                        <View
                           style={[
-                            styles.txDescription,
+                            styles.txIconBox,
                             {
-                              color: isVoided
-                                ? colors.textMuted
-                                : colors.textPrimary,
-                              textDecorationLine: isVoided
-                                ? 'line-through'
-                                : 'none',
+                              backgroundColor: isGave
+                                ? colors.youWillGetBg
+                                : colors.youWillGiveBg,
                             },
                           ]}
                         >
-                          {tx.description ||
-                            (isGave ? 'Credit Given (Udhaar)' : 'Payment Received (Jama)')}
-                        </Text>
-                        <Text
-                          style={[
-                            styles.txDate,
-                            { color: colors.textSecondary },
-                          ]}
-                        >
-                          {new Date(tx.date).toLocaleDateString('en-IN', {
-                            day: 'numeric',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                          {tx.billNumber ? ` • Bill #${tx.billNumber}` : ''}
-                          {tx.isOpeningBalance ? ' • Opening' : ''}
-                          {isVoided ? ' • [VOIDED]' : ''}
-                        </Text>
+                          <AppIcon
+                            name={isGave ? 'arrow-up-right' : 'arrow-down-left'}
+                            size={16}
+                            color={isGave ? colors.youWillGet : colors.youWillGive}
+                          />
+                        </View>
+                        <View style={styles.txTextContainer}>
+                          <Text
+                            style={[
+                              styles.txDescription,
+                              { color: colors.textPrimary },
+                            ]}
+                          >
+                            {tx.description ||
+                              (isGave ? 'You Gave' : 'You Got')}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.txDate,
+                              { color: colors.textSecondary },
+                            ]}
+                          >
+                            {new Date(tx.date).toLocaleDateString('en-IN', {
+                              day: 'numeric',
+                              month: 'short',
+                              year: 'numeric',
+                            })}
+                            {tx.billNumber ? ` • Bill #${tx.billNumber}` : ''}
+                            {tx.isOpeningBalance ? ' • Opening' : ''}
+                          </Text>
+                        </View>
                       </View>
-                    </View>
 
                     <View style={styles.txRightCol}>
                       <Text
                         style={[
                           styles.txAmount,
                           {
-                            color: isVoided
-                              ? colors.textMuted
-                              : isGave
-                              ? colors.youWillGet
-                              : colors.youWillGive,
-                            textDecorationLine: isVoided
-                              ? 'line-through'
-                              : 'none',
+                            color: isGave ? colors.youWillGet : colors.youWillGive,
                           },
                         ]}
                       >
@@ -706,9 +786,7 @@ export default function CustomerDetailScreen() {
                         style={[
                           styles.txTypeTag,
                           {
-                            backgroundColor: isVoided
-                              ? colors.borderLight
-                              : isGave
+                            backgroundColor: isGave
                               ? colors.youWillGetBg
                               : colors.youWillGiveBg,
                             borderRadius: borderRadius.sm,
@@ -719,20 +797,26 @@ export default function CustomerDetailScreen() {
                           style={[
                             styles.txTypeTagText,
                             {
-                              color: isVoided
-                                ? colors.textMuted
-                                : isGave
-                                ? colors.youWillGet
-                                : colors.youWillGive,
+                              color: isGave ? colors.youWillGet : colors.youWillGive,
                             },
                           ]}
                         >
-                          {isGave ? 'You Gave (বাকি)' : 'You Got (জমা)'}
+                          {isGave ? 'You Gave' : 'You Got'}
                         </Text>
                       </View>
 
-                      {!isVoided && !tx.isOpeningBalance && (
+                      {!tx.isOpeningBalance && (
                         <View style={styles.txActionBtnsRow}>
+                          <TouchableOpacity
+                            onPress={() => openTxModal(tx.type, tx)}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Edit transaction of ${formatINR(tx.amountPaise)}`}
+                            hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                            style={styles.editTxBtn}
+                          >
+                            <AppIcon name="edit-2" size={13} color={colors.primary} />
+                          </TouchableOpacity>
+
                           <TouchableOpacity
                             onPress={() => handleShareReceipt(tx)}
                             accessibilityRole="button"
@@ -746,17 +830,17 @@ export default function CustomerDetailScreen() {
                           <TouchableOpacity
                             onPress={() => handleVoidTx(tx.id)}
                             accessibilityRole="button"
-                            accessibilityLabel={`Void transaction of ${formatINR(tx.amountPaise)}`}
+                            accessibilityLabel={`Delete transaction of ${formatINR(tx.amountPaise)}`}
                             hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                             style={styles.voidBtn}
                           >
                             <Text
                               style={[
                                 styles.voidText,
-                                { color: colors.textMuted },
+                                { color: colors.danger },
                               ]}
                             >
-                              Void
+                              Delete
                             </Text>
                           </TouchableOpacity>
                         </View>
@@ -767,47 +851,6 @@ export default function CustomerDetailScreen() {
               );
             })
           )}
-        </View>
-
-        {/* Customer Account Management & Danger Zone */}
-        <View
-          style={[
-            styles.dangerCard,
-            {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-              borderRadius: borderRadius.lg,
-            },
-          ]}
-        >
-          <View style={styles.dangerHeaderRow}>
-            <AppIcon name="shield-alert" family="material" size={18} color={colors.danger} />
-            <Text style={[styles.dangerCardTitle, { color: colors.textPrimary }]}>
-              Customer Account Management
-            </Text>
-          </View>
-
-          <Text style={[styles.dangerCardDesc, { color: colors.textSecondary }]}>
-            Permanently delete this customer and remove all {transactions.length} transaction entries from your ledger records.
-          </Text>
-
-          <View style={styles.dangerBtnRow}>
-            <AppButton
-              title="Delete Customer"
-              variant="outline"
-              iconName="trash-2"
-              onPress={handleDeleteCustomer}
-              style={{ borderColor: colors.danger, flex: 1 }}
-              textStyle={{ color: colors.danger }}
-            />
-            <AppButton
-              title={customer.isArchived ? 'Unarchive' : 'Archive'}
-              variant="outline"
-              iconName={customer.isArchived ? 'refresh-cw' : 'archive'}
-              onPress={handleToggleArchive}
-              style={{ flex: 1 }}
-            />
-          </View>
         </View>
       </ScrollView>
 
@@ -830,7 +873,7 @@ export default function CustomerDetailScreen() {
           ]}
         >
           <AppIcon name="arrow-up-right" size={18} color="#FFFFFF" />
-          <Text style={styles.actionBtnLabel}>YOU GAVE ₹ (Udhaar / বাকি)</Text>
+          <Text style={styles.actionBtnLabel}>YOU GAVE</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -842,7 +885,7 @@ export default function CustomerDetailScreen() {
           ]}
         >
           <AppIcon name="arrow-down-left" size={18} color="#FFFFFF" />
-          <Text style={styles.actionBtnLabel}>YOU GOT ₹ (Jama / জমা)</Text>
+          <Text style={styles.actionBtnLabel}>YOU GOT</Text>
         </TouchableOpacity>
       </View>
 
@@ -851,6 +894,11 @@ export default function CustomerDetailScreen() {
         visible={modalVisible}
         transparent
         animationType="slide"
+        onShow={() => {
+          setTimeout(() => {
+            amountInputRef.current?.focus();
+          }, 80);
+        }}
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
@@ -872,8 +920,8 @@ export default function CustomerDetailScreen() {
                     {
                       backgroundColor:
                         modalType === 'GAVE'
-                          ? colors.youWillGiveBg
-                          : colors.youWillGetBg,
+                          ? colors.dangerBg
+                          : colors.successBg,
                     },
                   ]}
                 >
@@ -882,8 +930,8 @@ export default function CustomerDetailScreen() {
                     size={20}
                     color={
                       modalType === 'GAVE'
-                        ? colors.youWillGive
-                        : colors.youWillGet
+                        ? colors.danger
+                        : colors.success
                     }
                   />
                 </View>
@@ -891,14 +939,18 @@ export default function CustomerDetailScreen() {
                   <Text
                     style={[styles.modalTitle, { color: colors.textPrimary }]}
                   >
-                    {modalType === 'GAVE'
-                      ? 'Record Udhaar (You Gave বাকি)'
-                      : 'Record Jama (You Got জমা)'}
+                    {editingTx
+                      ? 'Edit Transaction'
+                      : modalType === 'GAVE'
+                      ? 'You Gave'
+                      : 'You Got'}
                   </Text>
                   <Text style={{ fontSize: 11, color: colors.textSecondary }}>
-                    {modalType === 'GAVE'
-                      ? 'Customer takes goods on credit (adds to balance)'
-                      : 'Customer pays money (clears balance)'}
+                    {editingTx
+                      ? 'Update transaction amount, date, or note'
+                      : modalType === 'GAVE'
+                      ? 'Record You Gave transaction'
+                      : 'Record You Got transaction'}
                   </Text>
                 </View>
               </View>
@@ -912,6 +964,65 @@ export default function CustomerDetailScreen() {
             </View>
 
             <View style={styles.modalBody}>
+              {/* Type Switcher for Edit & Entry */}
+              <View style={styles.typeSwitcherRow}>
+                <TouchableOpacity
+                  onPress={() => setModalType('GAVE')}
+                  style={[
+                    styles.typeSwitcherBtn,
+                    {
+                      backgroundColor:
+                        modalType === 'GAVE' ? colors.danger : colors.borderLight,
+                      borderColor:
+                        modalType === 'GAVE' ? colors.danger : colors.border,
+                      borderRadius: borderRadius.md,
+                    },
+                  ]}
+                >
+                  <AppIcon
+                    name="arrow-up-right"
+                    size={16}
+                    color={modalType === 'GAVE' ? '#FFFFFF' : colors.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.typeSwitcherText,
+                      { color: modalType === 'GAVE' ? '#FFFFFF' : colors.textPrimary },
+                    ]}
+                  >
+                    YOU GAVE
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => setModalType('GOT')}
+                  style={[
+                    styles.typeSwitcherBtn,
+                    {
+                      backgroundColor:
+                        modalType === 'GOT' ? colors.success : colors.borderLight,
+                      borderColor:
+                        modalType === 'GOT' ? colors.success : colors.border,
+                      borderRadius: borderRadius.md,
+                    },
+                  ]}
+                >
+                  <AppIcon
+                    name="arrow-down-left"
+                    size={16}
+                    color={modalType === 'GOT' ? '#FFFFFF' : colors.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.typeSwitcherText,
+                      { color: modalType === 'GOT' ? '#FFFFFF' : colors.textPrimary },
+                    ]}
+                  >
+                    YOU GOT
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
               {/* Manually select transaction date */}
               <TransactionDatePicker
                 date={txDate}
@@ -919,6 +1030,7 @@ export default function CustomerDetailScreen() {
               />
 
               <AppTextInput
+                ref={amountInputRef}
                 label="Amount"
                 placeholder="0"
                 prefixText="₹"
@@ -936,26 +1048,29 @@ export default function CustomerDetailScreen() {
 
               <AppTextInput
                 label="Description / Item (Optional)"
-                placeholder="e.g. 5x LED lights, Cash payment"
+                placeholder="e.g. 5x LED lights, Cash payment, নগদ জমা"
                 iconName="edit-3"
                 value={txDesc}
                 onChangeText={setTxDesc}
               />
 
               <AppTextInput
-                label="Bill / Invoice Number (Optional)"
-                placeholder="e.g. INV-1042"
+                label="Bill / Invoice Number (Numbers Only)"
+                placeholder="e.g. 1042"
                 iconName="tag"
                 value={txBill}
-                onChangeText={setTxBill}
+                keyboardType="number-pad"
+                onChangeText={(text) => setTxBill(text.replace(/[^0-9]/g, ''))}
               />
 
               <View style={styles.modalBtnRow}>
                 <AppButton
                   title={
-                    modalType === 'GAVE'
-                      ? 'Save (You Gave ₹)'
-                      : 'Save (You Got ₹)'
+                    editingTx
+                      ? 'Save Changes'
+                      : modalType === 'GAVE'
+                      ? 'Save You Gave'
+                      : 'Save You Got'
                   }
                   onPress={handleSaveTransaction}
                   variant={modalType === 'GAVE' ? 'danger' : 'success'}
@@ -967,6 +1082,163 @@ export default function CustomerDetailScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Customer Details View & Edit Modal */}
+      <Modal
+        visible={customerModalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setCustomerModalVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.modalOverlay}
+        >
+          <View
+            style={[
+              styles.modalSheet,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+                borderRadius: borderRadius.xl,
+              },
+            ]}
+          >
+            <View style={styles.modalHeader}>
+              <View style={styles.modalTitleRow}>
+                <View
+                  style={[
+                    styles.modalIconBox,
+                    { backgroundColor: colors.primaryLight, borderRadius: borderRadius.sm },
+                  ]}
+                >
+                  <AppIcon name="user" size={18} color={colors.primary} />
+                </View>
+                <View>
+                  <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
+                    Customer Details
+                  </Text>
+                  <Text style={{ fontSize: 11, color: colors.textSecondary }}>
+                    View and update customer information
+                  </Text>
+                </View>
+              </View>
+
+              <TouchableOpacity
+                onPress={() => setCustomerModalVisible(false)}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <AppIcon name="x" size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView
+              style={{ maxHeight: 520 }}
+              contentContainerStyle={styles.modalBody}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+            >
+              <AppTextInput
+                label="Customer Name"
+                placeholder="Name (বাংলা / English supported)"
+                iconName="user"
+                value={editCustName}
+                onChangeText={(t) => {
+                  setEditCustName(t);
+                  if (custNameError) setCustNameError('');
+                }}
+                error={custNameError}
+              />
+
+              <AppTextInput
+                label="Mobile Number"
+                placeholder="10-digit phone number"
+                iconName="phone"
+                value={editCustPhone}
+                onChangeText={(t) => {
+                  setEditCustPhone(t);
+                  if (custPhoneError) setCustPhoneError('');
+                }}
+                error={custPhoneError}
+                keyboardType="phone-pad"
+                maxLength={15}
+              />
+
+              <AppTextInput
+                label="Address (Optional)"
+                placeholder="Village / Town / Shop location"
+                iconName="map-pin"
+                value={editCustAddress}
+                onChangeText={setEditCustAddress}
+              />
+
+              <AppTextInput
+                label="Notes / Remarks (Optional)"
+                placeholder="Special ledger notes"
+                iconName="file-text"
+                value={editCustNotes}
+                onChangeText={setEditCustNotes}
+              />
+
+              <View style={{ marginTop: 12 }}>
+                <AppButton
+                  title="Save Customer Details"
+                  onPress={handleSaveCustomer}
+                  variant="primary"
+                  loading={isSavingCustomer}
+                  size="lg"
+                />
+              </View>
+
+              <View
+                style={{
+                  marginTop: 16,
+                  paddingTop: 16,
+                  borderTopWidth: 1,
+                  borderTopColor: colors.borderLight,
+                  gap: 10,
+                }}
+              >
+                <AppButton
+                  title={customer?.isArchived ? 'Unarchive Customer' : 'Archive Customer'}
+                  variant="outline"
+                  iconName={customer?.isArchived ? 'refresh-cw' : 'archive'}
+                  onPress={() => {
+                    setCustomerModalVisible(false);
+                    setTimeout(() => handleToggleArchive(), 150);
+                  }}
+                  size="md"
+                />
+                <AppButton
+                  title="Delete Customer"
+                  variant="outline"
+                  iconName="trash-2"
+                  onPress={() => {
+                    setCustomerModalVisible(false);
+                    setTimeout(() => handleDeleteCustomer(), 150);
+                  }}
+                  size="lg"
+                  style={{ borderColor: colors.danger }}
+                  textStyle={{ color: colors.danger }}
+                />
+              </View>
+            </ScrollView>
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Executive WhatsApp Due & Last Payment Share Modal */}
+      {customer && (
+        <WhatsAppShareModal
+          visible={whatsAppModalVisible}
+          onClose={() => setWhatsAppModalVisible(false)}
+          customer={customer}
+          lastPayment={lastPayment}
+          businessName={profile.business_name}
+          businessPhone={profile.phone}
+          initialLanguage={language}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -986,11 +1258,25 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   header: {
+    position: 'relative',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 1,
+    borderBottomWidth: 1.5,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+  },
+  headerAccentLine: {
+    position: 'absolute',
+    bottom: -1.5,
+    left: 16,
+    right: 16,
+    height: 2,
+    borderRadius: 1,
   },
   backTouch: {
     paddingRight: 12,
@@ -1202,6 +1488,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalSheet: {
+    maxHeight: '95%',
     borderTopWidth: 1,
     borderLeftWidth: 1,
     borderRightWidth: 1,
@@ -1280,29 +1567,32 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '700',
   },
-  dangerCard: {
+  addressBox: {
     borderWidth: 1,
-    padding: 16,
-    marginTop: 16,
-    marginBottom: 20,
-    gap: 10,
+    marginVertical: 4,
   },
-  dangerHeaderRow: {
+  editTxBtn: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  typeSwitcherRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 12,
+  },
+  typeSwitcherBtn: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderWidth: 1.5,
+    gap: 6,
   },
-  dangerCardTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  dangerCardDesc: {
+  typeSwitcherText: {
     fontSize: 12,
-    lineHeight: 18,
-  },
-  dangerBtnRow: {
-    flexDirection: 'row',
-    gap: 10,
-    marginTop: 6,
+    fontWeight: '800',
   },
 });

@@ -4,16 +4,16 @@ import {
   LedgerTransaction,
   CreateCustomerInput,
   AddTransactionInput,
-  calculateCustomerBalance,
   calculateCustomerBreakdown,
 } from '../types/customer';
 import { INITIAL_CUSTOMERS, INITIAL_TRANSACTIONS } from '../data/mockStore';
 import { syncEngine } from '../sync/syncEngine';
+import { findDuplicateCustomer } from '../utils/customerValidation';
 
 const STORAGE_KEYS = {
   CUSTOMERS: '@gwd_book:customers_v1',
   TRANSACTIONS: '@gwd_book:transactions_v1',
-  IS_INITIALIZED: '@gwd_book:initialized_v1',
+  IS_INITIALIZED: '@gwd_book:initialized_gwd_book_v2',
 };
 
 // In-memory cache
@@ -21,7 +21,7 @@ let customersCache: Customer[] | null = null;
 let transactionsCache: Record<string, LedgerTransaction[]> | null = null;
 const listeners = new Set<() => void>();
 
-function notifyListeners() {
+export function notifyListeners() {
   for (const listener of listeners) {
     try {
       listener();
@@ -39,6 +39,63 @@ export function subscribeToRepository(listener: () => void): () => void {
 }
 
 /**
+ * Reset ledger completely to Golden Weigh Bridge (66 customers, ₹44,180.00 total)
+ */
+export async function resetLedgerToGoldenWeighBridge(): Promise<void> {
+  try {
+    // 1. Wipe outbox to eliminate old failed queue items
+    await syncEngine.clearOutbox();
+
+    // 2. Prepare seeded customers with pending sync status and zero opening balance
+    const seededCustomers: Customer[] = INITIAL_CUSTOMERS.map((c) => ({
+      ...c,
+      openingBalancePaise: 0,
+      syncStatus: 'pending_insert',
+    }));
+
+    // 3. Persist to AsyncStorage
+    await AsyncStorage.setItem(
+      STORAGE_KEYS.CUSTOMERS,
+      JSON.stringify(seededCustomers)
+    );
+    await AsyncStorage.setItem(
+      STORAGE_KEYS.TRANSACTIONS,
+      JSON.stringify(INITIAL_TRANSACTIONS)
+    );
+    await AsyncStorage.setItem(STORAGE_KEYS.IS_INITIALIZED, 'true');
+
+    customersCache = seededCustomers;
+    transactionsCache = INITIAL_TRANSACTIONS;
+
+    // 4. Enqueue all 66 customers for cloud sync
+    for (const cust of seededCustomers) {
+      await syncEngine.addToOutbox({
+        entity: 'customer',
+        recordId: cust.id,
+        action: 'insert',
+        payload: cust,
+      });
+    }
+
+    // 5. Enqueue opening transactions
+    for (const txList of Object.values(INITIAL_TRANSACTIONS)) {
+      for (const tx of txList) {
+        await syncEngine.addToOutbox({
+          entity: 'transaction',
+          recordId: tx.id,
+          action: 'insert',
+          payload: tx,
+        });
+      }
+    }
+
+    notifyListeners();
+  } catch (error) {
+    console.error('Failed to reset ledger to Golden Weigh Bridge:', error);
+  }
+}
+
+/**
  * Initializes the repository with stored data or defaults
  */
 async function initializeIfNeeded(): Promise<void> {
@@ -47,25 +104,7 @@ async function initializeIfNeeded(): Promise<void> {
   try {
     const isInit = await AsyncStorage.getItem(STORAGE_KEYS.IS_INITIALIZED);
     if (!isInit) {
-      // Seed with initial sample ledger
-      const seededCustomers: Customer[] = INITIAL_CUSTOMERS.map((c) => ({
-        ...c,
-        openingBalancePaise: c.currentBalancePaise,
-        syncStatus: 'synced',
-      }));
-
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.CUSTOMERS,
-        JSON.stringify(seededCustomers)
-      );
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.TRANSACTIONS,
-        JSON.stringify(INITIAL_TRANSACTIONS)
-      );
-      await AsyncStorage.setItem(STORAGE_KEYS.IS_INITIALIZED, 'true');
-
-      customersCache = seededCustomers;
-      transactionsCache = INITIAL_TRANSACTIONS;
+      await resetLedgerToGoldenWeighBridge();
       return;
     }
 
@@ -74,14 +113,35 @@ async function initializeIfNeeded(): Promise<void> {
 
     customersCache = rawCustomers ? JSON.parse(rawCustomers) : [];
     transactionsCache = rawTx ? JSON.parse(rawTx) : {};
+
+    // Purge any legacy voided transactions completely from local database & cloud
+    let purgedAny = false;
+    const currentTxCache = transactionsCache;
+    if (currentTxCache) {
+      for (const [custId, txList] of Object.entries(currentTxCache)) {
+        const activeOnly = (txList || []).filter((t) => !t.isVoided);
+        if (activeOnly.length !== (txList || []).length) {
+          purgedAny = true;
+          for (const t of txList || []) {
+            if (t.isVoided) {
+              await syncEngine.addToOutbox({
+                entity: 'transaction',
+                action: 'delete',
+                recordId: t.id,
+                payload: { id: t.id, customerId: custId },
+              });
+            }
+          }
+          currentTxCache[custId] = activeOnly;
+        }
+      }
+    }
+    if (purgedAny) {
+      await persist();
+    }
   } catch (error) {
     console.error('Failed to initialize local ledger repository:', error);
-    customersCache = INITIAL_CUSTOMERS.map((c) => ({
-      ...c,
-      openingBalancePaise: c.currentBalancePaise,
-      syncStatus: 'synced',
-    }));
-    transactionsCache = INITIAL_TRANSACTIONS;
+    await resetLedgerToGoldenWeighBridge();
   }
 }
 
@@ -168,6 +228,18 @@ export async function addCustomer(
 ): Promise<Customer> {
   await initializeIfNeeded();
 
+  // Validate that customer name or mobile number does not already exist
+  if (customersCache) {
+    const dupCheck = findDuplicateCustomer(
+      customersCache,
+      input.name,
+      input.phone
+    );
+    if (dupCheck.isDuplicate) {
+      throw new Error(dupCheck.errorMessage);
+    }
+  }
+
   const id = `cust-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
   const now = new Date().toISOString();
   const openingPaise = input.openingBalancePaise || 0;
@@ -250,8 +322,25 @@ export async function updateCustomer(
   const index = customersCache.findIndex((c) => c.id === id);
   if (index === -1) throw new Error(`Customer with ID ${id} not found`);
 
+  const currentCust = customersCache[index];
+  const newName = updates.name !== undefined ? updates.name : currentCust.name;
+  const newPhone = updates.phone !== undefined ? updates.phone : currentCust.phone;
+
+  // Validate that updated name or mobile number does not conflict with another existing customer
+  if (updates.name !== undefined || updates.phone !== undefined) {
+    const dupCheck = findDuplicateCustomer(
+      customersCache,
+      newName,
+      newPhone,
+      id
+    );
+    if (dupCheck.isDuplicate) {
+      throw new Error(dupCheck.errorMessage);
+    }
+  }
+
   const updated: Customer = {
-    ...customersCache[index],
+    ...currentCust,
     ...updates,
     updatedAt: new Date().toISOString(),
     syncStatus: 'pending_update',
@@ -321,7 +410,100 @@ export async function getCustomerTransactions(
 ): Promise<LedgerTransaction[]> {
   await initializeIfNeeded();
   if (!transactionsCache) return [];
-  return transactionsCache[customerId] || [];
+  return (transactionsCache[customerId] || []).filter((t) => !t.isVoided);
+}
+
+/**
+ * Retrieve entire transactions map (for backup snapshot engine)
+ * Excludes any voided transactions so backup files are 100% clean
+ */
+export async function getAllTransactionsMap(): Promise<Record<string, LedgerTransaction[]>> {
+  await initializeIfNeeded();
+  if (!transactionsCache) return {};
+  const copy: Record<string, LedgerTransaction[]> = {};
+  for (const [custId, txList] of Object.entries(transactionsCache)) {
+    copy[custId] = txList.filter((t) => !t.isVoided);
+  }
+  return copy;
+}
+
+/**
+ * Retrieve a flat array of all active ledger transactions across all customers
+ * Excludes voided transactions completely
+ */
+export async function getAllTransactionsList(): Promise<LedgerTransaction[]> {
+  await initializeIfNeeded();
+  if (!transactionsCache) return [];
+  const list: LedgerTransaction[] = [];
+  for (const txList of Object.values(transactionsCache)) {
+    for (const t of txList) {
+      if (!t.isVoided) list.push(t);
+    }
+  }
+  return list;
+}
+
+/**
+ * Safe restore of a verified ledger backup snapshot
+ * Prevents duplicate transactions by unique ID and recalculates all customer balances
+ */
+export async function restoreLedgerSnapshot(
+  restoredCustomers: Customer[],
+  restoredTransactions: Record<string, LedgerTransaction[]>
+): Promise<{ customersRestored: number; transactionsRestored: number }> {
+  await initializeIfNeeded();
+  if (!customersCache) customersCache = [];
+  if (!transactionsCache) transactionsCache = {};
+
+  let custCount = 0;
+  let txCount = 0;
+
+  // 1. Merge customers safely
+  for (const rc of restoredCustomers) {
+    const existingIndex = customersCache.findIndex((c) => c.id === rc.id);
+    if (existingIndex >= 0) {
+      // Preserve local updatedAt if newer
+      customersCache[existingIndex] = {
+        ...customersCache[existingIndex],
+        ...rc,
+      };
+    } else {
+      customersCache.push({ ...rc });
+    }
+    custCount++;
+  }
+
+  // 2. Merge transactions safely without duplicates and exclude any voided entries
+  for (const [custId, txList] of Object.entries(restoredTransactions)) {
+    if (!transactionsCache[custId]) {
+      transactionsCache[custId] = [];
+    }
+
+    const cleanList = txList.filter((t) => !t.isVoided);
+    for (const rt of cleanList) {
+      const existingTxIndex = transactionsCache[custId].findIndex((t) => t.id === rt.id);
+      if (existingTxIndex >= 0) {
+        transactionsCache[custId][existingTxIndex] = { ...rt };
+      } else {
+        transactionsCache[custId].push({ ...rt });
+      }
+      txCount++;
+    }
+  }
+
+  // 3. Recompute running balance for all customers
+  for (let i = 0; i < customersCache.length; i++) {
+    const cust = customersCache[i];
+    const txs = transactionsCache[cust.id] || [];
+    const breakdown = calculateCustomerBreakdown(cust.openingBalancePaise || 0, txs);
+    cust.currentBalancePaise = breakdown.netBalancePaise;
+    cust.totalGavePaise = breakdown.totalGavePaise;
+    cust.totalGotPaise = breakdown.totalGotPaise;
+  }
+
+  await persist();
+  notifyListeners();
+  return { customersRestored: custCount, transactionsRestored: txCount };
 }
 
 /**
@@ -408,7 +590,8 @@ export async function addTransaction(
 }
 
 /**
- * Void an erroneous transaction while preserving the audit trail
+ * Void / Delete a transaction: permanently removes it from the local cache,
+ * recalculates customer balance, and enqueues deletion to cloud and backup file.
  */
 export async function voidTransaction(
   customerId: string,
@@ -427,16 +610,103 @@ export async function voidTransaction(
   const txIndex = customerTx.findIndex((t) => t.id === transactionId);
   if (txIndex === -1) throw new Error('Transaction not found');
 
+  const removedTx = customerTx[txIndex];
+
+  // Completely remove transaction from local database / cache
+  customerTx.splice(txIndex, 1);
+  transactionsCache[customerId] = customerTx;
+
   const now = new Date().toISOString();
-  customerTx[txIndex] = {
-    ...customerTx[txIndex],
-    isVoided: true,
-    voidReason: reason || 'Voided by user',
+
+  // Recalculate balance for customer without the deleted transaction
+  const breakdown = calculateCustomerBreakdown(
+    customersCache[customerIndex].openingBalancePaise || 0,
+    customerTx
+  );
+
+  const updatedCustomer: Customer = {
+    ...customersCache[customerIndex],
+    currentBalancePaise: breakdown.netBalancePaise,
+    totalGavePaise: breakdown.totalGavePaise,
+    totalGotPaise: breakdown.totalGotPaise,
     updatedAt: now,
     syncStatus: 'pending_update',
   };
 
-  // Recalculate balance excluding voided transactions
+  customersCache[customerIndex] = updatedCustomer;
+
+  // Enqueue permanent DELETE action to sync outbox so it is removed from remote cloud database
+  await syncEngine.addToOutbox({
+    entity: 'transaction',
+    action: 'delete',
+    recordId: transactionId,
+    payload: { id: transactionId, customerId },
+  });
+
+  // Enqueue customer balance update to sync outbox
+  await syncEngine.addToOutbox({
+    entity: 'customer',
+    action: 'update',
+    recordId: updatedCustomer.id,
+    payload: updatedCustomer,
+  });
+
+  await persist();
+  notifyListeners();
+
+  return {
+    transaction: { ...removedTx, isVoided: true },
+    customer: updatedCustomer,
+  };
+}
+
+export const deleteTransaction = voidTransaction;
+
+export interface UpdateTransactionInput {
+  customerId: string;
+  transactionId: string;
+  amountPaise: number;
+  type: 'GAVE' | 'GOT';
+  date?: string;
+  description?: string;
+  billNumber?: string;
+}
+
+/**
+ * Update an existing ledger transaction and recompute running balance
+ */
+export async function updateTransaction(
+  input: UpdateTransactionInput
+): Promise<{ transaction: LedgerTransaction; customer: Customer }> {
+  await initializeIfNeeded();
+  if (!customersCache || !transactionsCache) {
+    throw new Error('Repository not initialized');
+  }
+
+  const customerIndex = customersCache.findIndex((c) => c.id === input.customerId);
+  if (customerIndex === -1) throw new Error('Customer not found');
+
+  const customerTx = transactionsCache[input.customerId] || [];
+  const txIndex = customerTx.findIndex((t) => t.id === input.transactionId);
+  if (txIndex === -1) throw new Error('Transaction not found');
+
+  const now = new Date().toISOString();
+  const absAmount = Math.abs(Math.round(input.amountPaise));
+
+  const updatedTx: LedgerTransaction = {
+    ...customerTx[txIndex],
+    amountPaise: absAmount,
+    type: input.type,
+    date: input.date || customerTx[txIndex].date,
+    description: input.description?.trim(),
+    billNumber: input.billNumber?.trim(),
+    updatedAt: now,
+    syncStatus: 'pending_update',
+  };
+
+  customerTx[txIndex] = updatedTx;
+
+  // Recalculate customer running balance
   const activeTx = customerTx.filter((t) => !t.isVoided);
   const breakdown = calculateCustomerBreakdown(
     customersCache[customerIndex].openingBalancePaise || 0,
@@ -454,25 +724,25 @@ export async function voidTransaction(
 
   customersCache[customerIndex] = updatedCustomer;
 
-  // Enqueue transaction void update to sync outbox
+  // Enqueue transaction update to sync outbox
   await syncEngine.addToOutbox({
     entity: 'transaction',
     action: 'update',
-    recordId: customerTx[txIndex].id,
-    payload: customerTx[txIndex],
+    recordId: updatedTx.id,
+    payload: updatedTx,
   });
 
   await persist();
   notifyListeners();
 
   return {
-    transaction: customerTx[txIndex],
+    transaction: updatedTx,
     customer: updatedCustomer,
   };
 }
 
 /**
- * Merge remote data pulled from Supabase cloud into local repository (Last-Write-Wins)
+ * Merge remote data pulled from Supabase cloud into local repository (Last-Write-Wins and Deletion Reconciliation)
  */
 export async function mergeRemoteDataIntoLocal(
   remoteCustomers: any[],
@@ -482,7 +752,45 @@ export async function mergeRemoteDataIntoLocal(
   if (!customersCache) customersCache = [];
   if (!transactionsCache) transactionsCache = {};
 
-  // 1. Merge customers
+  const outbox = await syncEngine.getOutbox();
+  const pendingUploadTxIds = new Set(
+    outbox
+      .filter(
+        (item) =>
+          item.entity === 'transaction' &&
+          (item.action === 'insert' || item.action === 'update')
+      )
+      .map((item) => item.recordId)
+  );
+  const pendingUploadCustomerIds = new Set(
+    outbox
+      .filter(
+        (item) =>
+          item.entity === 'customer' &&
+          (item.action === 'insert' || item.action === 'update')
+      )
+      .map((item) => item.recordId)
+  );
+
+  // 1. Reconcile and Merge Customers
+  const remoteCustomerMap = new Map<string, any>();
+  for (const rc of remoteCustomers) {
+    remoteCustomerMap.set(rc.id, rc);
+  }
+
+  // If remote customers list is provided from cloud, reconcile remotely deleted customers
+  if (remoteCustomers.length > 0) {
+    customersCache = customersCache.filter((localCust) => {
+      if (pendingUploadCustomerIds.has(localCust.id)) return true;
+      if (remoteCustomerMap.has(localCust.id)) return true;
+      // Remotely deleted customer: purge from local cache
+      if (transactionsCache) {
+        delete transactionsCache[localCust.id];
+      }
+      return false;
+    });
+  }
+
   for (const rc of remoteCustomers) {
     const existingIndex = customersCache.findIndex((c) => c.id === rc.id);
     if (existingIndex >= 0) {
@@ -518,16 +826,60 @@ export async function mergeRemoteDataIntoLocal(
     }
   }
 
-  // 2. Merge transactions
+  // 2. Reconcile and Merge Transactions
+  const validRemoteTxMap = new Map<string, any>();
+  const remoteTxIdsByCust = new Map<string, Set<string>>();
+
   for (const rt of remoteTransactions) {
+    if (Boolean(rt.is_void)) {
+      continue;
+    }
+    validRemoteTxMap.set(rt.id, rt);
+
+    let custSet = remoteTxIdsByCust.get(rt.customer_id);
+    if (!custSet) {
+      custSet = new Set<string>();
+      remoteTxIdsByCust.set(rt.customer_id, custSet);
+    }
+    custSet.add(rt.id);
+  }
+
+  // RECONCILE REMOTELY DELETED TRANSACTIONS:
+  // For every customer, remove any local transaction that was deleted from the cloud
+  // (unless it's an offline creation currently waiting in the outbox)
+  for (const custId of Object.keys(transactionsCache)) {
+    const localTxList = transactionsCache[custId] || [];
+    const remoteIdsForCust = remoteTxIdsByCust.get(custId) || new Set<string>();
+
+    transactionsCache[custId] = localTxList.filter((localTx) => {
+      // Keep if pending local upload
+      if (pendingUploadTxIds.has(localTx.id)) {
+        return true;
+      }
+      // Keep if present in active remote transactions
+      if (remoteIdsForCust.has(localTx.id)) {
+        return true;
+      }
+      // Remotely deleted transaction: remove from local cache!
+      return false;
+    });
+  }
+
+  // MERGE / INSERT ACTIVE REMOTE TRANSACTIONS
+  for (const [rtId, rt] of validRemoteTxMap.entries()) {
     const custId = rt.customer_id;
     if (!transactionsCache[custId]) {
       transactionsCache[custId] = [];
     }
 
     const existingTxIndex = transactionsCache[custId].findIndex(
-      (t) => t.id === rt.id
+      (t) => t.id === rtId
     );
+
+    const isOpening =
+      Boolean(rt.is_opening_balance) ||
+      (typeof rt.description === 'string' && rt.description.toLowerCase().includes('opening')) ||
+      (typeof rt.id === 'string' && rt.id.includes('init'));
 
     const mappedTx: LedgerTransaction = {
       id: rt.id,
@@ -536,8 +888,8 @@ export async function mergeRemoteDataIntoLocal(
       type: rt.type as any,
       date: rt.transaction_date,
       description: rt.description || undefined,
-      isVoided: Boolean(rt.is_void),
-      voidReason: rt.void_reason || undefined,
+      isOpeningBalance: isOpening,
+      isVoided: false,
       createdAt: rt.created_at,
       updatedAt: rt.updated_at,
       syncStatus: 'synced',
@@ -550,15 +902,30 @@ export async function mergeRemoteDataIntoLocal(
     }
   }
 
-  // 3. Recompute balance for all customers
+  // Also clean up any voided transactions that came down from remote
+  for (const rt of remoteTransactions) {
+    if (Boolean(rt.is_void)) {
+      const custId = rt.customer_id;
+      if (transactionsCache[custId]) {
+        transactionsCache[custId] = transactionsCache[custId].filter(
+          (t) => t.id !== rt.id
+        );
+      }
+    }
+  }
+
+  // 3. Recompute balance and breakdown totals for all customers
   for (let i = 0; i < customersCache.length; i++) {
     const cust = customersCache[i];
     const txs = transactionsCache[cust.id] || [];
     const activeTx = txs.filter((t) => !t.isVoided);
-    cust.currentBalancePaise = calculateCustomerBalance(
+    const breakdown = calculateCustomerBreakdown(
       cust.openingBalancePaise || 0,
       activeTx
     );
+    cust.currentBalancePaise = breakdown.netBalancePaise;
+    cust.totalGavePaise = breakdown.totalGavePaise;
+    cust.totalGotPaise = breakdown.totalGotPaise;
   }
 
   await persist();

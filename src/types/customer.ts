@@ -18,10 +18,11 @@ export interface Customer {
   address?: string;
   notes?: string;
   openingBalancePaise?: number;
-  currentBalancePaise: number; // positive = you will get, negative = you will give, 0 = settled
+  currentBalancePaise: number; // positive = you will get, negative = you got (advance), 0 = settled
   totalGavePaise?: number;
   totalGotPaise?: number;
   lastTransactionDate?: string;
+  avatarUrl?: string;
   createdAt: string;
   updatedAt?: string;
   isArchived: boolean;
@@ -53,7 +54,7 @@ export interface CreateCustomerInput {
   phone: string;
   address?: string;
   notes?: string;
-  openingBalancePaise?: number; // positive = you will get, negative = you will give
+  openingBalancePaise?: number; // positive = you will get, negative = you got
 }
 
 export interface AddTransactionInput {

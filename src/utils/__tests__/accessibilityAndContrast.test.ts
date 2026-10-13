@@ -128,8 +128,31 @@ assert(
   `Dark primary on surface must meet WCAG AA large text (>= 3.0:1, got ${darkPrimaryRatio})`
 );
 
-// 4. Low Resolution & Font Scaling Resilience
-console.log('\n4. Testing Font Scaling & Small Screen Invariants...');
+// 4. Modern Navbar Contrast Conformance
+console.log('\n4. Testing Modern Floating Bottom Navbar Contrast against WCAG AA...');
+const lightBarActiveRatio = getContrastRatio(lightColors.tabBarBg, lightColors.tabBarActive);
+console.log(` - Light Mode Navbar Bg (#0F172A) vs Active Icon/Text (#38BDF8): ${lightBarActiveRatio}:1`);
+assert(
+  meetsWcagAA(lightColors.tabBarBg, lightColors.tabBarActive, true),
+  `Light mode navbar active item must meet WCAG AA (>= 3.0:1, got ${lightBarActiveRatio})`
+);
+
+const lightBarInactiveRatio = getContrastRatio(lightColors.tabBarBg, lightColors.tabBarInactive);
+console.log(` - Light Mode Navbar Bg (#0F172A) vs Inactive Icon/Text (#94A3B8): ${lightBarInactiveRatio}:1`);
+assert(
+  meetsWcagAA(lightColors.tabBarBg, lightColors.tabBarInactive, false),
+  `Light mode navbar inactive item must meet WCAG AA (>= 4.5:1, got ${lightBarInactiveRatio})`
+);
+
+const darkBarActiveRatio = getContrastRatio(darkColors.tabBarBg, darkColors.tabBarActive);
+console.log(` - Dark Mode Navbar Bg (#0B1120) vs Active Icon/Text (#60A5FA): ${darkBarActiveRatio}:1`);
+assert(
+  meetsWcagAA(darkColors.tabBarBg, darkColors.tabBarActive, true),
+  `Dark mode navbar active item must meet WCAG AA (>= 3.0:1, got ${darkBarActiveRatio})`
+);
+
+// 5. Low Resolution & Font Scaling Resilience
+console.log('\n5. Testing Font Scaling & Small Screen Invariants...');
 const minViewportWidth = 320; // Smallest Android budget device width (e.g. JioPhone / Redmi Go)
 const padding = 16 * 2;
 const availableContentWidth = minViewportWidth - padding;

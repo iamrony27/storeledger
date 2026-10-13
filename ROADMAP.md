@@ -15,9 +15,11 @@
 - [x] **Phase 4: Supabase Database Schema, Authentication & Row Level Security (RLS)**
 - [x] **Phase 5: Offline Persistence, Write Queue, Idempotent Cloud Sync & Conflict Handling**
 - [x] **Phase 6: Phone Calls, WhatsApp Report sender, Receipts & PDF Reports**
-- [ ] **Phase 7: Khatabook PDF Current-Balance Importer & Reconciliation Engine**
-- [ ] **Phase 8: Comprehensive Automated Testing, Security Review & Accessibility**
-- [ ] **Phase 9: Android Device Testing, EAS APK Build & Deployment Guide**
+- [x] **Phase 7: Khatabook PDF Current-Balance Importer & Reconciliation Engine**
+- [x] **Phase 8: Comprehensive Automated Testing, Security Review & Accessibility**
+- [x] **Phase 9: Android Device Testing, EAS APK Build & Deployment Guide**
+- [x] **Phase 10: Automatic Cloud Backup & Verified Snapshot Synchronization (Feature A)**
+- [x] **Phase 11: Supabase Plan Usage & Remaining Quota Monitor Dashboard (Feature B)**
 
 ---
 
@@ -192,3 +194,42 @@
 - [x] Document EAS build commands (`npx eas-cli@latest build --platform android --profile preview`).
 - [x] Document generated `.apk` file download and installation workflow.
 - [x] Produce end-user operational manual, disaster recovery plan, and Supabase free tier maintenance procedures (`DEPLOYMENT_AND_OPERATIONS_MANUAL.md`).
+
+---
+
+### Phase 10: Automatic Cloud Backup & Verified Snapshot Synchronization (Feature A)
+- [x] **10.1 Backup Snapshot Data Model & Engine:**
+  - Create `ledgerBackupEngine.ts` handling data snapshotting (customers, transactions, settings, import metadata).
+  - Exclude session tokens, passwords, and private secrets.
+  - Compute verifiable SHA-256 / Adler checksums, record counts, and schema version (`v1`).
+- [x] **10.2 Backup Scheduler & Android Lifecycle Integration:**
+  - Configurable 4-day (96-hour) default interval, structured for future 5-day (120-hour) interval.
+  - Store last-success timestamp, next eligible time, backup ID, and status persistently in `AsyncStorage`.
+  - Android foreground / resume lifecycle hook (`AppState` active listener) executing overdue backups.
+  - Document Android Doze, battery restrictions, and Expo Go background execution realities.
+  - Manual "Backup Now" trigger with verification before success reporting.
+- [x] **10.3 Cloud Persistence & Migration:**
+  - Create PostgreSQL migration `006_create_ledger_backups_table.sql` with strict RLS (`business_id = auth.uid()`).
+  - Safe retention rules (e.g. keep latest 10 snapshots) and prevent overwriting newer backups with older ones.
+- [x] **10.4 Safe Restore Engine:**
+  - Restore preview with record diff, checksum verification, and duplicate prevention.
+  - Explicit confirmation modal preventing silent data loss.
+
+---
+
+### Phase 11: Supabase Plan Usage & Remaining Quota Monitor Dashboard (Feature B)
+- [x] **11.1 Authoritative Usage Engine & Metrics Calculator:**
+  - Create `supabaseUsageMonitor.ts` implementing quota arithmetic: `remaining = quota - used`.
+  - Distinguish authoritative metrics (database row counts, active business records, backup archive size) from plan estimates (Free plan 500 MB DB limit, 1 GB Storage limit).
+  - Explicitly mark unretrievable metrics (like egress or edge functions without Management API) as "Unavailable" rather than inventing numbers.
+  - Never embed Supabase Service Role keys or Personal Access Tokens in mobile bundle.
+- [x] **11.2 Quota Warning Threshold Engine:**
+  - Configurable thresholds at 70%, 85%, and 95%.
+  - Visual non-intrusive alerts and warning badges without emojis.
+- [x] **11.3 Cloud Usage & Backup UI in Settings Screen:**
+  - Dedicated "Cloud Usage & Quota" card and "Automatic Backup & Restore" management section in `src/app/(tabs)/settings.tsx`.
+  - Progress bars, quota percentage, remaining amounts, and last refreshed timestamp.
+  - Backup history list with date, size, record count, and restore action.
+- [x] **11.4 Comprehensive Test Suite & Documentation:**
+  - Unit tests for backup scheduling, checksum validation, restore safety, quota arithmetic, and warning thresholds.
+  - Update `SETUP_GUIDE.md` and `README.md` with operational guidance.

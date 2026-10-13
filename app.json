@@ -13,6 +13,11 @@
     },
     "android": {
       "package": "com.gwd.book",
+      "versionCode": 1,
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#0F172A",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -27,6 +32,13 @@
     "plugins": [
       "expo-font",
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8bc88bdf-d66d-4285-85d0-d79dc127c927"
+      }
+    },
+    "owner": "iamrony"
   }
 }

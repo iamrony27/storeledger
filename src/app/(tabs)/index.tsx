@@ -1,33 +1,36 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   FlatList,
+  Animated,
   TouchableOpacity,
   ScrollView,
   RefreshControl,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { AppIcon } from '../../components/AppIcon';
-import { AppTextInput } from '../../components/AppTextInput';
+import { CollapsibleExecutiveTopBar } from '../../components/CollapsibleExecutiveTopBar';
 import { CustomerCard } from '../../components/CustomerCard';
 import { EmptyState } from '../../components/EmptyState';
-import { SyncIndicator } from '../../components/SyncIndicator';
-import { DashboardChart } from '../../components/DashboardChart';
+import { useTabBarVisibility } from '../../context/TabBarVisibilityContext';
 import { syncEngine } from '../../sync/syncEngine';
 import {
   Customer,
+  LedgerTransaction,
   formatINR,
   getBalanceType,
   calculateLedgerTotals,
 } from '../../types/customer';
 import {
   getCustomers,
+  getAllTransactionsList,
   deleteCustomer,
   subscribeToRepository,
 } from '../../storage/localLedgerRepository';
@@ -36,10 +39,20 @@ type FilterType = 'ALL' | 'GET' | 'GIVE' | 'SETTLED';
 type SortType = 'RECENT' | 'AMOUNT' | 'NAME';
 
 export default function CustomersScreen() {
-  const { colors, spacing, borderRadius, toggleTheme, isDark } = useTheme();
-  const { t, language, setLanguage } = useLanguage();
+  const { colors, borderRadius } = useTheme();
+  const { t } = useLanguage();
+  const { scrollY, diffClampedScrollY } = useTabBarVisibility();
+  const insets = useSafeAreaInsets();
+  const flatListRef = useRef<FlatList>(null);
+
+  const DRAWER_HEIGHT = 128;
+  const SEARCH_BAR_HEIGHT = 54;
+  const safeTopPadding = Math.max(insets.top, 14);
+  const FIXED_BAR_HEIGHT = safeTopPadding + 52;
+  const totalTopBarHeight = FIXED_BAR_HEIGHT + DRAWER_HEIGHT + SEARCH_BAR_HEIGHT;
 
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [transactions, setTransactions] = useState<LedgerTransaction[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterType>('ALL');
   const [activeSort, setActiveSort] = useState<SortType>('RECENT');
@@ -49,8 +62,12 @@ export default function CustomersScreen() {
     setIsRefreshing(true);
     try {
       await syncEngine.syncNow();
-      const data = await getCustomers();
-      setCustomers(data);
+      const [custData, txData] = await Promise.all([
+        getCustomers(),
+        getAllTransactionsList(),
+      ]);
+      setCustomers(custData);
+      setTransactions(txData);
     } finally {
       setIsRefreshing(false);
     }
@@ -59,8 +76,14 @@ export default function CustomersScreen() {
   useEffect(() => {
     let isMounted = true;
     const load = async () => {
-      const data = await getCustomers();
-      if (isMounted) setCustomers(data);
+      const [custData, txData] = await Promise.all([
+        getCustomers(),
+        getAllTransactionsList(),
+      ]);
+      if (isMounted) {
+        setCustomers(custData);
+        setTransactions(txData);
+      }
     };
     load();
     const unsubscribe = subscribeToRepository(() => {
@@ -73,17 +96,132 @@ export default function CustomersScreen() {
   }, []);
 
   // Calculate summary totals
-  const summary = useMemo(() => calculateLedgerTotals(customers), [customers]);
+  const summary = useMemo(() => {
+    const totals = calculateLedgerTotals(customers);
+
+    // Calculate total received (You Got) from customer records and transactions
+    let totalGotFromCust = 0;
+    for (const c of customers) {
+      if (c.totalGotPaise && c.totalGotPaise > 0) {
+        totalGotFromCust += c.totalGotPaise;
+      } else if (c.currentBalancePaise < 0) {
+        totalGotFromCust += Math.abs(c.currentBalancePaise);
+      }
+    }
+
+    let totalGotFromTx = 0;
+    for (const tx of transactions) {
+      if (!tx.isVoided && tx.type === 'GOT') {
+        totalGotFromTx += tx.amountPaise;
+      }
+    }
+
+    const effectiveGotPaise = Math.max(
+      totals.youWillGivePaise,
+      totalGotFromCust,
+      totalGotFromTx
+    );
+
+    return {
+      ...totals,
+      totalGotPaise: effectiveGotPaise,
+    };
+  }, [customers, transactions]);
+
+  // Today's Due Calculation (Total credit given today, collections, and active entries)
+  const todaySummary = useMemo(() => {
+    const now = new Date();
+    const todayStr = now.toDateString();
+    let gavePaise = 0;
+    let gotPaise = 0;
+    let entriesCount = 0;
+    const activeCustomerIds = new Set<string>();
+
+    for (const tx of transactions) {
+      if (tx.isVoided) continue;
+      const txDate = new Date(tx.date || tx.createdAt);
+      if (isNaN(txDate.getTime())) continue;
+
+      if (txDate.toDateString() === todayStr) {
+        entriesCount++;
+        activeCustomerIds.add(tx.customerId);
+        if (tx.type === 'GAVE') {
+          gavePaise += tx.amountPaise;
+        } else if (tx.type === 'GOT') {
+          gotPaise += tx.amountPaise;
+        }
+      }
+    }
+
+    return {
+      gavePaise,
+      gotPaise,
+      entriesCount,
+      customersCount: activeCustomerIds.size,
+    };
+  }, [transactions]);
+
+  const todayFormattedDate = useMemo(() => {
+    const d = new Date();
+    return d.toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'short',
+    });
+  }, []);
+
+  // Map each customer to their most recent transaction timestamp or creation activity
+  const latestTxDateByCustomer = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const tx of transactions) {
+      if (tx.isVoided) continue;
+      const createdTime = new Date(tx.createdAt || 0).getTime() || 0;
+      const dateVal = new Date(tx.date || 0).getTime() || 0;
+      const txTime = Math.max(createdTime, dateVal);
+      if (!isNaN(txTime) && txTime > 0) {
+        const existing = map.get(tx.customerId) || 0;
+        if (txTime > existing) {
+          map.set(tx.customerId, txTime);
+        }
+      }
+    }
+    return map;
+  }, [transactions]);
+
+  const getCustomerRecency = useCallback(
+    (c: Customer): number => {
+      // 1. Transaction recency or customer update recency (so adding a transaction today immediately bumps customer to top)
+      const txTime = latestTxDateByCustomer.get(c.id) || 0;
+      const updatedTime = c.updatedAt ? new Date(c.updatedAt).getTime() : 0;
+      const maxActivity = Math.max(txTime, isNaN(updatedTime) ? 0 : updatedTime);
+      if (maxActivity > 0) return maxActivity;
+
+      // 2. Last transaction date string from Khatabook or prior record
+      if (c.lastTransactionDate) {
+        const t = new Date(c.lastTransactionDate).getTime();
+        if (!isNaN(t) && t > 0) return t;
+      }
+
+      // 3. Creation timestamp
+      if (c.createdAt) {
+        const t = new Date(c.createdAt).getTime();
+        if (!isNaN(t) && t > 0) return t;
+      }
+
+      return 0;
+    },
+    [latestTxDateByCustomer]
+  );
 
   // Filter and sort customer list
   const filteredCustomers = useMemo(() => {
     return customers
       .filter((customer) => {
-        // Search filter (name or phone)
-        const query = searchQuery.trim().toLowerCase();
+        // Search filter (supports English and Bengali Unicode text)
+        const query = searchQuery.trim().toLowerCase().normalize('NFC');
+        const custName = (customer.name || '').toLowerCase().normalize('NFC');
         const matchesQuery =
           query === '' ||
-          customer.name.toLowerCase().includes(query) ||
+          custName.includes(query) ||
           customer.phone.includes(query);
 
         if (!matchesQuery) return false;
@@ -97,22 +235,27 @@ export default function CustomersScreen() {
       })
       .sort((a, b) => {
         if (activeSort === 'NAME') {
-          return a.name.localeCompare(b.name);
+          return a.name.localeCompare(b.name, ['en', 'bn'], { sensitivity: 'base' });
         }
         if (activeSort === 'AMOUNT') {
           return (
             Math.abs(b.currentBalancePaise) - Math.abs(a.currentBalancePaise)
           );
         }
-        // RECENT: default order
-        return 0;
+        // RECENT (default): customer with most recent transaction / activity on top
+        const recencyA = getCustomerRecency(a);
+        const recencyB = getCustomerRecency(b);
+        if (recencyB !== recencyA) {
+          return recencyB - recencyA;
+        }
+        return a.name.localeCompare(b.name, ['en', 'bn'], { sensitivity: 'base' });
       });
-  }, [customers, searchQuery, activeFilter, activeSort]);
+  }, [customers, searchQuery, activeFilter, activeSort, getCustomerRecency]);
 
   const handleCustomerLongPress = (cust: Customer) => {
     Alert.alert(
       cust.name,
-      `Phone: ${cust.phone || 'N/A'}\nBalance: ${formatINR(cust.currentBalancePaise)} (${getBalanceType(cust.currentBalancePaise) === 'GET' ? "You'll Get" : "You'll Give"})`,
+      `Phone: ${cust.phone || 'N/A'}\nBalance: ${formatINR(cust.currentBalancePaise)} (${getBalanceType(cust.currentBalancePaise) === 'GET' ? "You'll Get" : "You Got"})`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -143,221 +286,30 @@ export default function CustomersScreen() {
     );
   };
 
-  // Language cycle toggle
-  const cycleLanguage = () => {
-    if (language === 'en') setLanguage('bn');
-    else if (language === 'bn') setLanguage('hi');
-    else setLanguage('en');
-  };
-
   return (
-    <SafeAreaView
-      edges={['top', 'left', 'right']}
-      style={[styles.safeArea, { backgroundColor: colors.background }]}
-    >
-      {/* Header Bar */}
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: colors.surface,
-            borderBottomColor: colors.border,
-          },
-        ]}
-      >
-        <View style={styles.brandRow}>
-          <View
-            style={[
-              styles.logoBox,
-              { backgroundColor: colors.primaryLight, borderRadius: borderRadius.sm },
-            ]}
-          >
-            <AppIcon
-              family="material"
-              name="book-open-page-variant"
-              size={22}
-              color={colors.primary}
-            />
-          </View>
-          <View>
-            <Text style={[styles.brandTitle, { color: colors.textPrimary }]}>
-              {t.common.appName}
-            </Text>
-            <View style={{ marginTop: 2, alignItems: 'flex-start' }}>
-              <SyncIndicator />
-            </View>
-          </View>
-        </View>
+    <View style={[styles.safeArea, { backgroundColor: colors.background }]}>
+      <StatusBar style="light" />
 
-        {/* Top Controls: Language and Theme Toggle */}
-        <View style={styles.headerControls}>
-          <TouchableOpacity
-            onPress={cycleLanguage}
-            accessibilityRole="button"
-            accessibilityLabel={`Language selector. Current language is ${language.toUpperCase()}`}
-            accessibilityHint="Cycles between English, Bengali, and Hindi"
-            style={[
-              styles.headerControlBtn,
-              {
-                backgroundColor: colors.borderLight,
-                borderColor: colors.border,
-                borderRadius: borderRadius.sm,
-              },
-            ]}
-          >
-            <Text style={[styles.langText, { color: colors.textPrimary }]}>
-              {language.toUpperCase()}
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={toggleTheme}
-            accessibilityRole="button"
-            accessibilityLabel={`Theme toggle. Currently ${isDark ? 'Dark mode' : 'Light mode'}`}
-            accessibilityHint="Toggles between dark and light appearance"
-            style={[
-              styles.headerControlBtn,
-              {
-                backgroundColor: colors.borderLight,
-                borderColor: colors.border,
-                borderRadius: borderRadius.sm,
-              },
-            ]}
-          >
-            <AppIcon
-              name={isDark ? 'sun' : 'moon'}
-              size={16}
-              color={isDark ? colors.warning : colors.textPrimary}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Main Content */}
-      <FlatList
+      {/* Main Content (Smooth 120Hz native driver scroll tracking) */}
+      <Animated.FlatList
+        ref={flatListRef as any}
         data={filteredCustomers}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.listContainer, { padding: spacing.md, paddingBottom: 120 }]}
+        scrollEventThrottle={16}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+        contentContainerStyle={[
+          styles.listContainer,
+          {
+            paddingTop: totalTopBarHeight + 8,
+            paddingBottom: 120,
+          },
+        ]}
         ListHeaderComponent={
           <View style={styles.headerContent}>
-            {/* Khatabook-style Financial Summary Card */}
-            <View
-              style={[
-                styles.summaryCard,
-                {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                  borderRadius: borderRadius.lg,
-                },
-              ]}
-            >
-              {/* Split Summary: You Will Get / You Will Give */}
-              <View style={styles.splitRow}>
-                <View
-                  style={[
-                    styles.splitItem,
-                    { borderRightColor: colors.border, borderRightWidth: 1 },
-                  ]}
-                >
-                  <View style={styles.splitLabelRow}>
-                    <AppIcon
-                      name="arrow-down-left"
-                      size={15}
-                      color={colors.youWillGet}
-                    />
-                    <Text
-                      style={[
-                        styles.splitLabel,
-                        { color: colors.textSecondary },
-                      ]}
-                    >
-                      {t.dashboard.youWillGet}
-                    </Text>
-                  </View>
-                  <Text
-                    style={[
-                      styles.splitAmount,
-                      { color: colors.youWillGet },
-                    ]}
-                  >
-                    {formatINR(summary.youWillGetPaise)}
-                  </Text>
-                </View>
-
-                <View style={styles.splitItem}>
-                  <View style={styles.splitLabelRow}>
-                    <AppIcon
-                      name="arrow-up-right"
-                      size={15}
-                      color={colors.youWillGive}
-                    />
-                    <Text
-                      style={[
-                        styles.splitLabel,
-                        { color: colors.textSecondary },
-                      ]}
-                    >
-                      {t.dashboard.youWillGive}
-                    </Text>
-                  </View>
-                  <Text
-                    style={[
-                      styles.splitAmount,
-                      { color: colors.youWillGive },
-                    ]}
-                  >
-                    {formatINR(summary.youWillGivePaise)}
-                  </Text>
-                </View>
-              </View>
-
-              {/* Net Balance Footer */}
-              <View
-                style={[
-                  styles.netBalanceRow,
-                  {
-                    backgroundColor: colors.borderLight,
-                    borderTopColor: colors.border,
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.netBalanceLabel,
-                    { color: colors.textSecondary },
-                  ]}
-                >
-                  {t.dashboard.netBalance}
-                </Text>
-                <Text
-                  style={[
-                    styles.netBalanceAmount,
-                    {
-                      color:
-                        summary.netBalancePaise >= 0
-                          ? colors.youWillGet
-                          : colors.youWillGive,
-                    },
-                  ]}
-                >
-                  {formatINR(summary.netBalancePaise)}
-                </Text>
-              </View>
-            </View>
-
-            {/* Comprehensive Financial Dashboard Chart */}
-            <DashboardChart customers={customers} />
-
-            {/* Search Input */}
-            <AppTextInput
-              placeholder={t.dashboard.searchPlaceholder}
-              iconName="search"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              onClear={() => setSearchQuery('')}
-            />
-
             {/* Filter Chips */}
             <ScrollView
               horizontal
@@ -491,29 +443,29 @@ export default function CustomersScreen() {
             onRefresh={handleRefresh}
             colors={[colors.primary]}
             tintColor={colors.primary}
+            progressViewOffset={totalTopBarHeight}
           />
         }
       />
 
-      {/* Floating Action Button (FAB) for Add Customer */}
-      <TouchableOpacity
-        onPress={() => router.push('/customer/add' as any)}
-        activeOpacity={0.85}
-        accessibilityRole="button"
-        accessibilityLabel={t.dashboard.addCustomer}
-        accessibilityHint="Opens screen to add a new customer"
-        style={[
-          styles.fab,
-          {
-            backgroundColor: colors.primary,
-            borderRadius: borderRadius.full,
-          },
-        ]}
-      >
-        <AppIcon name="user-plus" size={20} color="#FFFFFF" />
-        <Text style={styles.fabText}>{t.dashboard.addCustomer}</Text>
-      </TouchableOpacity>
-    </SafeAreaView>
+      {/* Modern Long-Height Collapsible Executive Title Bar with Integrated Search (Color Hunt: #EF6905) */}
+      <CollapsibleExecutiveTopBar
+        appName={t.common.appName}
+        subtitle="Golden Weigh Bridge"
+        todayFormattedDate={todayFormattedDate}
+        youWillGetPaise={summary.youWillGetPaise}
+        totalGotPaise={summary.totalGotPaise > 0 ? summary.totalGotPaise : summary.youWillGivePaise}
+        netBalancePaise={summary.netBalancePaise}
+        todayGavePaise={todaySummary.gavePaise}
+        todayGotPaise={todaySummary.gotPaise}
+        showSync={true}
+        diffClampedScrollY={diffClampedScrollY}
+        searchQuery={searchQuery}
+        onSearchQueryChange={setSearchQuery}
+        searchPlaceholder={t.dashboard.searchPlaceholder}
+        onPressExpand={() => flatListRef.current?.scrollToOffset({ offset: 0, animated: true })}
+      />
+    </View>
   );
 }
 
@@ -522,12 +474,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    position: 'relative',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderBottomWidth: 1,
+    borderBottomWidth: 1.5,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+  },
+  headerAccentLine: {
+    position: 'absolute',
+    bottom: -1.5,
+    left: 16,
+    right: 16,
+    height: 2,
+    borderRadius: 1,
   },
   brandRow: {
     flexDirection: 'row',
@@ -537,44 +503,44 @@ const styles = StyleSheet.create({
   logoBox: {
     width: 38,
     height: 38,
+    borderRadius: 12,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  brandTextGroup: {
+    justifyContent: 'center',
+  },
   brandTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    letterSpacing: -0.3,
+    fontSize: 18,
+    fontWeight: '800',
+    letterSpacing: -0.4,
   },
-  syncRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 2,
-  },
-  syncText: {
+  brandSubtitle: {
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: '500',
+    letterSpacing: 0.1,
+    marginTop: 0.5,
   },
   headerControls: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
-  headerControlBtn: {
+  themeToggleBtn: {
+    width: 34,
     height: 34,
-    paddingHorizontal: 10,
+    borderRadius: 17,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  langText: {
-    fontSize: 11,
-    fontWeight: '700',
   },
   listContainer: {
     paddingBottom: 90,
   },
   headerContent: {
+    paddingTop: 8,
+    paddingHorizontal: 16,
     marginBottom: 6,
   },
   summaryCard: {
@@ -662,24 +628,75 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '600',
   },
-  fab: {
-    position: 'absolute',
-    bottom: 86,
-    right: 20,
+  todayDueCard: {
+    borderWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 18,
-    elevation: 6,
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    marginBottom: 12,
+    elevation: 1,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
-    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 2,
   },
-  fabText: {
-    color: '#FFFFFF',
+  todayDueLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    flex: 1,
+  },
+  todayDueIconBox: {
+    width: 34,
+    height: 34,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  todayDueTextGroup: {
+    flex: 1,
+  },
+  todayDueTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  todayDueTitle: {
     fontSize: 13,
     fontWeight: '700',
+    letterSpacing: -0.2,
+  },
+  todayDateBadge: {
+    paddingHorizontal: 5,
+    paddingVertical: 1.5,
+  },
+  todayDateBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  todayDueSubtitle: {
+    fontSize: 11,
+    marginTop: 1,
+  },
+  todayDueRight: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    marginLeft: 8,
+  },
+  todayDueAmountRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  todayDueAmount: {
+    fontSize: 14,
+    fontWeight: '800',
+    letterSpacing: -0.2,
+  },
+  todayGotMiniText: {
+    fontSize: 10,
+    fontWeight: '600',
+    marginTop: 2,
   },
 });

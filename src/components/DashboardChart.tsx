@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
   Dimensions,
 } from 'react-native';
 import Svg, {
@@ -11,7 +12,6 @@ import Svg, {
   Line,
   Text as SvgText,
   G,
-  Circle,
 } from 'react-native-svg';
 import { useTheme } from '../theme/ThemeContext';
 import { AppIcon } from './AppIcon';
@@ -27,87 +27,225 @@ interface DashboardChartProps {
   }[];
 }
 
-interface DayData {
-  dayLabel: string;
+interface ChartDataPoint {
+  key: string;
+  label: string;
+  shortLabel: string;
+  fullLabel: string;
   gavePaise: number;
   gotPaise: number;
 }
+
+type ChartTab = '30days' | 'monthly' | 'yearly' | 'topDebtors' | 'summary';
 
 export const DashboardChart: React.FC<DashboardChartProps> = ({
   customers,
   allTransactions = [],
 }) => {
   const { colors, borderRadius, spacing } = useTheme();
-  const [activeTab, setActiveTab] = useState<'7days' | 'summary'>('7days');
+  const [activeTab, setActiveTab] = useState<ChartTab>('30days');
+  const [selectedPoint, setSelectedPoint] = useState<ChartDataPoint | null>(null);
 
-  // Compute daily gave and got over the last 7 days
-  const chartData: DayData[] = useMemo(() => {
-    const days: DayData[] = [];
+  // 1. DATE-WISE (30 DAYS) AGGREGATION
+  const thirtyDaysData: ChartDataPoint[] = useMemo(() => {
+    const list: ChartDataPoint[] = [];
     const now = new Date();
 
-    for (let i = 6; i >= 0; i--) {
+    for (let i = 29; i >= 0; i--) {
       const d = new Date();
       d.setDate(now.getDate() - i);
-      const dayLabel = d.toLocaleDateString('en-IN', { weekday: 'short' });
-      const dateKey = d.toISOString().slice(0, 10);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const dateKey = `${year}-${month}-${day}`;
+
+      const shortLabel = `${d.getDate()}`;
+      const label = `${d.getDate()} ${d.toLocaleDateString('en-IN', { month: 'short' })}`;
+      const fullLabel = d.toLocaleDateString('en-IN', {
+        weekday: 'short',
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric',
+      });
 
       let gave = 0;
       let got = 0;
 
       for (const t of allTransactions) {
         if (t.isVoided) continue;
-        const tKey = t.date ? t.date.slice(0, 10) : '';
-        if (tKey === dateKey) {
+        const tDate = t.date ? new Date(t.date) : null;
+        if (tDate && !isNaN(tDate.getTime())) {
+          const ty = tDate.getFullYear();
+          const tm = String(tDate.getMonth() + 1).padStart(2, '0');
+          const td = String(tDate.getDate()).padStart(2, '0');
+          if (`${ty}-${tm}-${td}` === dateKey) {
+            if (t.type === 'GAVE') gave += t.amountPaise;
+            if (t.type === 'GOT') got += t.amountPaise;
+          }
+        }
+      }
+
+      list.push({
+        key: dateKey,
+        label,
+        shortLabel,
+        fullLabel,
+        gavePaise: gave,
+        gotPaise: got,
+      });
+    }
+
+    return list;
+  }, [allTransactions]);
+
+  // 2. MONTHLY (LAST 12 MONTHS) AGGREGATION
+  const monthlyData: ChartDataPoint[] = useMemo(() => {
+    const list: ChartDataPoint[] = [];
+    const now = new Date();
+
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const monthKey = `${year}-${month}`;
+
+      const label = d.toLocaleDateString('en-IN', { month: 'short' });
+      const fullLabel = d.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+
+      let gave = 0;
+      let got = 0;
+
+      for (const t of allTransactions) {
+        if (t.isVoided) continue;
+        const tDate = t.date ? new Date(t.date) : null;
+        if (tDate && !isNaN(tDate.getTime())) {
+          const ty = tDate.getFullYear();
+          const tm = String(tDate.getMonth() + 1).padStart(2, '0');
+          if (`${ty}-${tm}` === monthKey) {
+            if (t.type === 'GAVE') gave += t.amountPaise;
+            if (t.type === 'GOT') got += t.amountPaise;
+          }
+        }
+      }
+
+      list.push({
+        key: monthKey,
+        label,
+        shortLabel: label,
+        fullLabel,
+        gavePaise: gave,
+        gotPaise: got,
+      });
+    }
+
+    return list;
+  }, [allTransactions]);
+
+  // 3. YEARLY AGGREGATION
+  const yearlyData: ChartDataPoint[] = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    const yearsSet = new Set<number>([currentYear - 2, currentYear - 1, currentYear]);
+
+    for (const t of allTransactions) {
+      if (t.isVoided) continue;
+      const tDate = t.date ? new Date(t.date) : null;
+      if (tDate && !isNaN(tDate.getTime())) {
+        yearsSet.add(tDate.getFullYear());
+      }
+    }
+
+    const sortedYears = Array.from(yearsSet).sort((a, b) => a - b);
+    return sortedYears.map((yr) => {
+      let gave = 0;
+      let got = 0;
+
+      for (const t of allTransactions) {
+        if (t.isVoided) continue;
+        const tDate = t.date ? new Date(t.date) : null;
+        if (tDate && !isNaN(tDate.getTime()) && tDate.getFullYear() === yr) {
           if (t.type === 'GAVE') gave += t.amountPaise;
           if (t.type === 'GOT') got += t.amountPaise;
         }
       }
 
-      days.push({ dayLabel, gavePaise: gave, gotPaise: got });
-    }
-
-    // If transactions are empty (initial fresh app state), show realistic sample proportion
-    const hasData = days.some((d) => d.gavePaise > 0 || d.gotPaise > 0);
-    if (!hasData) {
-      const mockGave = [250000, 180000, 320000, 150000, 420000, 290000, 350000];
-      const mockGot = [150000, 220000, 190000, 280000, 310000, 240000, 410000];
-      return days.map((d, idx) => ({
-        ...d,
-        gavePaise: mockGave[idx % mockGave.length],
-        gotPaise: mockGot[idx % mockGot.length],
-      }));
-    }
-
-    return days;
+      return {
+        key: String(yr),
+        label: String(yr),
+        shortLabel: String(yr),
+        fullLabel: `Year ${yr}`,
+        gavePaise: gave,
+        gotPaise: got,
+      };
+    });
   }, [allTransactions]);
 
-  // Aggregate totals
-  const totalGavePaise = chartData.reduce((acc, d) => acc + d.gavePaise, 0);
-  const totalGotPaise = chartData.reduce((acc, d) => acc + d.gotPaise, 0);
-  const recoveryRate =
-    totalGavePaise > 0
-      ? Math.min(100, Math.round((totalGotPaise / totalGavePaise) * 100))
-      : 100;
+  // Select active dataset based on active tab
+  const currentDataset = useMemo(() => {
+    if (activeTab === '30days') return thirtyDaysData;
+    if (activeTab === 'monthly') return monthlyData;
+    if (activeTab === 'yearly') return yearlyData;
+    return [];
+  }, [activeTab, thirtyDaysData, monthlyData, yearlyData]);
 
-  // Chart dimensions
+  const hasActivity = useMemo(() => {
+    return currentDataset.some((d) => d.gavePaise > 0 || d.gotPaise > 0);
+  }, [currentDataset]);
+
+  // Totals & Debtors
+  const totalReceivablePaise = useMemo(() => {
+    return customers.reduce(
+      (acc, c) => (c.currentBalancePaise > 0 ? acc + c.currentBalancePaise : acc),
+      0
+    );
+  }, [customers]);
+
+  const totalGotAmountPaise = useMemo(() => {
+    const txGot = allTransactions
+      .filter((t) => !t.isVoided && t.type === 'GOT')
+      .reduce((acc, t) => acc + t.amountPaise, 0);
+
+    const custGot = customers.reduce(
+      (acc, c) =>
+        acc +
+        (c.totalGotPaise ??
+          (c.currentBalancePaise < 0 ? Math.abs(c.currentBalancePaise) : 0)),
+      0
+    );
+
+    return Math.max(txGot, custGot);
+  }, [allTransactions, customers]);
+
+  const activeDebtorsCount = customers.filter((c) => c.currentBalancePaise > 0).length;
+
+  const topDebtors = useMemo(() => {
+    return [...customers]
+      .filter((c) => c.currentBalancePaise > 0)
+      .sort((a, b) => b.currentBalancePaise - a.currentBalancePaise)
+      .slice(0, 5);
+  }, [customers]);
+
+  // Chart Rendering Sizing
   const screenWidth = Dimensions.get('window').width;
-  const svgWidth = Math.min(screenWidth - 48, 380);
-  const svgHeight = 150;
+  const isScrollable = activeTab === '30days';
+  const columnSlotWidth = activeTab === '30days' ? 26 : activeTab === 'monthly' ? 28 : 60;
+  const chartHeight = 160;
   const paddingLeft = 32;
   const paddingRight = 16;
-  const paddingTop = 20;
+  const paddingTop = 18;
   const paddingBottom = 26;
+  const innerHeight = chartHeight - paddingTop - paddingBottom;
 
-  const chartInnerWidth = svgWidth - paddingLeft - paddingRight;
-  const chartInnerHeight = svgHeight - paddingTop - paddingBottom;
-
-  const maxVal = Math.max(
-    ...chartData.map((d) => Math.max(d.gavePaise, d.gotPaise)),
-    10000
+  const svgCalculatedWidth = Math.max(
+    screenWidth - 56,
+    paddingLeft + paddingRight + currentDataset.length * columnSlotWidth
   );
 
-  const slotWidth = chartInnerWidth / chartData.length;
-  const barWidth = Math.max(8, Math.min(14, slotWidth * 0.32));
+  const maxVal = Math.max(
+    ...currentDataset.map((d) => Math.max(d.gavePaise, d.gotPaise)),
+    100000 // At least ₹1,000 baseline
+  );
+
+  const barWidth = Math.max(6, Math.min(12, columnSlotWidth * 0.32));
 
   return (
     <View
@@ -121,188 +259,437 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
         },
       ]}
     >
-      {/* Header with Title and Mode Switcher */}
+      {/* Top Header & Mode Switcher */}
       <View style={styles.headerRow}>
         <View style={styles.titleCol}>
           <View style={styles.titleWithIcon}>
-            <AppIcon
-              name="bar-chart-2"
-              size={18}
-              color={colors.primary}
-            />
+            <AppIcon name="bar-chart-2" size={18} color={colors.primary} />
             <Text style={[styles.title, { color: colors.textPrimary }]}>
-              Financial Flow & Analytics
+              Ledger Analytics
             </Text>
           </View>
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-            Credit Given (Udhaar) vs Payment Collected (Jama)
+            {activeTab === '30days'
+              ? 'Date-wise Credit & Payment (30 Days)'
+              : activeTab === 'monthly'
+              ? '12 Months Overview'
+              : activeTab === 'yearly'
+              ? 'Yearly Breakdown'
+              : activeTab === 'topDebtors'
+              ? 'Largest Outstanding Dues'
+              : 'Complete Customer Ledger Summary'}
           </Text>
         </View>
-
-        <View style={styles.tabPill}>
-          <TouchableOpacity
-            onPress={() => setActiveTab('7days')}
-            style={[
-              styles.tabBtn,
-              activeTab === '7days' && {
-                backgroundColor: colors.primary,
-                borderRadius: borderRadius.full,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.tabBtnText,
-                {
-                  color:
-                    activeTab === '7days' ? '#FFFFFF' : colors.textSecondary,
-                },
-              ]}
-            >
-              7 Days
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setActiveTab('summary')}
-            style={[
-              styles.tabBtn,
-              activeTab === 'summary' && {
-                backgroundColor: colors.primary,
-                borderRadius: borderRadius.full,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                styles.tabBtnText,
-                {
-                  color:
-                    activeTab === 'summary' ? '#FFFFFF' : colors.textSecondary,
-                },
-              ]}
-            >
-              Summary
-            </Text>
-          </TouchableOpacity>
-        </View>
       </View>
+
+      {/* Mode Switcher Tabs */}
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.tabsScrollContent}
+        style={styles.tabsScrollView}
+      >
+        <TouchableOpacity
+          onPress={() => {
+            setActiveTab('30days');
+            setSelectedPoint(null);
+          }}
+          style={[
+            styles.tabBtn,
+            activeTab === '30days' && {
+              backgroundColor: colors.primary,
+              borderRadius: borderRadius.full,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.tabBtnText,
+              { color: activeTab === '30days' ? '#FFFFFF' : colors.textSecondary },
+            ]}
+          >
+            30 Days
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            setActiveTab('monthly');
+            setSelectedPoint(null);
+          }}
+          style={[
+            styles.tabBtn,
+            activeTab === 'monthly' && {
+              backgroundColor: colors.primary,
+              borderRadius: borderRadius.full,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.tabBtnText,
+              { color: activeTab === 'monthly' ? '#FFFFFF' : colors.textSecondary },
+            ]}
+          >
+            Monthly
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            setActiveTab('yearly');
+            setSelectedPoint(null);
+          }}
+          style={[
+            styles.tabBtn,
+            activeTab === 'yearly' && {
+              backgroundColor: colors.primary,
+              borderRadius: borderRadius.full,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.tabBtnText,
+              { color: activeTab === 'yearly' ? '#FFFFFF' : colors.textSecondary },
+            ]}
+          >
+            Yearly
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            setActiveTab('topDebtors');
+            setSelectedPoint(null);
+          }}
+          style={[
+            styles.tabBtn,
+            activeTab === 'topDebtors' && {
+              backgroundColor: colors.primary,
+              borderRadius: borderRadius.full,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.tabBtnText,
+              { color: activeTab === 'topDebtors' ? '#FFFFFF' : colors.textSecondary },
+            ]}
+          >
+            Top Due
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            setActiveTab('summary');
+            setSelectedPoint(null);
+          }}
+          style={[
+            styles.tabBtn,
+            activeTab === 'summary' && {
+              backgroundColor: colors.primary,
+              borderRadius: borderRadius.full,
+            },
+          ]}
+        >
+          <Text
+            style={[
+              styles.tabBtnText,
+              { color: activeTab === 'summary' ? '#FFFFFF' : colors.textSecondary },
+            ]}
+          >
+            Summary
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
 
       {/* Legend & Stats Row */}
       <View style={styles.legendRow}>
         <View style={styles.legendItem}>
-          <View
-            style={[styles.legendDot, { backgroundColor: colors.youWillGet }]}
-          />
+          <View style={[styles.legendDot, { backgroundColor: colors.youWillGet }]} />
           <Text style={[styles.legendText, { color: colors.textSecondary }]}>
-            Udhaar: <Text style={{ color: colors.youWillGet, fontWeight: '700' }}>{formatINR(totalGavePaise)}</Text>
+            You Gave (Credit)
           </Text>
         </View>
 
         <View style={styles.legendItem}>
-          <View
-            style={[styles.legendDot, { backgroundColor: colors.youWillGive }]}
-          />
+          <View style={[styles.legendDot, { backgroundColor: colors.youWillGive }]} />
           <Text style={[styles.legendText, { color: colors.textSecondary }]}>
-            Jama: <Text style={{ color: colors.youWillGive, fontWeight: '700' }}>{formatINR(totalGotPaise)}</Text>
+            You Got (Payment)
           </Text>
         </View>
 
         <View style={styles.rateBadge}>
           <Text style={[styles.rateBadgeText, { color: colors.primary }]}>
-            {recoveryRate}% Recovery
+            Tap bar to view amount
           </Text>
         </View>
       </View>
 
-      {/* Main View: SVG Dual Bar Chart */}
-      {activeTab === '7days' ? (
-        <View style={styles.chartWrapper}>
-          <Svg width={svgWidth} height={svgHeight}>
-            {/* Gridlines */}
-            {[0, 0.5, 1].map((pct, idx) => {
-              const y = paddingTop + chartInnerHeight * (1 - pct);
-              return (
-                <G key={idx}>
-                  <Line
-                    x1={paddingLeft}
-                    y1={y}
-                    x2={svgWidth - paddingRight}
-                    y2={y}
-                    stroke={colors.border}
-                    strokeDasharray="3, 3"
-                    strokeWidth={1}
-                  />
-                  <SvgText
-                    x={paddingLeft - 6}
-                    y={y + 3}
-                    fill={colors.textMuted}
-                    fontSize={9}
-                    textAnchor="end"
-                  >
-                    {pct === 0 ? '0' : `₹${Math.round((maxVal * pct) / 100000)}k`}
-                  </SvgText>
-                </G>
-              );
-            })}
+      {/* INTERACTIVE ON-TAP AMOUNT CARD */}
+      {selectedPoint && (
+        <View
+          style={[
+            styles.tappedDetailsCard,
+            {
+              backgroundColor: colors.background,
+              borderColor: colors.primary,
+              borderRadius: borderRadius.md,
+            },
+          ]}
+        >
+          <View style={styles.tappedHeaderRow}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <AppIcon name="calendar" size={14} color={colors.primary} />
+              <Text style={[styles.tappedDateText, { color: colors.textPrimary }]}>
+                {selectedPoint.fullLabel || selectedPoint.label}
+              </Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => setSelectedPoint(null)}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <AppIcon name="x" size={16} color={colors.textSecondary} />
+            </TouchableOpacity>
+          </View>
 
-            {/* Bars for Each Day */}
-            {chartData.map((d, idx) => {
-              const xCenter = paddingLeft + idx * slotWidth + slotWidth / 2;
-              const gaveHeight = Math.max(
-                4,
-                (d.gavePaise / maxVal) * chartInnerHeight
-              );
-              const gotHeight = Math.max(
-                4,
-                (d.gotPaise / maxVal) * chartInnerHeight
-              );
-
-              const gaveX = xCenter - barWidth - 1;
-              const gotX = xCenter + 1;
-              const gaveY = paddingTop + chartInnerHeight - gaveHeight;
-              const gotY = paddingTop + chartInnerHeight - gotHeight;
-
-              return (
-                <G key={idx}>
-                  {/* Gave (Udhaar) Bar */}
-                  <Rect
-                    x={gaveX}
-                    y={gaveY}
-                    width={barWidth}
-                    height={gaveHeight}
-                    rx={3}
-                    fill={colors.youWillGet}
-                  />
-
-                  {/* Got (Jama) Bar */}
-                  <Rect
-                    x={gotX}
-                    y={gotY}
-                    width={barWidth}
-                    height={gotHeight}
-                    rx={3}
-                    fill={colors.youWillGive}
-                  />
-
-                  {/* Day Label */}
-                  <SvgText
-                    x={xCenter}
-                    y={svgHeight - 6}
-                    fill={colors.textSecondary}
-                    fontSize={10}
-                    fontWeight="600"
-                    textAnchor="middle"
-                  >
-                    {d.dayLabel}
-                  </SvgText>
-                </G>
-              );
-            })}
-          </Svg>
+          <View style={styles.tappedAmountsRow}>
+            <View style={styles.tappedCol}>
+              <Text style={[styles.tappedColLabel, { color: colors.youWillGet }]}>
+                YOU GAVE
+              </Text>
+              <Text style={[styles.tappedColAmount, { color: colors.youWillGet }]}>
+                {formatINR(selectedPoint.gavePaise)}
+              </Text>
+            </View>
+            <View style={[styles.tappedColDivider, { backgroundColor: colors.borderLight }]} />
+            <View style={styles.tappedCol}>
+              <Text style={[styles.tappedColLabel, { color: colors.youWillGive }]}>
+                YOU GOT
+              </Text>
+              <Text style={[styles.tappedColAmount, { color: colors.youWillGive }]}>
+                {formatINR(selectedPoint.gotPaise)}
+              </Text>
+            </View>
+            <View style={[styles.tappedColDivider, { backgroundColor: colors.borderLight }]} />
+            <View style={styles.tappedCol}>
+              <Text style={[styles.tappedColLabel, { color: colors.textSecondary }]}>
+                NET FLOW
+              </Text>
+              <Text
+                style={[
+                  styles.tappedColAmount,
+                  {
+                    color:
+                      selectedPoint.gavePaise - selectedPoint.gotPaise > 0
+                        ? colors.youWillGet
+                        : selectedPoint.gavePaise - selectedPoint.gotPaise < 0
+                        ? colors.youWillGive
+                        : colors.textPrimary,
+                  },
+                ]}
+              >
+                {formatINR(Math.abs(selectedPoint.gavePaise - selectedPoint.gotPaise))}
+              </Text>
+            </View>
+          </View>
         </View>
-      ) : (
-        /* Summary Breakdown View */
+      )}
+
+      {/* GRAPH VIEW: 30 DAYS / MONTHLY / YEARLY */}
+      {(activeTab === '30days' || activeTab === 'monthly' || activeTab === 'yearly') && (
+        <View style={styles.chartWrapper}>
+          {hasActivity ? (
+            <ScrollView
+              horizontal={isScrollable}
+              showsHorizontalScrollIndicator={isScrollable}
+              contentContainerStyle={{ minWidth: svgCalculatedWidth }}
+            >
+              <Svg width={svgCalculatedWidth} height={chartHeight}>
+                {/* Horizontal Gridlines */}
+                {[0, 0.5, 1].map((pct, idx) => {
+                  const y = paddingTop + innerHeight * (1 - pct);
+                  const gridVal = maxVal * pct;
+                  return (
+                    <G key={idx}>
+                      <Line
+                        x1={paddingLeft}
+                        y1={y}
+                        x2={svgCalculatedWidth - paddingRight}
+                        y2={y}
+                        stroke={colors.border}
+                        strokeDasharray="3, 3"
+                        strokeWidth={1}
+                      />
+                      <SvgText
+                        x={paddingLeft - 4}
+                        y={y + 3}
+                        fill={colors.textMuted}
+                        fontSize={9}
+                        textAnchor="end"
+                      >
+                        {pct === 0 ? '0' : `₹${Math.round(gridVal / 100000)}k`}
+                      </SvgText>
+                    </G>
+                  );
+                })}
+
+                {/* Bars for Each Data Point */}
+                {currentDataset.map((d, idx) => {
+                  const xCenter = paddingLeft + idx * columnSlotWidth + columnSlotWidth / 2;
+                  const gaveHeight =
+                    d.gavePaise > 0 ? Math.max(4, (d.gavePaise / maxVal) * innerHeight) : 0;
+                  const gotHeight =
+                    d.gotPaise > 0 ? Math.max(4, (d.gotPaise / maxVal) * innerHeight) : 0;
+
+                  const gaveX = xCenter - barWidth - 1;
+                  const gotX = xCenter + 1;
+                  const gaveY = paddingTop + innerHeight - gaveHeight;
+                  const gotY = paddingTop + innerHeight - gotHeight;
+
+                  const isSelected = selectedPoint?.key === d.key;
+
+                  return (
+                    <G
+                      key={d.key}
+                      onPress={() => setSelectedPoint(d)}
+                    >
+                      {/* Interactive Column Click Area */}
+                      <Rect
+                        x={xCenter - columnSlotWidth / 2}
+                        y={paddingTop}
+                        width={columnSlotWidth}
+                        height={innerHeight}
+                        fill={
+                          isSelected
+                            ? 'rgba(59, 130, 246, 0.12)'
+                            : 'transparent'
+                        }
+                        rx={4}
+                      />
+
+                      {/* Gave (Red) Bar */}
+                      {gaveHeight > 0 && (
+                        <Rect
+                          x={gaveX}
+                          y={gaveY}
+                          width={barWidth}
+                          height={gaveHeight}
+                          rx={3}
+                          fill={colors.youWillGet}
+                        />
+                      )}
+
+                      {/* Got (Green) Bar */}
+                      {gotHeight > 0 && (
+                        <Rect
+                          x={gotX}
+                          y={gotY}
+                          width={barWidth}
+                          height={gotHeight}
+                          rx={3}
+                          fill={colors.youWillGive}
+                        />
+                      )}
+
+                      {/* Active Indicator Pin */}
+                      {isSelected && (
+                        <Line
+                          x1={xCenter}
+                          y1={paddingTop}
+                          x2={xCenter}
+                          y2={paddingTop + innerHeight}
+                          stroke={colors.primary}
+                          strokeWidth={1.5}
+                        />
+                      )}
+
+                      {/* X-Axis Label */}
+                      <SvgText
+                        x={xCenter}
+                        y={chartHeight - 6}
+                        fill={isSelected ? colors.primary : colors.textSecondary}
+                        fontSize={activeTab === '30days' ? 9 : 10}
+                        fontWeight={isSelected ? '700' : '500'}
+                        textAnchor="middle"
+                      >
+                        {activeTab === '30days'
+                          ? idx % 3 === 0 || isSelected
+                            ? d.shortLabel
+                            : ''
+                          : d.shortLabel}
+                      </SvgText>
+                    </G>
+                  );
+                })}
+              </Svg>
+            </ScrollView>
+          ) : (
+            <View style={styles.emptyActivityBox}>
+              <AppIcon name="calendar" size={24} color={colors.textMuted} />
+              <Text style={[styles.emptyActivityText, { color: colors.textSecondary }]}>
+                No transaction activity recorded for this period.
+              </Text>
+            </View>
+          )}
+        </View>
+      )}
+
+      {/* TAB 4: Top Debtors Breakdown */}
+      {activeTab === 'topDebtors' && (
+        <View style={styles.topDebtorsContainer}>
+          {topDebtors.map((deb, index) => {
+            const sharePct =
+              totalReceivablePaise > 0
+                ? Math.round((deb.currentBalancePaise / totalReceivablePaise) * 100)
+                : 0;
+            return (
+              <View key={deb.id} style={styles.debtorRow}>
+                <View style={styles.debtorRankBadge}>
+                  <Text style={[styles.debtorRankText, { color: colors.primary }]}>
+                    #{index + 1}
+                  </Text>
+                </View>
+
+                <View style={styles.debtorInfoCol}>
+                  <View style={styles.debtorNameRow}>
+                    <Text
+                      style={[styles.debtorName, { color: colors.textPrimary }]}
+                      numberOfLines={1}
+                    >
+                      {deb.name}
+                    </Text>
+                    <Text style={[styles.debtorAmount, { color: colors.youWillGet }]}>
+                      {formatINR(deb.currentBalancePaise)}
+                    </Text>
+                  </View>
+
+                  <View style={styles.debtorBarTrack}>
+                    <View
+                      style={[
+                        styles.debtorBarFill,
+                        {
+                          width: `${Math.max(5, sharePct)}%`,
+                          backgroundColor: colors.youWillGet,
+                        },
+                      ]}
+                    />
+                  </View>
+
+                  <Text style={[styles.debtorSub, { color: colors.textMuted }]}>
+                    {sharePct}% of total dues {deb.phone ? `• ${deb.phone}` : ''}
+                  </Text>
+                </View>
+              </View>
+            );
+          })}
+        </View>
+      )}
+
+      {/* TAB 5: Summary Breakdown View */}
+      {activeTab === 'summary' && (
         <View style={styles.summaryBreakdown}>
           <View
             style={[
@@ -313,14 +700,14 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
             <View style={styles.summaryCardHeader}>
               <AppIcon name="arrow-up-right" size={16} color={colors.youWillGet} />
               <Text style={[styles.summaryCardTitle, { color: colors.youWillGet }]}>
-                Credit Given (Udhaar)
+                Total You&apos;ll Get
               </Text>
             </View>
             <Text style={[styles.summaryCardAmount, { color: colors.youWillGet }]}>
-              {formatINR(totalGavePaise)}
+              {formatINR(totalReceivablePaise)}
             </Text>
             <Text style={[styles.summaryCardNote, { color: colors.textSecondary }]}>
-              Goods sold on credit this week
+              {activeDebtorsCount} customers have dues
             </Text>
           </View>
 
@@ -333,47 +720,18 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
             <View style={styles.summaryCardHeader}>
               <AppIcon name="arrow-down-left" size={16} color={colors.youWillGive} />
               <Text style={[styles.summaryCardTitle, { color: colors.youWillGive }]}>
-                Payment Collected (Jama)
+                Total You Got
               </Text>
             </View>
             <Text style={[styles.summaryCardAmount, { color: colors.youWillGive }]}>
-              {formatINR(totalGotPaise)}
+              {formatINR(totalGotAmountPaise)}
             </Text>
             <Text style={[styles.summaryCardNote, { color: colors.textSecondary }]}>
-              Cash & digital payments received
+              Payments received
             </Text>
           </View>
         </View>
       )}
-
-      {/* Recovery Progress Bar */}
-      <View style={styles.progressContainer}>
-        <View style={styles.progressHeader}>
-          <Text style={[styles.progressLabel, { color: colors.textSecondary }]}>
-            Cash Recovery Efficiency
-          </Text>
-          <Text style={[styles.progressValue, { color: colors.primary }]}>
-            {recoveryRate}%
-          </Text>
-        </View>
-        <View style={[styles.progressTrack, { backgroundColor: colors.borderLight }]}>
-          <View
-            style={[
-              styles.progressBar,
-              {
-                width: `${recoveryRate}%`,
-                backgroundColor:
-                  recoveryRate >= 70
-                    ? colors.youWillGet
-                    : recoveryRate >= 40
-                    ? colors.primary
-                    : colors.warning,
-                borderRadius: borderRadius.full,
-              },
-            ]}
-          />
-        </View>
-      </View>
     </View>
   );
 };
@@ -381,13 +739,13 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
 const styles = StyleSheet.create({
   container: {
     borderWidth: 1,
-    marginBottom: 14,
+    marginBottom: 16,
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 10,
+    alignItems: 'center',
+    marginBottom: 8,
   },
   titleCol: {
     flex: 1,
@@ -398,27 +756,30 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   title: {
-    fontSize: 14,
-    fontWeight: '800',
-    letterSpacing: -0.2,
+    fontSize: 15,
+    fontWeight: '700',
   },
   subtitle: {
     fontSize: 11,
     marginTop: 2,
   },
-  tabPill: {
+  tabsScrollView: {
+    marginBottom: 10,
+  },
+  tabsScrollContent: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(0,0,0,0.05)',
-    borderRadius: 20,
-    padding: 2,
-    marginLeft: 6,
+    gap: 6,
+    paddingVertical: 2,
   },
   tabBtn: {
-    paddingVertical: 4,
-    paddingHorizontal: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   tabBtnText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '700',
   },
   legendRow: {
@@ -429,7 +790,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: 'rgba(0,0,0,0.05)',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   legendItem: {
     flexDirection: 'row',
@@ -448,32 +809,133 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
     backgroundColor: 'rgba(37,99,235,0.08)',
-    borderRadius: 10,
+    borderRadius: 6,
   },
   rateBadgeText: {
     fontSize: 10,
     fontWeight: '700',
   },
+  tappedDetailsCard: {
+    borderWidth: 1.5,
+    padding: 10,
+    marginBottom: 10,
+  },
+  tappedHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  tappedDateText: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  tappedAmountsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
+  tappedCol: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  tappedColLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  tappedColAmount: {
+    fontSize: 13,
+    fontWeight: '800',
+  },
+  tappedColDivider: {
+    width: 1,
+    height: 24,
+  },
   chartWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginVertical: 4,
+    minHeight: 160,
+  },
+  emptyActivityBox: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 32,
+    gap: 8,
+  },
+  emptyActivityText: {
+    fontSize: 12,
+    textAlign: 'center',
+  },
+  topDebtorsContainer: {
+    paddingVertical: 6,
+    gap: 10,
+  },
+  debtorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  debtorRankBadge: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(37,99,235,0.08)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  debtorRankText: {
+    fontSize: 11,
+    fontWeight: '800',
+  },
+  debtorInfoCol: {
+    flex: 1,
+  },
+  debtorNameRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  debtorName: {
+    fontSize: 12,
+    fontWeight: '700',
+    flex: 1,
+  },
+  debtorAmount: {
+    fontSize: 12,
+    fontWeight: '800',
+    marginLeft: 8,
+  },
+  debtorBarTrack: {
+    height: 5,
+    backgroundColor: 'rgba(0,0,0,0.06)',
+    borderRadius: 3,
+    overflow: 'hidden',
+    marginBottom: 3,
+  },
+  debtorBarFill: {
+    height: '100%',
+    borderRadius: 3,
+  },
+  debtorSub: {
+    fontSize: 10,
   },
   summaryBreakdown: {
     flexDirection: 'row',
     gap: 10,
-    marginVertical: 8,
+    paddingVertical: 6,
   },
   summaryCard: {
     flex: 1,
-    padding: 10,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: 10,
+    padding: 10,
   },
   summaryCardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 5,
     marginBottom: 4,
   },
   summaryCardTitle: {
@@ -481,35 +943,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   summaryCardAmount: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '800',
     marginBottom: 2,
   },
   summaryCardNote: {
     fontSize: 10,
-  },
-  progressContainer: {
-    marginTop: 6,
-  },
-  progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 4,
-  },
-  progressLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-  },
-  progressValue: {
-    fontSize: 11,
-    fontWeight: '800',
-  },
-  progressTrack: {
-    height: 5,
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  progressBar: {
-    height: '100%',
   },
 });

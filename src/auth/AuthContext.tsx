@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
@@ -19,9 +19,9 @@ const LOCAL_PROFILE_STORAGE_KEY = '@gwd_book:business_profile';
 const GUEST_MODE_STORAGE_KEY = '@gwd_book:guest_mode_enabled';
 
 const DEFAULT_PROFILE: LocalBusinessProfile = {
-  business_name: 'GWD Trading Enterprise',
+  business_name: 'Golden Weigh Bridge',
   owner_name: 'Owner',
-  phone: '+91 98765 43210',
+  phone: '+91 96068 00800',
   currency: 'INR',
 };
 
@@ -61,6 +61,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isGuestMode, setIsGuestModeState] = useState<boolean>(false);
   const [isConfiguredState, setIsConfiguredState] = useState<boolean>(isSupabaseConfigured());
   const isConfigured = isConfiguredState;
+
+  // Fetch Cloud Profile from Supabase
+  const fetchCloudProfile = useCallback(async (userId: string) => {
+    if (!isConfiguredState) return;
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+      if (data && !error) {
+        setProfile(data as ProfileRow);
+        await AsyncStorage.setItem(LOCAL_PROFILE_STORAGE_KEY, JSON.stringify(data));
+      }
+    } catch (err) {
+      console.warn('Error fetching Supabase profile:', err);
+    }
+  }, [isConfiguredState]);
 
   // 1. Initial Load: Load local profile and Supabase session
   useEffect(() => {
@@ -134,26 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       isMounted = false;
     };
-  }, [isConfiguredState]);
-
-  // Fetch Cloud Profile from Supabase
-  const fetchCloudProfile = async (userId: string) => {
-    if (!isConfigured) return;
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-
-      if (data && !error) {
-        setProfile(data as ProfileRow);
-        await AsyncStorage.setItem(LOCAL_PROFILE_STORAGE_KEY, JSON.stringify(data));
-      }
-    } catch (err) {
-      console.warn('Error fetching Supabase profile:', err);
-    }
-  };
+  }, [isConfiguredState, fetchCloudProfile]);
 
   const refreshProfile = async () => {
     if (user) {

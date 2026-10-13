@@ -143,6 +143,28 @@ npm test
 
 ## 7. Supabase Free Tier Caveats & Backup Strategy
 
-1. **Inactivity Pausing:** Supabase Free Tier projects pause after 1 week of inactivity. If paused, log into the dashboard and click "Restore project".
-2. **Backups:** Automatic daily backups are **not** provided on the free tier. We provide a manual SQL dump & CSV export feature inside the app (Phase 8) so you always keep a local backup copy of your ledger.
-3. **Storage Quota:** Free tier provides 500 MB database space and 1 GB file storage, which is more than enough for hundreds of thousands of customer ledger transactions.
+1. **Inactivity Pausing:** Supabase Free Tier projects pause after 1 week of complete inactivity. Legitimate business activity, transactions, and backups prevent unnecessary pauses. However, never generate fake artificial network traffic to evade platform policies.
+2. **Platform Backups vs Application Backups:**
+   - *PostgreSQL Database Physical Dump (pg_dump / WAL):* Requires superuser or CLI database access, not provided natively on free plan schedules without paid add-ons.
+   - *Application-Data Snapshot Backup (GWD Book Engine):* Exports all authorized customers, transactions, opening balances, and settings into an encrypted/checksummed JSON snapshot stored in Supabase with RLS (`business_id = auth.uid()`).
+3. **Storage Quotas:** Free tier includes 500 MB database storage, 1 GB file storage, 2 GB egress, and 50,000 monthly active users.
+
+---
+
+## 8. Automatic Cloud Backup & Quota Monitor (Features A & B)
+
+### Automatic Backup Architecture:
+- **Default Schedule:** Runs automatically every 4 days (96 hours) from the last verified successful backup (configurable to 5 days / 120 hours).
+- **Execution Lifecycle on Android:**
+  - On app launch and when resuming from background (`AppState === 'active'`), the app checks if `currentTime >= nextEligibleTime` (overdue).
+  - If overdue, online, and authenticated, a backup snapshot is assembled, verified by SHA-256 checksum, and committed to cloud storage.
+  - *Android Background Constraints:* On physical Android devices, OS battery managers (Doze mode, aggressive manufacturer battery optimization, app force-stop) strictly prevent arbitrary background timers without Foreground Services or WorkManager in development builds. Foreground lifecycle resumption guarantees 100% reliable execution without background battery drain.
+- **Manual "Backup Now":** Available anytime from Settings -> Cloud Backup with immediate verification.
+
+### Supabase Quota Monitor:
+- Tracks Database Storage (500 MB limit), File Storage (1 GB limit), and record counts.
+- Quota arithmetic: `Remaining = Limit - Confirmed Usage`.
+- Clear labels distinguish **Authoritative Verified Records** from **Free Plan Estimates**.
+- Edge Function & Egress metrics display "Unavailable" unless authoritative APIs exist.
+- Warning thresholds at 70%, 85%, and 95% with clear badges and zero emojis.
+

@@ -4,15 +4,14 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Linking,
+  Image,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { useLanguage } from '../i18n/LanguageContext';
-import { Customer, formatINR, getBalanceType } from '../types/customer';
-import { AppIcon } from './AppIcon';
-import { Badge } from './Badge';
+import { Customer } from '../types/customer';
+import { openWhatsAppReminder } from '../utils/communication';
 
-interface CustomerCardProps {
+export interface CustomerCardProps {
   customer: Customer;
   onPress: () => void;
   onLongPress?: () => void;
@@ -20,344 +19,298 @@ interface CustomerCardProps {
   onWhatsApp?: () => void;
 }
 
+// Format relative time (e.g., "29 hours ago", "7 days ago", "2 weeks ago", "2 months ago")
+function formatRelativeTime(dateString?: string): string {
+  if (!dateString) return 'No transactions';
+
+  const txDate = new Date(dateString);
+  const now = new Date();
+  const txTime = txDate.getTime();
+
+  if (isNaN(txTime)) {
+    return dateString;
+  }
+
+  const diffMs = now.getTime() - txTime;
+
+  // Clock skew or just now (< 1 min)
+  if (diffMs < 60 * 1000) {
+    return 'Just now';
+  }
+
+  const diffMins = Math.floor(diffMs / (60 * 1000));
+  const diffHours = Math.floor(diffMs / (60 * 60 * 1000));
+  const diffDays = Math.floor(diffMs / (24 * 60 * 60 * 1000));
+
+  if (diffHours < 1) {
+    return `${diffMins} min${diffMins === 1 ? '' : 's'} ago`;
+  }
+  if (diffHours < 48) {
+    return `${diffHours} hours ago`;
+  }
+  if (diffDays < 14) {
+    return `${diffDays} days ago`;
+  }
+
+  const diffWeeks = Math.floor(diffDays / 7);
+  if (diffDays < 60) {
+    return `${diffWeeks} week${diffWeeks === 1 ? '' : 's'} ago`;
+  }
+
+  const diffMonths = Math.floor(diffDays / 30);
+  if (diffDays < 365) {
+    return `${diffMonths} month${diffMonths === 1 ? '' : 's'} ago`;
+  }
+
+  const diffYears = Math.floor(diffDays / 365);
+  return `${diffYears} year${diffYears === 1 ? '' : 's'} ago`;
+}
+
+// Format amount matching screenshot: "₹ 1,520", "₹ 13,900", "₹ 0"
+function formatDueAmount(paise: number): string {
+  const rupees = Math.round(Math.abs(paise) / 100);
+  return `₹ ${rupees.toLocaleString('en-IN')}`;
+}
+
 export const CustomerCard: React.FC<CustomerCardProps> = ({
   customer,
   onPress,
   onLongPress,
-  onCall,
   onWhatsApp,
 }) => {
-  const { colors, borderRadius, spacing } = useTheme();
-  const { t } = useLanguage();
-  const balanceType = getBalanceType(customer.currentBalancePaise);
+  const { colors, isDark } = useTheme();
+  const { language } = useLanguage();
 
-  const totalGave =
-    customer.totalGavePaise ??
-    (customer.currentBalancePaise > 0 ? customer.currentBalancePaise : 0);
-  const totalGot =
-    customer.totalGotPaise ??
-    (customer.currentBalancePaise < 0 ? Math.abs(customer.currentBalancePaise) : 0);
+  const balancePaise = customer.currentBalancePaise || 0;
+  const hasDue = balancePaise > 0;
+  const hasAdvance = balancePaise < 0;
+  const isSettled = balancePaise === 0;
 
   const getInitials = (name: string) => {
-    const parts = name.trim().split(' ');
+    if (!name) return '?';
+    const trimmed = name.trim();
+    if (!trimmed) return '?';
+    const parts = trimmed.split(/\s+/).filter(Boolean);
     if (parts.length >= 2) {
-      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+      const firstChar = Array.from(parts[0])[0] || '';
+      const secondChar = Array.from(parts[1])[0] || '';
+      return `${firstChar}${secondChar}`.toUpperCase();
     }
-    return name.slice(0, 2).toUpperCase();
+    return Array.from(trimmed).slice(0, 2).join('').toUpperCase();
   };
 
-  const getBalanceColor = () => {
-    switch (balanceType) {
-      case 'GET':
-        return colors.youWillGet;
-      case 'GIVE':
-        return colors.youWillGive;
-      case 'SETTLED':
-      default:
-        return colors.settled;
-    }
-  };
-
-  const getBalanceLabel = () => {
-    switch (balanceType) {
-      case 'GET':
-        return t.dashboard.filterGet;
-      case 'GIVE':
-        return t.dashboard.filterGive;
-      case 'SETTLED':
-      default:
-        return t.dashboard.filterSettled;
-    }
-  };
-
-  const handleCall = () => {
-    if (onCall) {
-      onCall();
-    } else if (customer.phone) {
-      Linking.openURL(`tel:${customer.phone}`).catch(() => {});
-    }
-  };
-
-  const handleWhatsApp = () => {
+  const handleWhatsApp = (e: any) => {
+    e?.stopPropagation?.();
     if (onWhatsApp) {
       onWhatsApp();
     } else if (customer.phone) {
-      const cleanPhone = customer.phone.replace(/[^0-9]/g, '');
-      const msg = encodeURIComponent(
-        `Dear ${customer.name}, your current account balance on GWD Book is ${formatINR(
-          customer.currentBalancePaise
-        )}. Kindly review.`
-      );
-      Linking.openURL(`whatsapp://send?phone=${cleanPhone}&text=${msg}`).catch(() => {});
+      openWhatsAppReminder({
+        phoneNumber: customer.phone,
+        customerName: customer.name,
+        balancePaise: customer.currentBalancePaise,
+        businessName: 'Golden Weigh Bridge',
+        language,
+      });
     }
   };
+
+  const relativeTime = formatRelativeTime(
+    customer.lastTransactionDate || (customer as any).updatedAt || (customer as any).createdAt
+  );
 
   return (
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={onPress}
       onLongPress={onLongPress}
-      accessibilityLabel={`${customer.name}, Balance: ${formatINR(customer.currentBalancePaise)}, ${getBalanceLabel()}`}
-      accessibilityHint="Open customer ledger details"
+      accessibilityRole="button"
+      accessibilityLabel={`${customer.name}, Due: ${formatDueAmount(balancePaise)}, ${relativeTime}`}
+      accessibilityHint="Tap to view customer ledger details"
       style={[
-        styles.card,
+        styles.rowContainer,
         {
-          backgroundColor: colors.surface,
-          borderColor: colors.border,
-          borderRadius: borderRadius.lg,
-          padding: spacing.md,
+          borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.07)' : 'rgba(15, 23, 42, 0.08)',
+          backgroundColor: isDark ? '#000000' : colors.surface,
         },
       ]}
     >
-      <View style={styles.topRow}>
-        {/* Customer Avatar */}
-        <View
-          style={[
-            styles.avatar,
-            {
-              backgroundColor: colors.primaryLight,
-              borderColor: colors.primary,
-              borderRadius: borderRadius.full,
-            },
-          ]}
-        >
-          <Text style={[styles.avatarText, { color: colors.primary }]}>
-            {getInitials(customer.name)}
-          </Text>
-        </View>
+      {/* Left: Avatar + Name + Last Transaction Time */}
+      <View style={styles.leftCol}>
+        {/* Circular Avatar (White background with dark bold initials like screenshot) */}
+        {customer.avatarUrl ? (
+          <Image source={{ uri: customer.avatarUrl }} style={styles.avatarImage} />
+        ) : (
+          <View style={styles.avatarCircle}>
+            <Text style={styles.avatarText}>
+              {getInitials(customer.name)}
+            </Text>
+          </View>
+        )}
 
-        {/* Customer Info */}
-        <View style={styles.infoCol}>
+        {/* Customer Text Info */}
+        <View style={styles.nameBlock}>
           <Text
-            style={[styles.customerName, { color: colors.textPrimary }]}
+            style={[
+              styles.customerName,
+              { color: isDark ? '#FFFFFF' : '#0F172A' },
+            ]}
             numberOfLines={1}
           >
             {customer.name}
           </Text>
-          <Text style={[styles.phoneText, { color: colors.textSecondary }]}>
-            {customer.phone}
-          </Text>
-        </View>
-
-        {/* Status Badge */}
-        <View style={styles.badgeCol}>
-          <Badge type={balanceType} label={getBalanceLabel()} />
-        </View>
-      </View>
-
-      {/* 3-Column Financial Breakdown Row: You Gave | You Got | Net Amount */}
-      <View
-        style={[
-          styles.breakdownBar,
-          {
-            backgroundColor: colors.background,
-            borderColor: colors.borderLight,
-            borderRadius: borderRadius.md,
-            marginTop: spacing.sm,
-            paddingVertical: spacing.xs + 2,
-            paddingHorizontal: spacing.sm,
-          },
-        ]}
-      >
-        <View style={styles.breakdownCol}>
-          <Text style={[styles.breakdownLabel, { color: colors.textSecondary }]}>
-            {t.customerDetail.totalGave}
-          </Text>
           <Text
             style={[
-              styles.breakdownValue,
-              { color: colors.youWillGet },
+              styles.timeText,
+              { color: isDark ? '#94A3B8' : '#64748B' },
             ]}
+            numberOfLines={1}
           >
-            {formatINR(totalGave)}
-          </Text>
-        </View>
-
-        <View style={[styles.verticalDivider, { backgroundColor: colors.border }]} />
-
-        <View style={styles.breakdownCol}>
-          <Text style={[styles.breakdownLabel, { color: colors.textSecondary }]}>
-            {t.customerDetail.totalGot}
-          </Text>
-          <Text
-            style={[
-              styles.breakdownValue,
-              { color: colors.youWillGive },
-            ]}
-          >
-            {formatINR(totalGot)}
-          </Text>
-        </View>
-
-        <View style={[styles.verticalDivider, { backgroundColor: colors.border }]} />
-
-        <View style={[styles.breakdownCol, { alignItems: 'flex-end' }]}>
-          <Text style={[styles.breakdownLabel, { color: colors.textSecondary }]}>
-            {t.customerDetail.netAmount}
-          </Text>
-          <Text
-            style={[
-              styles.breakdownValue,
-              styles.netBoldValue,
-              { color: getBalanceColor() },
-            ]}
-          >
-            {formatINR(customer.currentBalancePaise)}
+            {relativeTime}
           </Text>
         </View>
       </View>
 
-      {/* Quick Action Footer */}
+      {/* Right Column: Due Amount + REMIND > link (with subtle dual-tone reddish tint when due) */}
       <View
         style={[
-          styles.footerRow,
-          {
-            borderTopColor: colors.borderLight,
-            paddingTop: spacing.sm,
-            marginTop: spacing.sm,
-          },
+          styles.rightCol,
+          hasDue && (isDark ? styles.rightColDueDark : styles.rightColDueLight),
         ]}
       >
-        <Text style={[styles.timeText, { color: colors.textMuted }]}>
-          {customer.lastTransactionDate
-            ? `Active: ${customer.lastTransactionDate}`
-            : 'No transactions yet'}
+        <Text
+          style={[
+            styles.amountText,
+            hasDue && styles.amountDue,
+            hasAdvance && styles.amountAdvance,
+            isSettled && (isDark ? styles.amountSettledDark : styles.amountSettledLight),
+          ]}
+          numberOfLines={1}
+          adjustsFontSizeToFit={true}
+        >
+          {formatDueAmount(balancePaise)}
         </Text>
 
-        <View style={styles.actionsGroup}>
+        {hasDue ? (
           <TouchableOpacity
-            onPress={handleCall}
-            accessibilityRole="button"
-            accessibilityLabel={`Call ${customer.name}`}
-            accessibilityHint="Opens phone dialer"
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            style={[
-              styles.actionButton,
-              { backgroundColor: colors.borderLight, borderRadius: borderRadius.sm },
-            ]}
-          >
-            <AppIcon name="phone" size={14} color={colors.primary} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
+            activeOpacity={0.65}
             onPress={handleWhatsApp}
+            hitSlop={{ top: 8, bottom: 8, left: 10, right: 10 }}
             accessibilityRole="button"
-            accessibilityLabel={`Send WhatsApp reminder to ${customer.name}`}
-            accessibilityHint="Opens WhatsApp with pre-filled balance reminder"
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            style={[
-              styles.actionButton,
-              { backgroundColor: 'rgba(37, 211, 102, 0.12)', borderRadius: borderRadius.sm },
-            ]}
+            accessibilityLabel={`Remind ${customer.name} via WhatsApp`}
+            style={styles.remindButton}
           >
-            <AppIcon
-              family="material"
-              name="whatsapp"
-              size={15}
-              color="#25D366"
-            />
+            <Text style={styles.remindText}>REMIND &gt;</Text>
           </TouchableOpacity>
-        </View>
+        ) : hasAdvance ? (
+          <Text style={styles.advanceLabel}>Advance</Text>
+        ) : null}
       </View>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
-    borderWidth: 1,
-    marginBottom: 10,
-  },
-  topRow: {
+  rowContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    minHeight: 64,
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  avatar: {
+  leftCol: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    paddingLeft: 16,
+    paddingRight: 10,
+    paddingVertical: 10,
+    gap: 13,
+  },
+  avatarCircle: {
     width: 44,
     height: 44,
-    borderWidth: 1.5,
+    borderRadius: 22,
+    backgroundColor: '#FFFFFF', // Solid crisp white circle matching screenshot
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.08)',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  avatarImage: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
   },
   avatarText: {
     fontSize: 15,
-    fontWeight: '700',
+    fontWeight: '800',
+    color: '#0F172A', // Dark initials inside white circle
+    letterSpacing: -0.2,
   },
-  infoCol: {
+  nameBlock: {
     flex: 1,
+    justifyContent: 'center',
   },
   customerName: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '700',
     letterSpacing: -0.2,
-    marginBottom: 2,
-  },
-  phoneText: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  badgeCol: {
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-  },
-  breakdownBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderWidth: 1,
-  },
-  breakdownCol: {
-    flex: 1,
-    alignItems: 'flex-start',
-  },
-  breakdownLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    marginBottom: 2,
-    letterSpacing: -0.1,
-  },
-  breakdownValue: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  netBoldValue: {
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  verticalDivider: {
-    width: 1,
-    height: 22,
-    marginHorizontal: 6,
-    opacity: 0.4,
-  },
-  balanceCol: {
-    alignItems: 'flex-end',
-    gap: 4,
-  },
-  balanceAmount: {
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  footerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderTopWidth: 1,
   },
   timeText: {
-    fontSize: 11,
-    fontWeight: '500',
+    fontSize: 13,
+    fontWeight: '400',
+    marginTop: 2.5,
   },
-  actionsGroup: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  actionButton: {
-    width: 32,
-    height: 32,
-    alignItems: 'center',
+  rightCol: {
+    minWidth: 110,
+    alignSelf: 'stretch',
+    alignItems: 'flex-end',
     justifyContent: 'center',
+    paddingRight: 16,
+    paddingLeft: 12,
+    paddingVertical: 10,
+  },
+  rightColDueDark: {
+    backgroundColor: 'rgba(139, 38, 38, 0.14)', // Subtle deep crimson column tint in dark mode
+  },
+  rightColDueLight: {
+    backgroundColor: 'rgba(239, 68, 68, 0.05)', // Subtle rose tint in light mode
+  },
+  amountText: {
+    fontSize: 17,
+    fontWeight: '700',
+    letterSpacing: -0.2,
+  },
+  amountDue: {
+    color: '#F87171', // Red / Rose due amount matching screenshot
+  },
+  amountAdvance: {
+    color: '#34D399', // Green for advance
+  },
+  amountSettledDark: {
+    color: '#94A3B8', // Grey for ₹ 0
+  },
+  amountSettledLight: {
+    color: '#64748B',
+  },
+  remindButton: {
+    marginTop: 3,
+  },
+  remindText: {
+    fontSize: 11.5,
+    fontWeight: '800',
+    color: '#38BDF8', // Cyan/Light Blue matching screenshot "REMIND >"
+    letterSpacing: 0.4,
+  },
+  advanceLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#34D399',
+    marginTop: 3,
   },
 });

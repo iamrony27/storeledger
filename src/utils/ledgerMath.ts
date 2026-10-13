@@ -7,7 +7,7 @@
  * 3. Credit given to a customer (GAVE / Udhaar) increases receivable (+amountPaise).
  * 4. Payment received from a customer (GOT / Jama) decreases receivable (-amountPaise).
  * 5. Positive balance: Customer owes business ("You'll Get" / "পাবেন" / Receivable).
- * 6. Negative balance: Business owes customer ("You'll Give" / "দেবেন" / Payable/Advance).
+ * 6. Negative balance: Business owes customer ("You Got" / "পেয়েছেন" / "জমা" / Advance).
  * 7. Zero balance: Settled ("পরিশোধিত").
  */
 
@@ -107,13 +107,23 @@ export function calculateCustomerBalance(
  */
 export function calculateCustomerBreakdown(
   openingBalancePaise: number = 0,
-  transactions: (MinimalTransaction & { isVoided?: boolean; isOpeningBalance?: boolean })[] = []
+  transactions: (MinimalTransaction & {
+    isVoided?: boolean;
+    isOpeningBalance?: boolean;
+    description?: string;
+    id?: string;
+  })[] = []
 ): CustomerBreakdown {
   let totalGavePaise = 0;
   let totalGotPaise = 0;
 
   const validTx = transactions.filter((t) => !t.isVoided);
-  const hasOpeningTx = validTx.some((t) => t.isOpeningBalance);
+  const hasOpeningTx = validTx.some(
+    (t) =>
+      Boolean(t.isOpeningBalance) ||
+      (typeof t.description === 'string' && t.description.toLowerCase().includes('opening')) ||
+      (typeof t.id === 'string' && t.id.includes('init'))
+  );
 
   for (const tx of validTx) {
     const txAmount = Math.abs(Math.round(tx.amountPaise));
@@ -144,6 +154,8 @@ export function calculateCustomerBreakdown(
 
 export interface CustomerBalanceItem {
   currentBalancePaise: number;
+  totalGavePaise?: number;
+  totalGotPaise?: number;
 }
 
 /**
@@ -152,6 +164,8 @@ export interface CustomerBalanceItem {
 export function calculateLedgerTotals(customers: CustomerBalanceItem[]) {
   let youWillGetPaise = 0;
   let youWillGivePaise = 0;
+  let totalGavePaise = 0;
+  let totalGotPaise = 0;
 
   for (const c of customers) {
     const balance = Math.round(c.currentBalancePaise);
@@ -160,6 +174,18 @@ export function calculateLedgerTotals(customers: CustomerBalanceItem[]) {
     } else if (balance < 0) {
       youWillGivePaise += Math.abs(balance);
     }
+
+    if (c.totalGavePaise !== undefined) {
+      totalGavePaise += c.totalGavePaise;
+    } else if (balance > 0) {
+      totalGavePaise += balance;
+    }
+
+    if (c.totalGotPaise !== undefined) {
+      totalGotPaise += c.totalGotPaise;
+    } else if (balance < 0) {
+      totalGotPaise += Math.abs(balance);
+    }
   }
 
   const netBalancePaise = youWillGetPaise - youWillGivePaise;
@@ -167,6 +193,8 @@ export function calculateLedgerTotals(customers: CustomerBalanceItem[]) {
   return {
     youWillGetPaise,
     youWillGivePaise,
+    totalGavePaise,
+    totalGotPaise,
     netBalancePaise,
   };
 }

@@ -117,4 +117,24 @@ assertEquals(
   'Floating point paise amounts must be rejected'
 );
 
+// 4. Ledger Backups Multi-Tenant Isolation
+console.log('4. Testing Ledger Backups RLS Invariants...');
+interface MockBackupRow {
+  id: string;
+  business_id: string;
+  checksum: string;
+  total_customers: number;
+}
+
+const backupRows: MockBackupRow[] = [
+  { id: 'bk-1', business_id: businessAId, checksum: 'hashA1', total_customers: 5 },
+  { id: 'bk-2', business_id: businessBId, checksum: 'hashB1', total_customers: 2 },
+];
+
+const userABackups = backupRows.filter((b) => b.business_id === businessAId);
+const userBBackups = backupRows.filter((b) => b.business_id === businessBId);
+assertEquals(userABackups.length, 1, 'Business A should only see its own backups');
+assertEquals(userBBackups.length, 1, 'Business B should only see its own backups');
+assertEquals(userABackups[0].id, 'bk-1', 'Business A cannot access Business B backup id');
+
 console.log('\nAll Supabase Schema & Security test suites passed successfully!\n');

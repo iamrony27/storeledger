@@ -58,7 +58,7 @@ CREATE TRIGGER on_auth_user_created
 -- 2. CUSTOMERS TABLE
 -- ------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.customers (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     business_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     name TEXT NOT NULL,
     phone TEXT,
@@ -82,14 +82,15 @@ CREATE TRIGGER set_customers_updated_at
 -- 3. LEDGER TRANSACTIONS TABLE
 -- ------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.ledger_transactions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     business_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-    customer_id UUID NOT NULL REFERENCES public.customers(id) ON DELETE CASCADE,
+    customer_id TEXT NOT NULL REFERENCES public.customers(id) ON DELETE CASCADE,
     type TEXT NOT NULL CHECK (type IN ('GAVE', 'GOT')),
     amount_paise BIGINT NOT NULL CHECK (amount_paise > 0),
     description TEXT,
     transaction_date TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
     bill_photo_url TEXT,
+    is_opening_balance BOOLEAN NOT NULL DEFAULT false,
     is_void BOOLEAN NOT NULL DEFAULT false,
     void_reason TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
@@ -115,7 +116,7 @@ CREATE TRIGGER set_transactions_updated_at
 -- 4. IMPORT BATCHES TABLE (KHATABOOK PDF AUDIT)
 -- ------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS public.import_batches (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
     business_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
     source_filename TEXT NOT NULL,
     total_records INTEGER NOT NULL DEFAULT 0,
@@ -217,3 +218,81 @@ SELECT
 FROM public.customers c
 LEFT JOIN public.ledger_transactions t ON c.id = t.customer_id AND c.business_id = t.business_id
 GROUP BY c.id, c.business_id, c.name, c.phone;
+
+-- ------------------------------------------------------------------------------
+-- 7. LEDGER BACKUPS TABLE & USAGE RPC (MIGRATION 006)
+-- ------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS public.ledger_backups (
+    id TEXT PRIMARY KEY,
+    business_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    schema_version TEXT NOT NULL DEFAULT 'v1',
+    total_customers INTEGER NOT NULL DEFAULT 0,
+    total_transactions INTEGER NOT NULL DEFAULT 0,
+    checksum TEXT NOT NULL,
+    data_size_bytes BIGINT NOT NULL DEFAULT 0,
+    payload JSONB NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now())
+);
+
+CREATE INDEX IF NOT EXISTS idx_ledger_backups_biz_date 
+    ON public.ledger_backups(business_id, created_at DESC);
+
+DROP TRIGGER IF EXISTS set_ledger_backups_updated_at ON public.ledger_backups;
+CREATE TRIGGER set_ledger_backups_updated_at
+    BEFORE UPDATE ON public.ledger_backups
+    FOR EACH ROW
+    EXECUTE FUNCTION public.handle_updated_at();
+
+ALTER TABLE public.ledger_backups ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "backups_select_own_business" ON public.ledger_backups;
+CREATE POLICY "backups_select_own_business" ON public.ledger_backups 
+    FOR SELECT TO authenticated USING (auth.uid() = business_id);
+
+DROP POLICY IF EXISTS "backups_insert_own_business" ON public.ledger_backups;
+CREATE POLICY "backups_insert_own_business" ON public.ledger_backups 
+    FOR INSERT TO authenticated WITH CHECK (auth.uid() = business_id);
+
+DROP POLICY IF EXISTS "backups_update_own_business" ON public.ledger_backups;
+CREATE POLICY "backups_update_own_business" ON public.ledger_backups 
+    FOR UPDATE TO authenticated USING (auth.uid() = business_id) WITH CHECK (auth.uid() = business_id);
+
+DROP POLICY IF EXISTS "backups_delete_own_business" ON public.ledger_backups;
+CREATE POLICY "backups_delete_own_business" ON public.ledger_backups 
+    FOR DELETE TO authenticated USING (auth.uid() = business_id);
+
+CREATE OR REPLACE FUNCTION public.get_business_storage_usage()
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY INVOKER
+AS $$
+DECLARE
+    current_uid UUID;
+    cust_count BIGINT;
+    tx_count BIGINT;
+    bk_count BIGINT;
+    bk_bytes BIGINT;
+    result JSONB;
+BEGIN
+    current_uid := auth.uid();
+    IF current_uid IS NULL THEN
+        RAISE EXCEPTION 'Not authenticated';
+    END IF;
+
+    SELECT COUNT(*) INTO cust_count FROM public.customers WHERE business_id = current_uid;
+    SELECT COUNT(*) INTO tx_count FROM public.ledger_transactions WHERE business_id = current_uid;
+    SELECT COUNT(*), COALESCE(SUM(data_size_bytes), 0) INTO bk_count, bk_bytes FROM public.ledger_backups WHERE business_id = current_uid;
+
+    result := jsonb_build_object(
+        'customer_count', cust_count,
+        'transaction_count', tx_count,
+        'backup_count', bk_count,
+        'backup_total_bytes', bk_bytes,
+        'estimated_record_bytes', (cust_count * 250) + (tx_count * 300) + bk_bytes,
+        'last_updated', timezone('utc'::text, now())
+    );
+
+    RETURN result;
+END;
+$$;

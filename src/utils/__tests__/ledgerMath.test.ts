@@ -8,12 +8,6 @@ import {
   calculateLedgerTotals,
 } from '../ledgerMath';
 
-function assert(condition: boolean, message: string) {
-  if (!condition) {
-    throw new Error(`Assertion failed: ${message}`);
-  }
-}
-
 function assertEquals<T>(actual: T, expected: T, message: string) {
   if (actual !== expected) {
     throw new Error(

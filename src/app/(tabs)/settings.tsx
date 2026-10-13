@@ -8,26 +8,29 @@ import {
   Modal,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { useAuth } from '../../auth/AuthContext';
 import { AppIcon } from '../../components/AppIcon';
+import { AppTopBar } from '../../components/AppTopBar';
 import { AppButton } from '../../components/AppButton';
 import { AppTextInput } from '../../components/AppTextInput';
 import { Badge } from '../../components/Badge';
-import { SupportedLanguage } from '../../i18n/translations';
 import {
   getCurrentSupabaseConfig,
   saveCustomSupabaseConfig,
   clearCustomSupabaseConfig,
 } from '../../lib/supabase';
+import { CloudBackupCard } from '../../components/CloudBackupCard';
+import { CloudUsageCard } from '../../components/CloudUsageCard';
+import { useTabBarVisibility } from '../../context/TabBarVisibilityContext';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { colors, spacing, borderRadius, mode, setThemeMode } = useTheme();
-  const { t, language, setLanguage } = useLanguage();
+  const { t } = useLanguage();
+  const { handleScroll } = useTabBarVisibility();
   const {
     user,
     profile,
@@ -102,12 +105,6 @@ export default function SettingsScreen() {
     );
   };
 
-  const languages: { code: SupportedLanguage; label: string; native: string }[] = [
-    { code: 'en', label: 'English', native: 'English' },
-    { code: 'bn', label: 'Bengali', native: 'বাংলা' },
-    { code: 'hi', label: 'Hindi', native: 'हिन्दी' },
-  ];
-
   const handleOpenEditModal = () => {
     setBizName(profile.business_name);
     setBizOwner(profile.owner_name);
@@ -149,31 +146,23 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView
-      edges={['top', 'left', 'right']}
+    <View
       style={[styles.safeArea, { backgroundColor: colors.background }]}
     >
-      {/* Top Header */}
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: colors.surface,
-            borderBottomColor: colors.border,
-          },
-        ]}
-      >
-        <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
-          {t.settings.title}
-        </Text>
-        <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-          Customize language, appearance and business profile
-        </Text>
-      </View>
+      {/* Modern Executive Header Bar */}
+      <AppTopBar
+        title={t.settings.title}
+        subtitle="Preferences & Security"
+        iconName="settings"
+        iconFamily="feather"
+        showSync={true}
+      />
 
       <ScrollView
         contentContainerStyle={[styles.content, { padding: spacing.md, paddingBottom: 110 }]}
         showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
       >
         {/* Business Profile Card */}
         <View
@@ -327,7 +316,13 @@ export default function SettingsScreen() {
           )}
         </View>
 
-        {/* Language Selection Card */}
+        {/* Feature A: Automatic Cloud Backup & Recovery */}
+        <CloudBackupCard />
+
+        {/* Feature B: Supabase Plan Usage & Remaining Quota Monitor */}
+        <CloudUsageCard />
+
+        {/* Feature C: Demo Data Import & Management */}
         <View
           style={[
             styles.sectionCard,
@@ -338,60 +333,41 @@ export default function SettingsScreen() {
             },
           ]}
         >
-          <Text style={[styles.sectionHeading, { color: colors.textPrimary }]}>
-            {t.settings.language}
+          <View style={styles.cardHeaderRow}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <View
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: borderRadius.sm,
+                  backgroundColor: colors.primaryLight,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <AppIcon name="database" size={17} color={colors.primary} />
+              </View>
+              <View>
+                <Text style={[styles.sectionHeading, { color: colors.textPrimary }]}>
+                  Demo Data Import
+                </Text>
+                <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 1 }}>
+                  Golden Weigh Bridge Sample Accounts
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <Text style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 12, lineHeight: 18 }}>
+            Preview and import 66 sample customer accounts totaling ₹44,180.00 in authentic active dues with duplicate prevention.
           </Text>
 
-          {languages.map((item, idx) => {
-            const isSelected = language === item.code;
-            return (
-              <TouchableOpacity
-                key={item.code}
-                onPress={() => setLanguage(item.code)}
-                style={[
-                  styles.optionRow,
-                  {
-                    borderBottomColor:
-                      idx === languages.length - 1
-                        ? 'transparent'
-                        : colors.borderLight,
-                  },
-                ]}
-              >
-                <View>
-                  <Text
-                    style={[
-                      styles.optionTitle,
-                      { color: isSelected ? colors.primary : colors.textPrimary },
-                    ]}
-                  >
-                    {item.label}
-                  </Text>
-                  <Text
-                    style={[styles.optionSub, { color: colors.textSecondary }]}
-                  >
-                    {item.native}
-                  </Text>
-                </View>
-
-                <View
-                  style={[
-                    styles.radioCircle,
-                    {
-                      borderColor: isSelected ? colors.primary : colors.border,
-                      backgroundColor: isSelected
-                        ? colors.primary
-                        : 'transparent',
-                    },
-                  ]}
-                >
-                  {isSelected && (
-                    <AppIcon name="check" size={12} color="#FFFFFF" />
-                  )}
-                </View>
-              </TouchableOpacity>
-            );
-          })}
+          <AppButton
+            title="Open Demo Data Importer"
+            variant="outline"
+            iconName="database"
+            onPress={() => router.push('/import' as any)}
+          />
         </View>
 
         {/* Theme Selection Card */}
@@ -632,7 +608,7 @@ export default function SettingsScreen() {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -641,9 +617,23 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    position: 'relative',
     paddingHorizontal: 20,
     paddingVertical: 14,
-    borderBottomWidth: 1,
+    borderBottomWidth: 1.5,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+  },
+  headerAccentLine: {
+    position: 'absolute',
+    bottom: -1.5,
+    left: 20,
+    right: 20,
+    height: 2,
+    borderRadius: 1,
   },
   headerTitle: {
     fontSize: 18,

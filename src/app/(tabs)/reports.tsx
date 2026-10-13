@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,21 +7,25 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { useAuth } from '../../auth/AuthContext';
 import { AppIcon } from '../../components/AppIcon';
+import { AppTopBar } from '../../components/AppTopBar';
 import { AppButton } from '../../components/AppButton';
 import {
   Customer,
+  LedgerTransaction,
   formatINR,
   calculateLedgerTotals,
 } from '../../types/customer';
 import {
   getCustomers,
+  getAllTransactionsList,
   subscribeToRepository,
 } from '../../storage/localLedgerRepository';
+import { useTabBarVisibility } from '../../context/TabBarVisibilityContext';
+import { DashboardChart } from '../../components/DashboardChart';
 import {
   generateBusinessReportPdf,
   sharePdfFile,
@@ -33,14 +37,20 @@ export default function ReportsScreen() {
   const { colors, spacing, borderRadius } = useTheme();
   const { t } = useLanguage();
   const { profile } = useAuth();
+  const { handleScroll } = useTabBarVisibility();
   const [dateFilter, setDateFilter] = useState<DateFilter>('ALL');
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [transactions, setTransactions] = useState<LedgerTransaction[]>([]);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-  const loadData = async () => {
-    const list = await getCustomers();
-    setCustomers(list);
-  };
+  const loadData = useCallback(async () => {
+    const [custList, txList] = await Promise.all([
+      getCustomers(),
+      getAllTransactionsList(),
+    ]);
+    setCustomers(custList);
+    setTransactions(txList);
+  }, []);
 
   const handleExportPdf = async () => {
     if (customers.length === 0) {
@@ -52,7 +62,9 @@ export default function ReportsScreen() {
       const uri = await generateBusinessReportPdf(
         customers,
         profile,
-        `Ledger Report (${dateFilter})`
+        `Ledger Report (${dateFilter})`,
+        undefined,
+        transactions
       );
       await sharePdfFile(uri, `${profile.business_name} - Master Ledger`);
     } catch (err: any) {
@@ -70,36 +82,28 @@ export default function ReportsScreen() {
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [loadData]);
 
   const summary = calculateLedgerTotals(customers);
 
   return (
-    <SafeAreaView
-      edges={['top', 'left', 'right']}
+    <View
       style={[styles.safeArea, { backgroundColor: colors.background }]}
     >
-      {/* Top Header */}
-      <View
-        style={[
-          styles.header,
-          {
-            backgroundColor: colors.surface,
-            borderBottomColor: colors.border,
-          },
-        ]}
-      >
-        <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
-          {t.reports.title}
-        </Text>
-        <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-          {t.reports.overview}
-        </Text>
-      </View>
+      {/* Modern Executive Header Bar */}
+      <AppTopBar
+        title={t.reports.title}
+        subtitle={t.reports.overview}
+        iconName="bar-chart-2"
+        iconFamily="feather"
+        showSync={true}
+      />
 
       <ScrollView
         contentContainerStyle={[styles.content, { padding: spacing.md, paddingBottom: 110 }]}
         showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
       >
         {/* Date Filter Tabs */}
         <View
@@ -252,6 +256,9 @@ export default function ReportsScreen() {
           </View>
         </View>
 
+        {/* Executive Analytics Dashboard Chart with 30-Day, Monthly, Yearly and On-Tap Amount */}
+        <DashboardChart customers={customers} allTransactions={transactions} />
+
         {/* Customer Balance Breakdown */}
         <View
           style={[
@@ -287,11 +294,18 @@ export default function ReportsScreen() {
                 >
                   {cust.name}
                 </Text>
-                <Text
-                  style={[styles.customerPhone, { color: colors.textSecondary }]}
-                >
-                  {cust.phone}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 6, marginTop: 2 }}>
+                  <Text
+                    style={[styles.customerPhone, { color: colors.textSecondary }]}
+                  >
+                    {cust.phone}
+                  </Text>
+                  {typeof cust.totalGotPaise === 'number' && cust.totalGotPaise > 0 && (
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: colors.youWillGive }}>
+                      • Recv: {formatINR(cust.totalGotPaise)}
+                    </Text>
+                  )}
+                </View>
               </View>
               <Text
                 style={[
@@ -312,28 +326,13 @@ export default function ReportsScreen() {
           ))}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderBottomWidth: 1,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    letterSpacing: -0.3,
-  },
-  headerSubtitle: {
-    fontSize: 12,
-    fontWeight: '500',
-    marginTop: 2,
   },
   content: {
     paddingBottom: 40,

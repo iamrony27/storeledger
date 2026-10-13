@@ -25,7 +25,7 @@ export const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
   date,
   onDateChange,
 }) => {
-  const { colors, borderRadius, spacing } = useTheme();
+  const { colors, borderRadius } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
 
   const parsedDate = date ? new Date(date) : new Date();

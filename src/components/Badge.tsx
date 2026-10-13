@@ -4,7 +4,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { BalanceType } from '../types/customer';
 
 interface BadgeProps {
-  type: BalanceType | 'info' | 'sync';
+  type: BalanceType | 'info' | 'sync' | 'danger' | 'warning' | 'neutral';
   label: string;
 }
 
@@ -21,6 +21,11 @@ export const Badge: React.FC<BadgeProps> = ({ type, label }) => {
         return { bg: colors.settledBg, text: colors.settled };
       case 'sync':
         return { bg: colors.primaryLight, text: colors.primary };
+      case 'danger':
+        return { bg: colors.dangerBg, text: colors.danger };
+      case 'warning':
+        return { bg: colors.warningBg, text: colors.warning };
+      case 'neutral':
       case 'info':
       default:
         return { bg: colors.badgeBg, text: colors.textSecondary };

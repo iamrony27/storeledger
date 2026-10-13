@@ -82,11 +82,12 @@ export const AppButton: React.FC<AppButtonProps> = ({
 
   const vStyles = getVariantStyles();
 
+  const minHeight = size === 'sm' ? 34 : size === 'lg' ? 50 : 42;
   const paddingVertical =
-    size === 'sm' ? spacing.xs + 2 : size === 'lg' ? spacing.lg : spacing.md;
+    size === 'sm' ? spacing.xs + 2 : size === 'lg' ? spacing.lg : 10;
   const paddingHorizontal =
-    size === 'sm' ? spacing.sm : size === 'lg' ? spacing.xl : spacing.lg;
-  const fontSize = size === 'sm' ? 12 : size === 'lg' ? 16 : 14;
+    size === 'sm' ? spacing.sm : size === 'lg' ? spacing.xl : 12;
+  const fontSize = size === 'sm' ? 12 : size === 'lg' ? 15 : 13.5;
 
   return (
     <TouchableOpacity
@@ -100,6 +101,7 @@ export const AppButton: React.FC<AppButtonProps> = ({
       style={[
         styles.button,
         {
+          minHeight,
           backgroundColor: disabled ? colors.border : vStyles.bg,
           borderColor: disabled ? colors.border : vStyles.border,
           borderRadius: borderRadius.md,
@@ -131,6 +133,9 @@ export const AppButton: React.FC<AppButtonProps> = ({
               },
               textStyle,
             ]}
+            numberOfLines={1}
+            adjustsFontSizeToFit={true}
+            minimumFontScale={0.82}
           >
             {title}
           </Text>
@@ -150,10 +155,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
+    gap: 6,
+    maxWidth: '100%',
   },
   text: {
     fontWeight: '600',
     textAlign: 'center',
+    flexShrink: 1,
   },
 });

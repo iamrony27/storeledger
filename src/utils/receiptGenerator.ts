@@ -16,7 +16,7 @@ export function formatTransactionReceiptText(
   business: BusinessHeader
 ): string {
   const isPaymentReceived = tx.type === 'GOT';
-  const typeLabel = isPaymentReceived ? 'PAYMENT RECEIVED' : 'CREDIT GIVEN';
+  const typeLabel = isPaymentReceived ? 'YOU GOT' : 'YOU GAVE';
   const amountStr = formatINR(tx.amountPaise);
   const balanceStr = formatINR(customer.currentBalancePaise);
   const formattedDate = new Date(tx.date).toLocaleDateString('en-IN', {

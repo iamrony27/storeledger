@@ -7,16 +7,18 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
-import { AppIcon } from '../../components/AppIcon';
+import { AppTopBar } from '../../components/AppTopBar';
 import { AppTextInput } from '../../components/AppTextInput';
 import { AppButton } from '../../components/AppButton';
 import { rupeesToPaise } from '../../types/customer';
-import { createCustomer } from '../../storage/localLedgerRepository';
+import { createCustomer, getCustomers } from '../../storage/localLedgerRepository';
+import { findDuplicateCustomer } from '../../utils/customerValidation';
 
 export default function AddCustomerScreen() {
   const { colors, spacing, borderRadius } = useTheme();
@@ -32,7 +34,7 @@ export default function AddCustomerScreen() {
   const [nameError, setNameError] = useState('');
   const [phoneError, setPhoneError] = useState('');
 
-  const validate = () => {
+  const validate = async () => {
     let isValid = true;
     if (!name.trim()) {
       setNameError('Customer name is required');
@@ -49,11 +51,35 @@ export default function AddCustomerScreen() {
       setPhoneError('');
     }
 
-    return isValid;
+    if (!isValid) return false;
+
+    // Check for duplicate customer name or mobile number
+    try {
+      const existingList = await getCustomers();
+      const dupCheck = findDuplicateCustomer(existingList, name, cleanPhone);
+      if (dupCheck.isDuplicate) {
+        if (dupCheck.duplicateField === 'name') {
+          setNameError(dupCheck.errorMessage || 'A customer with this name already exists');
+        } else if (dupCheck.duplicateField === 'phone') {
+          setPhoneError(dupCheck.errorMessage || 'A customer with this mobile number already exists');
+        } else {
+          setNameError('A customer with this name already exists');
+          setPhoneError('A customer with this mobile number already exists');
+        }
+        Alert.alert('Duplicate Customer', dupCheck.errorMessage);
+        return false;
+      }
+    } catch (e) {
+      console.warn('Error checking for duplicate customers:', e);
+    }
+
+    return true;
   };
 
   const handleSave = async () => {
-    if (!validate()) return;
+    const isValid = await validate();
+    if (!isValid) return;
+
     setIsSaving(true);
     try {
       let openingPaise = 0;
@@ -63,9 +89,9 @@ export default function AddCustomerScreen() {
       }
 
       await createCustomer({
-        name,
-        phone,
-        address: address || undefined,
+        name: name.trim().normalize('NFC'),
+        phone: phone.trim(),
+        address: address.trim() || undefined,
         openingBalancePaise: openingPaise,
       });
 
@@ -74,8 +100,9 @@ export default function AddCustomerScreen() {
       } else {
         router.replace('/(tabs)');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to create customer:', err);
+      Alert.alert('Duplicate Customer', err?.message || 'Failed to create customer.');
     } finally {
       setIsSaving(false);
     }
@@ -83,36 +110,22 @@ export default function AddCustomerScreen() {
 
   return (
     <SafeAreaView
-      edges={['top', 'left', 'right', 'bottom']}
+      edges={['bottom', 'left', 'right']}
       style={[styles.safeArea, { backgroundColor: colors.background }]}
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.keyboardAvoid}
       >
-        {/* Top Header */}
-        <View
-          style={[
-            styles.header,
-            {
-              backgroundColor: colors.surface,
-              borderBottomColor: colors.border,
-            },
-          ]}
-        >
-          <View style={styles.headerTitleRow}>
-            <TouchableOpacity
-              onPress={() => router.back()}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              style={styles.backTouch}
-            >
-              <AppIcon name="x" size={22} color={colors.textPrimary} />
-            </TouchableOpacity>
-            <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>
-              {t.addCustomer.title}
-            </Text>
-          </View>
-        </View>
+        {/* Modern Executive TopBar */}
+        <AppTopBar
+          showBack={true}
+          backIcon="x"
+          title={t.addCustomer.title}
+          subtitle="Create ledger account"
+          iconName="user-plus"
+          iconFamily="feather"
+        />
 
         <ScrollView
           contentContainerStyle={[styles.content, { padding: spacing.md }]}
@@ -247,7 +260,7 @@ export default function AddCustomerScreen() {
                         },
                       ]}
                     >
-                      {t.dashboard.filterGive} (Payable)
+                      {t.dashboard.filterGive} (Advance)
                     </Text>
                   </TouchableOpacity>
                 </View>
@@ -261,6 +274,8 @@ export default function AddCustomerScreen() {
               title={t.addCustomer.createButton}
               iconName="check"
               onPress={handleSave}
+              loading={isSaving}
+              disabled={isSaving}
               variant="primary"
               size="lg"
             />

@@ -9,6 +9,7 @@ import {
   Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
+  Keyboard,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -140,14 +141,28 @@ export default function CustomerDetailScreen() {
     };
   }, [loadData]);
 
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      () => setKeyboardVisible(true)
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => setKeyboardVisible(false)
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
   const focusAmountKeypad = useCallback(() => {
-    const timers = [
-      setTimeout(() => amountInputRef.current?.focus(), 50),
-      setTimeout(() => amountInputRef.current?.focus(), 150),
-      setTimeout(() => amountInputRef.current?.focus(), 280),
-      setTimeout(() => amountInputRef.current?.focus(), 450),
-    ];
-    return () => timers.forEach(clearTimeout);
+    const timer = setTimeout(() => {
+      amountInputRef.current?.focus();
+    }, 120);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -919,7 +934,10 @@ export default function CustomerDetailScreen() {
         }}
         onRequestClose={() => setModalVisible(false)}
       >
-        <View style={styles.modalOverlay}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          style={styles.modalOverlay}
+        >
           <View
             style={[
               styles.modalSheet,
@@ -927,6 +945,7 @@ export default function CustomerDetailScreen() {
                 backgroundColor: colors.surface,
                 borderColor: colors.border,
                 borderRadius: borderRadius.xl,
+                maxHeight: '92%',
               },
             ]}
           >
@@ -981,7 +1000,15 @@ export default function CustomerDetailScreen() {
               </TouchableOpacity>
             </View>
 
-            <View style={styles.modalBody}>
+            <ScrollView
+              showsVerticalScrollIndicator={true}
+              keyboardShouldPersistTaps="handled"
+              keyboardDismissMode="interactive"
+              contentContainerStyle={[
+                styles.modalBody,
+                { paddingBottom: keyboardVisible ? 260 : 20 },
+              ]}
+            >
               {/* Type Switcher for Edit & Entry */}
               <View style={styles.typeSwitcherRow}>
                 <TouchableOpacity
@@ -1065,7 +1092,6 @@ export default function CustomerDetailScreen() {
                     error={amountError}
                     keyboardType="numeric"
                     selectTextOnFocus
-                    autoFocus
                   />
                 </View>
 
@@ -1150,9 +1176,9 @@ export default function CustomerDetailScreen() {
                   size="lg"
                 />
               </View>
-            </View>
+            </ScrollView>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
 
       {/* Customer Details View & Edit Modal */}
@@ -1560,12 +1586,12 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalSheet: {
-    maxHeight: '95%',
+    maxHeight: '92%',
     borderTopWidth: 1,
     borderLeftWidth: 1,
     borderRightWidth: 1,
     padding: 20,
-    paddingBottom: 36,
+    paddingBottom: 16,
   },
   modalHeader: {
     flexDirection: 'row',

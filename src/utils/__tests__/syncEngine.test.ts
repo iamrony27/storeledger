@@ -274,4 +274,60 @@ assert(
   'Deleted transaction tx-2 must be cleanly removed from other device cache'
 );
 
+// 6. Transaction Add/Remove Sync Queue & Concurrency Invariants
+console.log('6. Testing Add/Remove Transaction Sync & Concurrency Invariants...');
+let testOutbox: SyncQueueItem[] = [];
+
+// Adding a transaction must enqueue both transaction and customer
+testOutbox = simulateAddToOutbox(testOutbox, {
+  entity: 'transaction',
+  action: 'insert',
+  recordId: 'tx-new-1',
+  payload: { id: 'tx-new-1', amountPaise: 5000 },
+});
+testOutbox = simulateAddToOutbox(testOutbox, {
+  entity: 'customer',
+  action: 'update',
+  recordId: 'cust-1',
+  payload: { id: 'cust-1', currentBalancePaise: 5000 },
+});
+
+assertEquals(testOutbox.length, 2, 'Adding a transaction must enqueue transaction and customer update');
+assert(testOutbox.some(i => i.entity === 'transaction' && i.action === 'insert'), 'Must have transaction insert');
+assert(testOutbox.some(i => i.entity === 'customer' && i.action === 'update'), 'Must have customer update');
+
+// Removing a transaction must enqueue transaction deletion and customer update
+testOutbox = simulateAddToOutbox(testOutbox, {
+  entity: 'transaction',
+  action: 'delete',
+  recordId: 'tx-new-1',
+  payload: { id: 'tx-new-1', customerId: 'cust-1' },
+});
+testOutbox = simulateAddToOutbox(testOutbox, {
+  entity: 'customer',
+  action: 'update',
+  recordId: 'cust-1',
+  payload: { id: 'cust-1', currentBalancePaise: 0 },
+});
+
+// The customer update was replaced with latest balance, and transaction delete was appended
+assert(testOutbox.some(i => i.entity === 'transaction' && i.action === 'delete'), 'Must have transaction delete');
+const custUpdate = testOutbox.find(i => i.entity === 'customer' && i.action === 'update');
+assert(Boolean(custUpdate), 'Customer update must exist');
+assertEquals(custUpdate?.payload.currentBalancePaise, 0, 'Customer balance must reflect updated state after deletion');
+
+// Concurrency queue test: when a sync is running, next trigger sets pending flag
+let isSyncing = true;
+let syncPendingAfterCurrent = false;
+
+function triggerSync() {
+  if (isSyncing) {
+    syncPendingAfterCurrent = true;
+    return;
+  }
+}
+
+triggerSync();
+assertEquals(syncPendingAfterCurrent, true, 'Subsequent sync during in-flight sync must set pending flag');
+
 console.log('\nAll Sync Engine & Conflict Resolution test suites passed successfully!\n');

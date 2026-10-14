@@ -22,6 +22,8 @@ class SyncEngine {
   private listeners = new Set<(state: SyncState) => void>();
   private isOnline = true;
   private isSyncing = false;
+  private syncPendingAfterCurrent = false;
+  private syncDebounceTimer: any = null;
   private netInfoUnsubscribe: (() => void) | null = null;
   private realtimeChannel: any = null;
 
@@ -52,15 +54,18 @@ class SyncEngine {
           this.updateState({ status: 'offline' });
         } else if (wasOffline) {
           // Came back online: trigger sync automatically
-          this.syncNow();
+          this.triggerDebouncedSync(200);
         }
       });
 
-      // 3. Initial check
+      // 3. Initial check and auto-sync on app start
       const currentNet = await NetInfo.fetch();
       this.isOnline = Boolean(currentNet.isConnected && currentNet.isInternetReachable !== false);
       if (!this.isOnline) {
         this.updateState({ status: 'offline' });
+      } else if (isSupabaseConfigured()) {
+        // Automatically sync on engine startup if online
+        this.triggerDebouncedSync(300);
       }
     } catch (err) {
       console.warn('SyncEngine init failed:', err);
@@ -68,6 +73,10 @@ class SyncEngine {
   }
 
   public destroy() {
+    if (this.syncDebounceTimer) {
+      clearTimeout(this.syncDebounceTimer);
+      this.syncDebounceTimer = null;
+    }
     if (this.netInfoUnsubscribe) {
       this.netInfoUnsubscribe();
     }
@@ -126,6 +135,16 @@ class SyncEngine {
     this.updateState({ pendingCount: items.length });
   }
 
+  public triggerDebouncedSync(delayMs = 80): void {
+    if (this.syncDebounceTimer) {
+      clearTimeout(this.syncDebounceTimer);
+    }
+    this.syncDebounceTimer = setTimeout(() => {
+      this.syncDebounceTimer = null;
+      this.syncNow();
+    }, delayMs);
+  }
+
   public async addToOutbox(
     item: Omit<SyncQueueItem, 'id' | 'createdAt' | 'retryCount'>
   ): Promise<void> {
@@ -145,9 +164,9 @@ class SyncEngine {
     filtered.push(queueItem);
     await this.saveOutbox(filtered);
 
-    // If online and Supabase is configured, trigger sync in background
+    // If online and Supabase is configured, trigger debounced sync immediately
     if (this.isOnline && isSupabaseConfigured()) {
-      this.syncNow();
+      this.triggerDebouncedSync(80);
     }
   }
 
@@ -161,7 +180,16 @@ class SyncEngine {
   // ============================================================================
 
   public async syncNow(): Promise<void> {
-    if (this.isSyncing) return;
+    if (this.syncDebounceTimer) {
+      clearTimeout(this.syncDebounceTimer);
+      this.syncDebounceTimer = null;
+    }
+
+    if (this.isSyncing) {
+      this.syncPendingAfterCurrent = true;
+      return;
+    }
+
     if (!this.isOnline) {
       this.updateState({ status: 'offline' });
       return;
@@ -210,6 +238,10 @@ class SyncEngine {
       });
     } finally {
       this.isSyncing = false;
+      if (this.syncPendingAfterCurrent) {
+        this.syncPendingAfterCurrent = false;
+        this.triggerDebouncedSync(50);
+      }
     }
   }
 
@@ -226,13 +258,15 @@ class SyncEngine {
             const { error } = await supabase
               .from('customers')
               .delete()
-              .eq('id', item.recordId);
+              .eq('id', item.recordId)
+              .eq('business_id', userId);
             if (error) throw error;
           } else if (item.entity === 'transaction') {
             const { error } = await supabase
               .from('ledger_transactions')
               .delete()
-              .eq('id', item.recordId);
+              .eq('id', item.recordId)
+              .eq('business_id', userId);
             if (error) throw error;
           }
         } else if (item.entity === 'customer') {
@@ -266,7 +300,7 @@ class SyncEngine {
               customer_id: tx.customerId,
               type: tx.type,
               amount_paise: tx.amountPaise,
-              description: tx.description || null,
+              description: tx.type === 'GAVE' ? null : (tx.description || null),
               transaction_date: tx.date,
               is_opening_balance: isOpening,
               is_void: Boolean(tx.isVoided),

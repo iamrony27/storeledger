@@ -28,12 +28,12 @@ export const TabBarVisibilityProvider: React.FC<{ children: React.ReactNode }> =
       extrapolateLeft: 'clamp',
     });
 
-    // 2. Native continuous diffClamp for drawer (128dp)
-    const diffClampedScrollY = Animated.diffClamp(safeScrollY, 0, 128);
+    // 2. Native continuous diffClamp for drawer (96dp)
+    const diffClampedScrollY = Animated.diffClamp(safeScrollY, 0, 96);
 
     // 3. Native dock tab bar translation (slides down smoothly with scroll)
     const nativeTabBarTranslateY = diffClampedScrollY.interpolate({
-      inputRange: [0, 128],
+      inputRange: [0, 96],
       outputRange: [0, 120],
       extrapolate: 'clamp',
     });
@@ -160,7 +160,7 @@ export const useTabBarVisibility = (): TabBarVisibilityContextType => {
     const fallbackAnim = new Animated.Value(0);
     const fallbackCollapse = new Animated.Value(0);
     const fallbackScrollY = new Animated.Value(0);
-    const fallbackClamped = Animated.diffClamp(fallbackScrollY, 0, 126);
+    const fallbackClamped = Animated.diffClamp(fallbackScrollY, 0, 96);
     return {
       tabBarTranslateY: fallbackAnim,
       isTabBarVisible: true,

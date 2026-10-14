@@ -57,12 +57,14 @@ import {
   sharePdfFile,
 } from '../../utils/pdfGenerator';
 import { WhatsAppShareModal } from '../../components/WhatsAppShareModal';
+import { useQuickAmounts } from '../../storage/quickAmountSettings';
 
 export default function CustomerDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { colors, spacing, borderRadius } = useTheme();
   const { t, language } = useLanguage();
   const { profile } = useAuth();
+  const { quickAmounts } = useQuickAmounts();
 
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [transactions, setTransactions] = useState<LedgerTransaction[]>([]);
@@ -138,6 +140,23 @@ export default function CustomerDetailScreen() {
     };
   }, [loadData]);
 
+  const focusAmountKeypad = useCallback(() => {
+    const timers = [
+      setTimeout(() => amountInputRef.current?.focus(), 50),
+      setTimeout(() => amountInputRef.current?.focus(), 150),
+      setTimeout(() => amountInputRef.current?.focus(), 280),
+      setTimeout(() => amountInputRef.current?.focus(), 450),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  useEffect(() => {
+    if (modalVisible) {
+      const cleanup = focusAmountKeypad();
+      return cleanup;
+    }
+  }, [modalVisible, focusAmountKeypad]);
+
   if (isLoading) {
     return (
       <SafeAreaView
@@ -211,7 +230,7 @@ export default function CustomerDetailScreen() {
       setModalType(existingTx.type);
       setTxAmount(paiseToRupees(existingTx.amountPaise).toString());
       setTxDate(existingTx.date || new Date().toISOString());
-      setTxDesc(existingTx.description || '');
+      setTxDesc(existingTx.type === 'GAVE' ? '' : (existingTx.description || ''));
       setTxBill(existingTx.billNumber || '');
     } else {
       setEditingTx(null);
@@ -223,7 +242,7 @@ export default function CustomerDetailScreen() {
     }
     setAmountError('');
     setModalVisible(true);
-    setTimeout(() => amountInputRef.current?.focus(), 80);
+    focusAmountKeypad();
   };
 
   const handleOpenEditCustomer = () => {
@@ -318,7 +337,7 @@ export default function CustomerDetailScreen() {
           transactionId: editingTx.id,
           amountPaise: parsedPaise,
           type: modalType,
-          description: txDesc || undefined,
+          description: modalType === 'GAVE' ? undefined : (txDesc?.trim() || undefined),
           billNumber: txBill || undefined,
           date: txDate,
         });
@@ -328,7 +347,7 @@ export default function CustomerDetailScreen() {
           customerId: customer.id,
           amountPaise: parsedPaise,
           type: modalType,
-          description: txDesc || undefined,
+          description: modalType === 'GAVE' ? undefined : (txDesc?.trim() || undefined),
           billNumber: txBill || undefined,
           date: txDate,
         });
@@ -751,8 +770,9 @@ export default function CustomerDetailScreen() {
                               { color: colors.textPrimary },
                             ]}
                           >
-                            {tx.description ||
-                              (isGave ? 'You Gave' : 'You Got')}
+                            {isGave
+                              ? 'You Gave'
+                              : (tx.description || 'You Got')}
                           </Text>
                           <Text
                             style={[
@@ -895,9 +915,7 @@ export default function CustomerDetailScreen() {
         transparent
         animationType="slide"
         onShow={() => {
-          setTimeout(() => {
-            amountInputRef.current?.focus();
-          }, 80);
+          focusAmountKeypad();
         }}
         onRequestClose={() => setModalVisible(false)}
       >
@@ -1029,30 +1047,84 @@ export default function CustomerDetailScreen() {
                 onDateChange={setTxDate}
               />
 
-              <AppTextInput
-                ref={amountInputRef}
-                label="Amount"
-                placeholder="0"
-                prefixText="₹"
-                value={txAmount}
-                onChangeText={(text) => {
-                  const withoutDecimals = text.split('.')[0];
-                  const filtered = withoutDecimals.replace(/[^0-9]/g, '');
-                  setTxAmount(filtered);
-                  if (amountError) setAmountError('');
-                }}
-                error={amountError}
-                keyboardType="number-pad"
-                autoFocus
-              />
+              {/* Half-width Amount Box + 3 Quick Amount Buttons */}
+              <View style={styles.amountRow}>
+                <View style={styles.amountInputCol}>
+                  <AppTextInput
+                    ref={amountInputRef}
+                    label="Amount"
+                    placeholder="0"
+                    prefixText="₹"
+                    value={txAmount}
+                    onChangeText={(text) => {
+                      const withoutDecimals = text.split('.')[0];
+                      const filtered = withoutDecimals.replace(/[^0-9]/g, '');
+                      setTxAmount(filtered);
+                      if (amountError) setAmountError('');
+                    }}
+                    error={amountError}
+                    keyboardType="numeric"
+                    selectTextOnFocus
+                    autoFocus
+                  />
+                </View>
 
-              <AppTextInput
-                label="Description / Item (Optional)"
-                placeholder="e.g. 5x LED lights, Cash payment, নগদ জমা"
-                iconName="edit-3"
-                value={txDesc}
-                onChangeText={setTxDesc}
-              />
+                <View style={styles.quickButtonsCol}>
+                  <Text style={[styles.quickButtonsLabel, { color: colors.textSecondary }]}>
+                    QUICK AMOUNT
+                  </Text>
+                  <View style={styles.quickButtonsGroup}>
+                    {quickAmounts.map((amt, idx) => {
+                      const isSelected = txAmount === amt.toString();
+                      return (
+                        <TouchableOpacity
+                          key={idx}
+                          activeOpacity={0.75}
+                          onPress={() => {
+                            setTxAmount(amt.toString());
+                            if (amountError) setAmountError('');
+                          }}
+                          style={[
+                            styles.quickAmtBtn,
+                            {
+                              backgroundColor: isSelected ? colors.primary : colors.surface,
+                              borderColor: isSelected ? colors.primary : colors.border,
+                              borderRadius: borderRadius.md,
+                            },
+                          ]}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Quick select ₹${amt}`}
+                        >
+                          <Text
+                            style={[
+                              styles.quickAmtBtnText,
+                              {
+                                color: isSelected ? '#FFFFFF' : colors.textPrimary,
+                                fontWeight: isSelected ? '800' : '700',
+                              },
+                            ]}
+                            numberOfLines={1}
+                            adjustsFontSizeToFit={true}
+                            minimumFontScale={0.75}
+                          >
+                            ₹{amt}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                </View>
+              </View>
+
+              {modalType !== 'GAVE' && (
+                <AppTextInput
+                  label="Payment Note / Description (Optional)"
+                  placeholder="e.g. Cash payment, GPay, Bank transfer, নগদ জমা"
+                  iconName="edit-3"
+                  value={txDesc}
+                  onChangeText={setTxDesc}
+                />
+              )}
 
               <AppTextInput
                 label="Bill / Invoice Number (Numbers Only)"
@@ -1594,5 +1666,40 @@ const styles = StyleSheet.create({
   typeSwitcherText: {
     fontSize: 12,
     fontWeight: '800',
+  },
+  amountRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginBottom: 0,
+  },
+  amountInputCol: {
+    flex: 1,
+  },
+  quickButtonsCol: {
+    flex: 1,
+  },
+  quickButtonsLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 6,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  quickButtonsGroup: {
+    flexDirection: 'row',
+    height: 48,
+    gap: 6,
+  },
+  quickAmtBtn: {
+    flex: 1,
+    height: 48,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 2,
+  },
+  quickAmtBtnText: {
+    fontSize: 13,
   },
 });

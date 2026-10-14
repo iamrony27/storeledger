@@ -3,10 +3,15 @@
     "name": "GWD book",
     "slug": "gwd-book",
     "scheme": "gwdbook",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#EF6905"
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.gwd.book"
@@ -18,7 +23,7 @@
         "WRITE_EXTERNAL_STORAGE"
       ],
       "adaptiveIcon": {
-        "backgroundColor": "#0F172A",
+        "backgroundColor": "#EF6905",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"

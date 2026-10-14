@@ -1,10 +1,12 @@
 import React from 'react';
 import { ColorValue } from 'react-native';
-import { Feather, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import Feather from '@expo/vector-icons/Feather';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export type IconFamily = 'feather' | 'material' | 'ionicons';
 
-interface AppIconProps {
+export interface AppIconProps {
   family?: IconFamily;
   name: string;
   size?: number;

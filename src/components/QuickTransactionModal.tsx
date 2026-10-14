@@ -29,6 +29,8 @@ import {
   getAllTransactionsList,
   addTransaction,
 } from '../storage/localLedgerRepository';
+import { useQuickAmounts } from '../storage/quickAmountSettings';
+import { getCustomerSearchTier, rankAndSortCustomers } from '../utils/customerSearch';
 
 interface QuickTransactionModalProps {
   visible: boolean;
@@ -46,6 +48,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
   initialType,
 }) => {
   const { colors, spacing, borderRadius } = useTheme();
+  const { quickAmounts } = useQuickAmounts();
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [transactions, setTransactions] = useState<LedgerTransaction[]>([]);
@@ -78,6 +81,23 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
     };
   }, []);
 
+  const focusAmountKeypad = useCallback(() => {
+    const timers = [
+      setTimeout(() => amountInputRef.current?.focus(), 50),
+      setTimeout(() => amountInputRef.current?.focus(), 150),
+      setTimeout(() => amountInputRef.current?.focus(), 280),
+      setTimeout(() => amountInputRef.current?.focus(), 450),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  useEffect(() => {
+    if (visible && selectedCustomer) {
+      const cleanup = focusAmountKeypad();
+      return cleanup;
+    }
+  }, [visible, selectedCustomer, focusAmountKeypad]);
+
   // Load active customers and transactions
   const loadCustomers = useCallback(async () => {
     try {
@@ -92,13 +112,13 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
         const found = custList.find((c) => c.id === initialCustomerId);
         if (found) {
           setSelectedCustomer(found);
-          setTimeout(() => amountInputRef.current?.focus(), 100);
+          focusAmountKeypad();
         }
       }
     } catch (err) {
       console.error('Failed to load customers for quick transaction modal:', err);
     }
-  }, [initialCustomerId]);
+  }, [initialCustomerId, focusAmountKeypad]);
 
   useEffect(() => {
     if (visible) {
@@ -136,30 +156,23 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
     return map;
   }, [transactions]);
 
-  // Filter and sort customer list (recent activity first, full Bengali unicode search)
+  // Filter and sort customer list (prefix-first alphabetical ranking for search queries)
   const filteredCustomers = useMemo(() => {
     const q = searchQuery.trim().toLowerCase().normalize('NFC');
-    return customers
-      .filter((c) => {
-        if (!q) return true;
-        const name = (c.name || '').toLowerCase().normalize('NFC');
-        const phone = (c.phone || '');
-        return name.includes(q) || phone.includes(q);
-      })
-      .sort((a, b) => {
-        const recencyA = Math.max(
-          latestTxByCustomer.get(a.id) || 0,
-          a.updatedAt ? new Date(a.updatedAt).getTime() : 0
-        );
-        const recencyB = Math.max(
-          latestTxByCustomer.get(b.id) || 0,
-          b.updatedAt ? new Date(b.updatedAt).getTime() : 0
-        );
-        if (recencyB !== recencyA) {
-          return recencyB - recencyA;
-        }
-        return a.name.localeCompare(b.name, ['en', 'bn'], { sensitivity: 'base' });
-      });
+    const matched = customers.filter((c) => {
+      if (q && getCustomerSearchTier(c.name, c.phone, q) >= 999) {
+        return false;
+      }
+      return true;
+    });
+
+    const getRecency = (c: Customer) =>
+      Math.max(
+        latestTxByCustomer.get(c.id) || 0,
+        c.updatedAt ? new Date(c.updatedAt).getTime() : 0
+      );
+
+    return rankAndSortCustomers(matched, searchQuery, 'RECENT', getRecency);
   }, [customers, searchQuery, latestTxByCustomer]);
 
   const getInitials = (name: string): string => {
@@ -178,9 +191,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
   const handleSelectCustomer = (customer: Customer) => {
     setSelectedCustomer(customer);
     setAmountError('');
-    setTimeout(() => {
-      amountInputRef.current?.focus();
-    }, 100);
+    focusAmountKeypad();
   };
 
   const handleSave = async () => {
@@ -203,7 +214,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
         customerId: selectedCustomer.id,
         amountPaise: parsedPaise,
         type: txType,
-        description: description.trim() || undefined,
+        description: txType === 'GAVE' ? undefined : (description.trim() || undefined),
         billNumber: billNumber.trim() || undefined,
         date: date,
       });
@@ -235,7 +246,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
       animationType="slide"
       onShow={() => {
         if (selectedCustomer) {
-          setTimeout(() => amountInputRef.current?.focus(), 80);
+          focusAmountKeypad();
         } else {
           Keyboard.dismiss();
         }
@@ -559,32 +570,85 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                 {/* Date Picker */}
                 <TransactionDatePicker date={date} onDateChange={setDate} />
 
-                {/* Amount Input */}
-                <AppTextInput
-                  ref={amountInputRef}
-                  label="Amount"
-                  placeholder="0"
-                  prefixText="₹"
-                  value={amount}
-                  onChangeText={(text) => {
-                    const withoutDecimals = text.split('.')[0];
-                    const filtered = withoutDecimals.replace(/[^0-9]/g, '');
-                    setAmount(filtered);
-                    if (amountError) setAmountError('');
-                  }}
-                  error={amountError}
-                  keyboardType="number-pad"
-                  autoFocus
-                />
+                {/* Half-width Amount Box + 3 Quick Amount Buttons */}
+                <View style={styles.amountRow}>
+                  <View style={styles.amountInputCol}>
+                    <AppTextInput
+                      ref={amountInputRef}
+                      label="Amount"
+                      placeholder="0"
+                      prefixText="₹"
+                      value={amount}
+                      onChangeText={(text) => {
+                        const withoutDecimals = text.split('.')[0];
+                        const filtered = withoutDecimals.replace(/[^0-9]/g, '');
+                        setAmount(filtered);
+                        if (amountError) setAmountError('');
+                      }}
+                      error={amountError}
+                      keyboardType="numeric"
+                      selectTextOnFocus
+                      autoFocus
+                    />
+                  </View>
 
-                {/* Description Input */}
-                <AppTextInput
-                  label="Description / Note (Optional)"
-                  placeholder="e.g. Rice delivery, Weighment charges, নগদ জমা"
-                  iconName="edit-3"
-                  value={description}
-                  onChangeText={setDescription}
-                />
+                  <View style={styles.quickButtonsCol}>
+                    <Text style={[styles.quickButtonsLabel, { color: colors.textSecondary }]}>
+                      QUICK AMOUNT
+                    </Text>
+                    <View style={styles.quickButtonsGroup}>
+                      {quickAmounts.map((amt, idx) => {
+                        const isSelected = amount === amt.toString();
+                        return (
+                          <TouchableOpacity
+                            key={idx}
+                            activeOpacity={0.75}
+                            onPress={() => {
+                              setAmount(amt.toString());
+                              if (amountError) setAmountError('');
+                            }}
+                            style={[
+                              styles.quickAmtBtn,
+                              {
+                                backgroundColor: isSelected ? colors.primary : colors.surface,
+                                borderColor: isSelected ? colors.primary : colors.border,
+                                borderRadius: borderRadius.md,
+                              },
+                            ]}
+                            accessibilityRole="button"
+                            accessibilityLabel={`Quick select ₹${amt}`}
+                          >
+                            <Text
+                              style={[
+                                styles.quickAmtBtnText,
+                                {
+                                  color: isSelected ? '#FFFFFF' : colors.textPrimary,
+                                  fontWeight: isSelected ? '800' : '700',
+                                },
+                              ]}
+                              numberOfLines={1}
+                              adjustsFontSizeToFit={true}
+                              minimumFontScale={0.75}
+                            >
+                              ₹{amt}
+                            </Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  </View>
+                </View>
+
+                {/* Description Input (Only for Payments / YOU GOT) */}
+                {txType !== 'GAVE' && (
+                  <AppTextInput
+                    label="Payment Note / Description (Optional)"
+                    placeholder="e.g. Cash payment, UPI, Bank Transfer, নগদ জমা"
+                    iconName="edit-3"
+                    value={description}
+                    onChangeText={setDescription}
+                  />
+                )}
 
                 {/* Bill Number Input */}
                 <AppTextInput
@@ -784,5 +848,40 @@ const styles = StyleSheet.create({
   typeToggleLabel: {
     fontSize: 12,
     fontWeight: '800',
+  },
+  amountRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginBottom: 0,
+  },
+  amountInputCol: {
+    flex: 1,
+  },
+  quickButtonsCol: {
+    flex: 1,
+  },
+  quickButtonsLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 6,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  quickButtonsGroup: {
+    flexDirection: 'row',
+    height: 48,
+    gap: 6,
+  },
+  quickAmtBtn: {
+    flex: 1,
+    height: 48,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 2,
+  },
+  quickAmtBtnText: {
+    fontSize: 13,
   },
 });

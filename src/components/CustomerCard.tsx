@@ -119,13 +119,7 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
   );
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={onPress}
-      onLongPress={onLongPress}
-      accessibilityRole="button"
-      accessibilityLabel={`${customer.name}, Due: ${formatDueAmount(balancePaise)}, ${relativeTime}`}
-      accessibilityHint="Tap to view customer ledger details"
+    <View
       style={[
         styles.rowContainer,
         {
@@ -134,8 +128,16 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
         },
       ]}
     >
-      {/* Left: Avatar + Name + Last Transaction Time */}
-      <View style={styles.leftCol}>
+      {/* Left: Avatar + Name + Last Transaction Time (Opens customer ledger) */}
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={onPress}
+        onLongPress={onLongPress}
+        accessibilityRole="button"
+        accessibilityLabel={`${customer.name}, Due: ${formatDueAmount(balancePaise)}, ${relativeTime}`}
+        accessibilityHint="Tap to view customer ledger details"
+        style={styles.leftCol}
+      >
         {/* Circular Avatar (White background with dark bold initials like screenshot) */}
         {customer.avatarUrl ? (
           <Image source={{ uri: customer.avatarUrl }} style={styles.avatarImage} />
@@ -168,27 +170,36 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
             {relativeTime}
           </Text>
         </View>
-      </View>
+      </TouchableOpacity>
 
-      {/* Right Column: Due Amount + REMIND > link (with subtle dual-tone reddish tint when due) */}
+      {/* Right Column: Due Amount + REMIND > link (Sibling controls, NOT nested!) */}
       <View
         style={[
           styles.rightCol,
           hasDue && (isDark ? styles.rightColDueDark : styles.rightColDueLight),
         ]}
       >
-        <Text
-          style={[
-            styles.amountText,
-            hasDue && styles.amountDue,
-            hasAdvance && styles.amountAdvance,
-            isSettled && (isDark ? styles.amountSettledDark : styles.amountSettledLight),
-          ]}
-          numberOfLines={1}
-          adjustsFontSizeToFit={true}
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={onPress}
+          onLongPress={onLongPress}
+          accessibilityRole="button"
+          accessibilityLabel={`Balance: ${formatDueAmount(balancePaise)}`}
+          style={styles.amountTouchArea}
         >
-          {formatDueAmount(balancePaise)}
-        </Text>
+          <Text
+            style={[
+              styles.amountText,
+              hasDue && styles.amountDue,
+              hasAdvance && styles.amountAdvance,
+              isSettled && (isDark ? styles.amountSettledDark : styles.amountSettledLight),
+            ]}
+            numberOfLines={1}
+            adjustsFontSizeToFit={true}
+          >
+            {formatDueAmount(balancePaise)}
+          </Text>
+        </TouchableOpacity>
 
         {hasDue ? (
           <TouchableOpacity
@@ -205,7 +216,7 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
           <Text style={styles.advanceLabel}>Advance</Text>
         ) : null}
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
@@ -280,6 +291,11 @@ const styles = StyleSheet.create({
   },
   rightColDueLight: {
     backgroundColor: 'rgba(239, 68, 68, 0.05)', // Subtle rose tint in light mode
+  },
+  amountTouchArea: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    paddingVertical: 2,
   },
   amountText: {
     fontSize: 17,

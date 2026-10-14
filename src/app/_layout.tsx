@@ -1,10 +1,14 @@
-import { Platform, Alert } from 'react-native';
+import { useState, useEffect } from 'react';
+import { Platform, Alert, View, Image } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useFonts } from 'expo-font';
+import { Feather, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { ThemeProvider, useTheme } from '../theme/ThemeContext';
 import { LanguageProvider } from '../i18n/LanguageContext';
 import { AuthProvider } from '../auth/AuthContext';
+import { syncEngine } from '../sync/syncEngine';
 
 // Polyfill Alert.alert for Web browsers
 if (Platform.OS === 'web' && typeof window !== 'undefined') {
@@ -30,6 +34,11 @@ if (Platform.OS === 'web' && typeof window !== 'undefined') {
 
 function RootLayoutContent() {
   const { colors } = useTheme();
+
+  useEffect(() => {
+    // Perform sync after app start
+    syncEngine.syncNow();
+  }, []);
 
   return (
     <>
@@ -77,6 +86,35 @@ function RootLayoutContent() {
 }
 
 export default function RootLayout() {
+  const [fontsLoaded, fontError] = useFonts({
+    ...Feather.font,
+    ...MaterialCommunityIcons.font,
+    ...Ionicons.font,
+  });
+  const [isSplashMinTimeDone, setIsSplashMinTimeDone] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsSplashMinTimeDone(true);
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const isAppReady = (fontsLoaded || fontError) && isSplashMinTimeDone;
+
+  if (!isAppReady) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#EF6905', justifyContent: 'center', alignItems: 'center' }}>
+        <StatusBar style="light" />
+        <Image
+          source={require('../../assets/splash-icon.png')}
+          style={{ width: 260, height: 260 }}
+          resizeMode="contain"
+        />
+      </View>
+    );
+  }
+
   return (
     <SafeAreaProvider>
       <ThemeProvider>

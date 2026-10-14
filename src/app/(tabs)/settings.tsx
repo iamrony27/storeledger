@@ -25,6 +25,7 @@ import {
 import { CloudBackupCard } from '../../components/CloudBackupCard';
 import { CloudUsageCard } from '../../components/CloudUsageCard';
 import { useTabBarVisibility } from '../../context/TabBarVisibilityContext';
+import { useQuickAmounts, DEFAULT_QUICK_AMOUNTS } from '../../storage/quickAmountSettings';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -52,6 +53,52 @@ export default function SettingsScreen() {
   const [sbUrl, setSbUrl] = useState('');
   const [sbKey, setSbKey] = useState('');
   const [savingSb, setSavingSb] = useState(false);
+
+  // Quick Amount Buttons State
+  const { quickAmounts, saveQuickAmounts } = useQuickAmounts();
+  const [quickAmountsModalVisible, setQuickAmountsModalVisible] = useState(false);
+  const [qaVal1, setQaVal1] = useState('');
+  const [qaVal2, setQaVal2] = useState('');
+  const [qaVal3, setQaVal3] = useState('');
+  const [savingQa, setSavingQa] = useState(false);
+
+  const handleOpenQaModal = () => {
+    setQaVal1(quickAmounts[0].toString());
+    setQaVal2(quickAmounts[1].toString());
+    setQaVal3(quickAmounts[2].toString());
+    setQuickAmountsModalVisible(true);
+  };
+
+  const handleSaveQuickAmounts = async () => {
+    const num1 = parseInt(qaVal1.replace(/[^0-9]/g, ''), 10);
+    const num2 = parseInt(qaVal2.replace(/[^0-9]/g, ''), 10);
+    const num3 = parseInt(qaVal3.replace(/[^0-9]/g, ''), 10);
+
+    if (isNaN(num1) || num1 <= 0 || isNaN(num2) || num2 <= 0 || isNaN(num3) || num3 <= 0) {
+      Alert.alert('Invalid Amounts', 'Please enter positive numbers greater than ₹0 for all 3 buttons.');
+      return;
+    }
+
+    setSavingQa(true);
+    try {
+      await saveQuickAmounts([num1, num2, num3]);
+      setQuickAmountsModalVisible(false);
+      Alert.alert('Presets Saved', `Quick amounts updated to ₹${num1}, ₹${num2}, and ₹${num3}.`);
+    } catch {
+      Alert.alert('Error', 'Failed to save quick amount settings.');
+    } finally {
+      setSavingQa(false);
+    }
+  };
+
+  const handleResetQuickAmounts = async () => {
+    setQaVal1(DEFAULT_QUICK_AMOUNTS[0].toString());
+    setQaVal2(DEFAULT_QUICK_AMOUNTS[1].toString());
+    setQaVal3(DEFAULT_QUICK_AMOUNTS[2].toString());
+    await saveQuickAmounts([...DEFAULT_QUICK_AMOUNTS]);
+    setQuickAmountsModalVisible(false);
+    Alert.alert('Reset Done', 'Quick amounts reset to default ₹50, ₹100, and ₹200.');
+  };
 
   const handleOpenSbModal = () => {
     const current = getCurrentSupabaseConfig();
@@ -370,6 +417,89 @@ export default function SettingsScreen() {
           />
         </View>
 
+        {/* Quick Amount Buttons Settings Card */}
+        <View
+          style={[
+            styles.sectionCard,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+              borderRadius: borderRadius.lg,
+            },
+          ]}
+        >
+          <View style={styles.cardHeaderRow}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <View
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: borderRadius.sm,
+                  backgroundColor: colors.primaryLight,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <AppIcon name="zap" size={17} color={colors.primary} />
+              </View>
+              <View>
+                <Text style={[styles.sectionHeading, { color: colors.textPrimary }]}>
+                  Quick Amount Buttons
+                </Text>
+                <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 1 }}>
+                  1-Click Shortcut Buttons on Transaction Entry
+                </Text>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              onPress={handleOpenQaModal}
+              style={[
+                styles.editBtn,
+                {
+                  backgroundColor: colors.primaryLight,
+                  borderRadius: borderRadius.sm,
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel="Customize quick amounts"
+            >
+              <AppIcon name="edit" size={14} color={colors.primary} />
+              <Text style={[styles.editBtnText, { color: colors.primary }]}>
+                Edit
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 12, lineHeight: 18 }}>
+            These 3 shortcut buttons appear next to the Amount box when recording a new transaction for instant 1-click entry.
+          </Text>
+
+          <View style={styles.quickAmountsPreviewRow}>
+            {quickAmounts.map((amt, idx) => (
+              <TouchableOpacity
+                key={idx}
+                onPress={handleOpenQaModal}
+                style={[
+                  styles.quickAmountPreviewPill,
+                  {
+                    backgroundColor: colors.background,
+                    borderColor: colors.primary,
+                    borderRadius: borderRadius.md,
+                  },
+                ]}
+              >
+                <Text style={[styles.quickAmountPreviewLabel, { color: colors.textSecondary }]}>
+                  Button {idx + 1}
+                </Text>
+                <Text style={[styles.quickAmountPreviewValue, { color: colors.primary }]}>
+                  ₹{amt}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
         {/* Theme Selection Card */}
         <View
           style={[
@@ -465,7 +595,7 @@ export default function SettingsScreen() {
         {/* App Version Info */}
         <View style={styles.footerInfo}>
           <Text style={[styles.versionText, { color: colors.textMuted }]}>
-            GWD Book v1.0.0 (Expo SDK 57)
+            GWD Book v1.0.1 (Expo SDK 57)
           </Text>
           <Text style={[styles.versionSub, { color: colors.textMuted }]}>
             Mobile Customer Ledger Application
@@ -602,6 +732,82 @@ export default function SettingsScreen() {
                 title="Save & Connect"
                 onPress={handleSaveSbConfig}
                 loading={savingSb}
+                style={styles.modalBtn}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Customize Quick Amounts Modal */}
+      <Modal
+        visible={quickAmountsModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setQuickAmountsModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View
+            style={[
+              styles.modalCard,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+                borderRadius: borderRadius.lg,
+              },
+            ]}
+          >
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
+                Customize Quick Amounts
+              </Text>
+              <TouchableOpacity onPress={() => setQuickAmountsModalVisible(false)}>
+                <AppIcon name="x" size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={{ fontSize: 12, color: colors.textSecondary, lineHeight: 18 }}>
+              Set custom preset values for the 3 shortcut buttons displayed next to the Amount input box.
+            </Text>
+
+            <View style={styles.modalForm}>
+              <AppTextInput
+                label="Button 1 Amount"
+                prefixText="₹"
+                placeholder="50"
+                keyboardType="numeric"
+                value={qaVal1}
+                onChangeText={(t) => setQaVal1(t.replace(/[^0-9]/g, ''))}
+              />
+              <AppTextInput
+                label="Button 2 Amount"
+                prefixText="₹"
+                placeholder="100"
+                keyboardType="numeric"
+                value={qaVal2}
+                onChangeText={(t) => setQaVal2(t.replace(/[^0-9]/g, ''))}
+              />
+              <AppTextInput
+                label="Button 3 Amount"
+                prefixText="₹"
+                placeholder="200"
+                keyboardType="numeric"
+                value={qaVal3}
+                onChangeText={(t) => setQaVal3(t.replace(/[^0-9]/g, ''))}
+              />
+            </View>
+
+            <View style={styles.modalActions}>
+              <AppButton
+                title="Reset Default"
+                variant="outline"
+                onPress={handleResetQuickAmounts}
+                style={styles.modalBtn}
+              />
+              <AppButton
+                title="Save Presets"
+                onPress={handleSaveQuickAmounts}
+                loading={savingQa}
                 style={styles.modalBtn}
               />
             </View>
@@ -804,5 +1010,28 @@ const styles = StyleSheet.create({
   },
   modalBtn: {
     flex: 1,
+  },
+  quickAmountsPreviewRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  quickAmountPreviewPill: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quickAmountPreviewLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
+    marginBottom: 2,
+  },
+  quickAmountPreviewValue: {
+    fontSize: 16,
+    fontWeight: '800',
   },
 });

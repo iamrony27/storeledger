@@ -136,7 +136,21 @@ async function initializeIfNeeded(): Promise<void> {
         }
       }
     }
-    if (purgedAny) {
+
+    // Check and delete description of any GAVE (credit given) transactions so they are not stored locally or in backups
+    let cleanedGaveDesc = false;
+    if (currentTxCache) {
+      for (const txList of Object.values(currentTxCache)) {
+        for (const t of txList || []) {
+          if (t.type === 'GAVE' && t.description !== undefined) {
+            delete t.description;
+            cleanedGaveDesc = true;
+          }
+        }
+      }
+    }
+
+    if (purgedAny || cleanedGaveDesc) {
       await persist();
     }
   } catch (error) {
@@ -277,7 +291,7 @@ export async function addCustomer(
       amountPaise: Math.abs(openingPaise),
       type: isReceivable ? 'GAVE' : 'GOT',
       date: now,
-      description: 'Opening Balance (Initial Account Setup)',
+      description: isReceivable ? undefined : 'Opening Balance (Initial Account Setup)',
       isOpeningBalance: true,
       createdAt: now,
       updatedAt: now,
@@ -481,11 +495,15 @@ export async function restoreLedgerSnapshot(
 
     const cleanList = txList.filter((t) => !t.isVoided);
     for (const rt of cleanList) {
+      const cleanTx: LedgerTransaction = {
+        ...rt,
+        description: rt.type === 'GAVE' ? undefined : (rt.description || undefined),
+      };
       const existingTxIndex = transactionsCache[custId].findIndex((t) => t.id === rt.id);
       if (existingTxIndex >= 0) {
-        transactionsCache[custId][existingTxIndex] = { ...rt };
+        transactionsCache[custId][existingTxIndex] = cleanTx;
       } else {
-        transactionsCache[custId].push({ ...rt });
+        transactionsCache[custId].push(cleanTx);
       }
       txCount++;
     }
@@ -535,7 +553,7 @@ export async function addTransaction(
     amountPaise: absAmount,
     type: input.type,
     date: txDate,
-    description: input.description?.trim(),
+    description: input.type === 'GAVE' ? undefined : (input.description?.trim() || undefined),
     billNumber: input.billNumber?.trim(),
     createdAt: now,
     updatedAt: now,
@@ -578,6 +596,14 @@ export async function addTransaction(
     action: 'insert',
     recordId: newTx.id,
     payload: newTx,
+  });
+
+  // Enqueue customer balance update to sync outbox
+  await syncEngine.addToOutbox({
+    entity: 'customer',
+    action: 'update',
+    recordId: updatedCustomer.id,
+    payload: updatedCustomer,
   });
 
   await persist();
@@ -698,7 +724,7 @@ export async function updateTransaction(
     amountPaise: absAmount,
     type: input.type,
     date: input.date || customerTx[txIndex].date,
-    description: input.description?.trim(),
+    description: input.type === 'GAVE' ? undefined : (input.description?.trim() || undefined),
     billNumber: input.billNumber?.trim(),
     updatedAt: now,
     syncStatus: 'pending_update',
@@ -730,6 +756,14 @@ export async function updateTransaction(
     action: 'update',
     recordId: updatedTx.id,
     payload: updatedTx,
+  });
+
+  // Enqueue customer balance update to sync outbox
+  await syncEngine.addToOutbox({
+    entity: 'customer',
+    action: 'update',
+    recordId: updatedCustomer.id,
+    payload: updatedCustomer,
   });
 
   await persist();
@@ -887,7 +921,7 @@ export async function mergeRemoteDataIntoLocal(
       amountPaise: Number(rt.amount_paise),
       type: rt.type as any,
       date: rt.transaction_date,
-      description: rt.description || undefined,
+      description: rt.type === 'GAVE' ? undefined : (rt.description || undefined),
       isOpeningBalance: isOpening,
       isVoided: false,
       createdAt: rt.created_at,

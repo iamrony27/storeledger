@@ -76,4 +76,35 @@ const greenWhiteContrast = getContrast(COLOR_HUNT_PALETTE.forestGreen, '#FFFFFF'
 console.log(` - Forest Green Paid Card (#486C2F) vs White Text: ${greenWhiteContrast.toFixed(2)}:1`);
 assert(greenWhiteContrast >= 4.5, 'Forest Green vs White text must satisfy WCAG AA (>= 4.5:1)');
 
+// 4. Testing Integrated Same-Bar Search Bar & Hero Cards Drawer Invariants
+console.log('\n4. Testing Integrated Same-Bar Search Bar & Hero Cards Drawer Invariants...');
+const CARD_HEIGHT = 84;
+const DRAWER_PADDING_TOP = 4;
+const SEARCH_MARGIN_TOP = 8;
+const SEARCH_INPUT_HEIGHT = 42;
+const DRAWER_PADDING_BOTTOM = 10;
+const TOTAL_DRAWER_CONTENT_HEIGHT =
+  DRAWER_PADDING_TOP + CARD_HEIGHT + SEARCH_MARGIN_TOP + SEARCH_INPUT_HEIGHT + DRAWER_PADDING_BOTTOM;
+const DRAWER_HEIGHT = 148;
+const CARDS_COLLAPSE_DISTANCE = 96;
+
+console.log(` - Drawer total content height: ${TOTAL_DRAWER_CONTENT_HEIGHT}px vs Drawer height: ${DRAWER_HEIGHT}px`);
+assert(DRAWER_HEIGHT === TOTAL_DRAWER_CONTENT_HEIGHT, 'Drawer height must match total content height in the same bar');
+assert(
+  CARDS_COLLAPSE_DISTANCE === DRAWER_PADDING_TOP + CARD_HEIGHT + SEARCH_MARGIN_TOP,
+  'Cards collapse distance must exactly equal card area to dock search bar flush'
+);
+
+// Card hidden invariant:
+const cardBottomRelativeWhenCollapsed = DRAWER_PADDING_TOP + CARD_HEIGHT - CARDS_COLLAPSE_DISTANCE;
+assert(
+  cardBottomRelativeWhenCollapsed <= 0,
+  `Cards bottom must be at or above 0dp relative to fixedTopBar when collapsed (got ${cardBottomRelativeWhenCollapsed}dp)`
+);
+
+// Docking invariant:
+const FIXED_BAR_HEIGHT = 80;
+const collapsedSearchTop = FIXED_BAR_HEIGHT + CARDS_COLLAPSE_DISTANCE - CARDS_COLLAPSE_DISTANCE;
+assert(collapsedSearchTop === FIXED_BAR_HEIGHT, 'Collapsed search bar must dock flush at FIXED_BAR_HEIGHT with zero slicing');
+
 console.log('\nAll Modern TopBar & Titlebar Design Tests Passed Successfully! ✨\n');

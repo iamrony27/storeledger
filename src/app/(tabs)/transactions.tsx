@@ -262,7 +262,7 @@ export default function TransactionsScreen() {
     setEditAmount(paiseToRupees(tx.amountPaise).toString());
     setEditType(tx.type);
     setEditDate(tx.date || new Date().toISOString());
-    setEditDesc(tx.description || '');
+    setEditDesc(tx.type === 'GAVE' ? '' : (tx.description || ''));
     setEditBill(tx.billNumber || '');
     setEditAmountError('');
     setEditModalVisible(true);
@@ -286,7 +286,7 @@ export default function TransactionsScreen() {
         transactionId: editingTx.id,
         amountPaise: parsedPaise,
         type: editType,
-        description: editDesc.trim() || undefined,
+        description: editType === 'GAVE' ? undefined : (editDesc.trim() || undefined),
         billNumber: editBill.trim() || undefined,
         date: editDate,
       });
@@ -366,6 +366,8 @@ export default function TransactionsScreen() {
         data={filteredTransactions}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         onScroll={handleScroll}
         scrollEventThrottle={16}
         contentContainerStyle={[styles.listContainer, { padding: spacing.md }]}
@@ -740,14 +742,14 @@ export default function TransactionsScreen() {
               </View>
 
               {/* Note / Bill Description Row */}
-              {(tx.description || tx.billNumber) && (
+              {((tx.type !== 'GAVE' && tx.description) || tx.billNumber) && (
                 <View
                   style={[
                     styles.txMetaDetailsRow,
                     { borderTopColor: colors.borderLight },
                   ]}
                 >
-                  {tx.description ? (
+                  {tx.type !== 'GAVE' && tx.description ? (
                     <Text
                       style={[styles.txDescText, { color: colors.textSecondary }]}
                       numberOfLines={2}
@@ -977,14 +979,16 @@ export default function TransactionsScreen() {
                 autoFocus
               />
 
-              {/* Description Input */}
-              <AppTextInput
-                label="Description / Note (Optional)"
-                placeholder="e.g. Weighment charges, Cash payment"
-                iconName="edit-3"
-                value={editDesc}
-                onChangeText={setEditDesc}
-              />
+              {/* Description Input (Only for Payments / YOU GOT) */}
+              {editType === 'GOT' && (
+                <AppTextInput
+                  label="Payment Note / Description (Optional)"
+                  placeholder="e.g. Cash, UPI, Cheque payment"
+                  iconName="edit-3"
+                  value={editDesc}
+                  onChangeText={setEditDesc}
+                />
+              )}
 
               {/* Bill Number Input (Numbers Only) */}
               <AppTextInput

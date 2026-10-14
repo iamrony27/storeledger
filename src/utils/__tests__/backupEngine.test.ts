@@ -178,6 +178,35 @@ export async function runAllBackupEngineTests() {
     'Voided transaction must be completely removed from backup snapshot'
   );
 
+  // GAVE Transaction Description Exclusion Invariant: Backup files must NEVER store descriptions for GAVE transactions
+  const txMapWithGaveDesc: Record<string, LedgerTransaction[]> = {
+    'cust-test-1': [
+      {
+        id: 'tx-gave-desc-1',
+        customerId: 'cust-test-1',
+        amountPaise: 120000,
+        type: 'GAVE',
+        date: '2026-01-05T00:00:00.000Z',
+        description: 'Should not be in backup',
+        createdAt: '2026-01-05T00:00:00.000Z',
+      },
+      {
+        id: 'tx-got-desc-2',
+        customerId: 'cust-test-1',
+        amountPaise: 80000,
+        type: 'GOT',
+        date: '2026-01-05T10:00:00.000Z',
+        description: 'Payment receipt allowed',
+        createdAt: '2026-01-05T10:00:00.000Z',
+      },
+    ],
+  };
+  const snapshotCleanDesc = assembleBackupSnapshot(sampleCustomers, txMapWithGaveDesc, cleanProfile);
+  const gaveTxInBackup = snapshotCleanDesc.transactions['cust-test-1'].find((t) => t.id === 'tx-gave-desc-1');
+  const gotTxInBackup = snapshotCleanDesc.transactions['cust-test-1'].find((t) => t.id === 'tx-got-desc-2');
+  assertEquals(gaveTxInBackup?.description, undefined, 'GAVE transaction description must be undefined in backup');
+  assertEquals(gotTxInBackup?.description, 'Payment receipt allowed', 'GOT payment description should be preserved in backup');
+
   // ==========================================================================
   // Test 4: Checksum Integrity & Tamper Detection
   // ==========================================================================

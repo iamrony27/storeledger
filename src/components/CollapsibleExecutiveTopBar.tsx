@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
-import { useTheme } from '../theme/ThemeContext';
 import { AppIcon } from './AppIcon';
 import { SyncIndicator } from './SyncIndicator';
 import { useTabBarVisibility } from '../context/TabBarVisibilityContext';
@@ -50,14 +49,14 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
   onPressExpand,
 }) => {
   const insets = useSafeAreaInsets();
-  const { isDark } = useTheme();
   const { topBarCollapseAnim, expandTopBar } = useTabBarVisibility();
 
   // Metrics
   const hasSearchBar = onSearchQueryChange !== undefined || searchQuery !== undefined;
   const safeTopPadding = Math.max(insets.top, 14);
   const FIXED_BAR_HEIGHT = safeTopPadding + 52;
-  const DRAWER_HEIGHT = 128;
+  const CARDS_COLLAPSE_DISTANCE = 96;
+  const DRAWER_HEIGHT = hasSearchBar ? 148 : 98;
   const TOTAL_BAR_HEIGHT = FIXED_BAR_HEIGHT + DRAWER_HEIGHT;
 
   // Track collapse state to switch pointerEvents so buttons are never blocked
@@ -65,7 +64,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
 
   useEffect(() => {
     const driver = diffClampedScrollY || topBarCollapseAnim;
-    const threshold = diffClampedScrollY ? DRAWER_HEIGHT * 0.45 : 0.5;
+    const threshold = diffClampedScrollY ? CARDS_COLLAPSE_DISTANCE * 0.45 : 0.5;
     const id = driver.addListener(({ value }) => {
       const collapsed = value > threshold;
       setIsCollapsed((prev) => (prev !== collapsed ? collapsed : prev));
@@ -73,7 +72,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
     return () => {
       driver.removeListener(id);
     };
-  }, [diffClampedScrollY, topBarCollapseAnim, DRAWER_HEIGHT]);
+  }, [diffClampedScrollY, topBarCollapseAnim, CARDS_COLLAPSE_DISTANCE]);
 
   // Active continuous driver:
   // Directly maps scroll deltas via diffClamp on native UI thread at 60/120Hz
@@ -81,44 +80,37 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
     diffClampedScrollY ||
     topBarCollapseAnim.interpolate({
       inputRange: [0, 1],
-      outputRange: [0, DRAWER_HEIGHT],
+      outputRange: [0, CARDS_COLLAPSE_DISTANCE],
     });
 
-  // 1. DRAWER SLIDE: Slides the hero cards panel up behind the fixed top bar (0 to -128dp)
+  // 1. DRAWER SLIDE: Slides the hero cards panel up behind the fixed top bar
   const drawerTranslateY = animValue.interpolate({
-    inputRange: [0, DRAWER_HEIGHT],
-    outputRange: [0, -DRAWER_HEIGHT],
-    extrapolate: 'clamp',
-  });
-
-  // 1B. SEARCH BAR SLIDE: Stays connected at the bottom of the top bar in 1:1 lockstep
-  const searchBarTranslateY = animValue.interpolate({
-    inputRange: [0, DRAWER_HEIGHT],
-    outputRange: [0, -DRAWER_HEIGHT],
+    inputRange: [0, CARDS_COLLAPSE_DISTANCE],
+    outputRange: [0, -CARDS_COLLAPSE_DISTANCE],
     extrapolate: 'clamp',
   });
 
   // 2. Fixed Top Bar: Cross-fades between Expanded branding and Collapsed summary pill
   const expandedRowOpacity = animValue.interpolate({
-    inputRange: [0, DRAWER_HEIGHT * 0.42],
+    inputRange: [0, CARDS_COLLAPSE_DISTANCE * 0.42],
     outputRange: [1, 0],
     extrapolate: 'clamp',
   });
 
   const expandedRowTranslateY = animValue.interpolate({
-    inputRange: [0, DRAWER_HEIGHT * 0.42],
+    inputRange: [0, CARDS_COLLAPSE_DISTANCE * 0.42],
     outputRange: [0, -8],
     extrapolate: 'clamp',
   });
 
   const collapsedRowOpacity = animValue.interpolate({
-    inputRange: [DRAWER_HEIGHT * 0.45, DRAWER_HEIGHT * 0.95],
+    inputRange: [CARDS_COLLAPSE_DISTANCE * 0.45, CARDS_COLLAPSE_DISTANCE * 0.95],
     outputRange: [0, 1],
     extrapolate: 'clamp',
   });
 
   const collapsedRowTranslateY = animValue.interpolate({
-    inputRange: [DRAWER_HEIGHT * 0.45, DRAWER_HEIGHT * 0.95],
+    inputRange: [CARDS_COLLAPSE_DISTANCE * 0.45, CARDS_COLLAPSE_DISTANCE * 0.95],
     outputRange: [8, 0],
     extrapolate: 'clamp',
   });
@@ -150,10 +142,6 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
           {
             height: TOTAL_BAR_HEIGHT,
             paddingTop: FIXED_BAR_HEIGHT,
-            borderBottomLeftRadius: hasSearchBar ? 0 : 24,
-            borderBottomRightRadius: hasSearchBar ? 0 : 24,
-            shadowOpacity: hasSearchBar ? 0 : 0.32,
-            elevation: hasSearchBar ? 0 : 6,
             transform: [{ translateY: drawerTranslateY }],
           },
         ]}
@@ -240,26 +228,42 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
             </TouchableOpacity>
           </View>
 
-          {/* Activity Status Ribbon */}
-          <View style={styles.activityRibbon}>
-            <View style={styles.ribbonLeft}>
-              <AppIcon
-                family="feather"
-                name="activity"
-                size={12}
-                color={COLOR_HUNT_PALETTE.creamYellow}
-              />
-              <Text style={styles.ribbonLabel}>Net Book Balance:</Text>
-              <Text style={styles.ribbonValue}>{formatINR(netBalancePaise)}</Text>
+          {/* Integrated Search Bar: IN THE SAME BAR DIRECTLY UNDER HERO CARDS */}
+          {hasSearchBar && (
+            <View style={styles.searchBarRow}>
+              <View style={styles.searchInputContainer}>
+                <AppIcon
+                  family="feather"
+                  name="search"
+                  size={16}
+                  color={COLOR_HUNT_PALETTE.crimsonRed}
+                />
+                <TextInput
+                  style={styles.searchInput}
+                  value={searchQuery}
+                  onChangeText={onSearchQueryChange}
+                  placeholder={searchPlaceholder}
+                  placeholderTextColor="rgba(100, 116, 139, 0.75)"
+                  returnKeyType="search"
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  clearButtonMode="while-editing"
+                  accessibilityLabel="Search customers"
+                />
+                {Boolean(searchQuery) && (
+                  <TouchableOpacity
+                    onPress={() => onSearchQueryChange?.('')}
+                    style={styles.clearBtn}
+                    accessibilityRole="button"
+                    accessibilityLabel="Clear search text"
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <AppIcon family="feather" name="x" size={14} color="#64748B" />
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
-            <View style={styles.ribbonRight}>
-              <Text style={styles.ribbonTodayText}>
-                {todayGavePaise > 0 || todayGotPaise > 0
-                  ? `Today: +${formatINR(todayGotPaise)}`
-                  : 'Ledger updated'}
-              </Text>
-            </View>
-          </View>
+          )}
         </View>
       </Animated.View>
 
@@ -275,10 +279,6 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
           {
             height: FIXED_BAR_HEIGHT,
             paddingTop: safeTopPadding,
-            borderBottomLeftRadius: hasSearchBar ? 0 : 24,
-            borderBottomRightRadius: hasSearchBar ? 0 : 24,
-            shadowOpacity: hasSearchBar ? 0 : 0.28,
-            elevation: hasSearchBar ? 0 : 10,
           },
         ]}
       >
@@ -423,66 +423,6 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
         </View>
       </Animated.View>
 
-      {/* 
-        3. INTEGRATED SEARCH BAR (Directly on top bar, stays visible and tracks scroll in lockstep)
-      */}
-      {hasSearchBar && (
-        <Animated.View
-          style={[
-            styles.searchBarPanel,
-            {
-              top: FIXED_BAR_HEIGHT + DRAWER_HEIGHT - 1,
-              height: 55,
-              transform: [{ translateY: searchBarTranslateY }],
-            },
-          ]}
-        >
-          <View
-            style={[
-              styles.searchInputContainer,
-              {
-                backgroundColor: isDark ? 'rgba(30, 41, 59, 0.95)' : '#FFFFFF',
-                borderColor: isDark
-                  ? 'rgba(241, 229, 161, 0.3)'
-                  : 'rgba(241, 229, 161, 0.55)',
-              },
-            ]}
-          >
-            <AppIcon
-              family="feather"
-              name="search"
-              size={16}
-              color={COLOR_HUNT_PALETTE.crimsonRed}
-            />
-            <TextInput
-              value={searchQuery}
-              onChangeText={onSearchQueryChange}
-              placeholder={searchPlaceholder}
-              placeholderTextColor={isDark ? '#94A3B8' : '#78716C'}
-              style={[
-                styles.searchInput,
-                { color: isDark ? '#FFFFFF' : '#1C1917' },
-              ]}
-              autoCapitalize="none"
-              autoCorrect={false}
-              returnKeyType="search"
-              accessibilityRole="search"
-              accessibilityLabel={searchPlaceholder}
-            />
-            {Boolean(searchQuery) && (
-              <TouchableOpacity
-                onPress={() => onSearchQueryChange?.('')}
-                accessibilityRole="button"
-                accessibilityLabel="Clear search text"
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                style={styles.clearBtn}
-              >
-                <AppIcon family="feather" name="x" size={14} color="#78716C" />
-              </TouchableOpacity>
-            )}
-          </View>
-        </Animated.View>
-      )}
     </View>
   );
 };
@@ -515,8 +455,8 @@ const styles = StyleSheet.create({
   },
   drawerInner: {
     paddingHorizontal: 12,
-    paddingTop: 6,
-    paddingBottom: 8,
+    paddingTop: 4,
+    paddingBottom: 10,
   },
 
   // 2. Fixed Top Bar (Pinned status bar & branding)
@@ -526,15 +466,15 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 20,
-    elevation: 10,
+    elevation: 0, // NO elevation shadow in the middle of top bar on Android
+    shadowOpacity: 0, // NO shadow in the middle of top bar on iOS
+    shadowRadius: 0,
+    shadowOffset: { width: 0, height: 0 },
+    shadowColor: 'transparent',
+    borderWidth: 0,
+    borderBottomWidth: 0,
     backgroundColor: COLOR_HUNT_PALETTE.headerBg, // #EF6905 (Flame Orange)
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
     paddingHorizontal: 12,
-    shadowColor: COLOR_HUNT_PALETTE.crimsonRed,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.28,
-    shadowRadius: 8,
   },
   fixedContent: {
     height: 48,
@@ -739,17 +679,23 @@ const styles = StyleSheet.create({
   },
   dueCard: {
     flex: 1,
+    height: 84,
+    justifyContent: 'space-between',
     backgroundColor: COLOR_HUNT_PALETTE.crimsonRed, // #8B2626
-    borderRadius: 15,
-    padding: 10,
+    borderRadius: 14,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
     borderWidth: 1.2,
     borderColor: 'rgba(241, 229, 161, 0.35)',
   },
   paidCard: {
     flex: 1,
+    height: 84,
+    justifyContent: 'space-between',
     backgroundColor: COLOR_HUNT_PALETTE.forestGreen, // #486C2F
-    borderRadius: 15,
-    padding: 10,
+    borderRadius: 14,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
     borderWidth: 1.2,
     borderColor: 'rgba(241, 229, 161, 0.35)',
   },
@@ -805,77 +751,32 @@ const styles = StyleSheet.create({
     color: 'rgba(241, 229, 161, 0.75)',
   },
 
-  // Ribbon
-  activityRibbon: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: 'rgba(139, 38, 38, 0.45)',
-    borderRadius: 11,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    marginTop: 7,
-    marginHorizontal: 4,
-    borderWidth: 1,
-    borderColor: 'rgba(241, 229, 161, 0.25)',
-  },
-  ribbonLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  ribbonLabel: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: COLOR_HUNT_PALETTE.creamYellow,
-  },
-  ribbonValue: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#FFFFFF',
-  },
-  ribbonRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  ribbonTodayText: {
-    fontSize: 9.5,
-    fontWeight: '600',
-    color: COLOR_HUNT_PALETTE.creamYellow,
-  },
-
-  // 3. Integrated Top Bar Search Bar
-  searchBarPanel: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    height: 54,
-    backgroundColor: COLOR_HUNT_PALETTE.headerBg, // #EF6905 (Flame Orange)
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    zIndex: 25,
-    elevation: 8,
-    shadowColor: COLOR_HUNT_PALETTE.crimsonRed,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.28,
-    shadowRadius: 6,
-    paddingHorizontal: 12,
-    justifyContent: 'center',
+  // Integrated Search Bar inside the same bar
+  searchBarRow: {
+    marginTop: 8,
   },
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 40,
-    borderRadius: 12,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#FFFFFF',
     borderWidth: 1.2,
-    paddingHorizontal: 10,
+    borderColor: 'rgba(241, 229, 161, 0.5)',
+    paddingHorizontal: 12,
     gap: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
   searchInput: {
     flex: 1,
     height: '100%',
     fontSize: 13,
     fontWeight: '500',
+    color: '#0F172A',
     padding: 0,
   },
   clearBtn: {

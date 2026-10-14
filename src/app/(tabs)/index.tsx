@@ -34,6 +34,7 @@ import {
   deleteCustomer,
   subscribeToRepository,
 } from '../../storage/localLedgerRepository';
+import { getCustomerSearchTier, rankAndSortCustomers } from '../../utils/customerSearch';
 
 type FilterType = 'ALL' | 'GET' | 'GIVE' | 'SETTLED';
 type SortType = 'RECENT' | 'AMOUNT' | 'NAME';
@@ -45,11 +46,10 @@ export default function CustomersScreen() {
   const insets = useSafeAreaInsets();
   const flatListRef = useRef<FlatList>(null);
 
-  const DRAWER_HEIGHT = 128;
-  const SEARCH_BAR_HEIGHT = 54;
+  const TOP_BAR_DRAWER_HEIGHT = 148;
   const safeTopPadding = Math.max(insets.top, 14);
   const FIXED_BAR_HEIGHT = safeTopPadding + 52;
-  const totalTopBarHeight = FIXED_BAR_HEIGHT + DRAWER_HEIGHT + SEARCH_BAR_HEIGHT;
+  const totalTopBarHeight = FIXED_BAR_HEIGHT + TOP_BAR_DRAWER_HEIGHT;
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [transactions, setTransactions] = useState<LedgerTransaction[]>([]);
@@ -212,44 +212,23 @@ export default function CustomersScreen() {
     [latestTxDateByCustomer]
   );
 
-  // Filter and sort customer list
+  // Filter and sort customer list (prefix-first alphabetical ranking for search queries)
   const filteredCustomers = useMemo(() => {
-    return customers
-      .filter((customer) => {
-        // Search filter (supports English and Bengali Unicode text)
-        const query = searchQuery.trim().toLowerCase().normalize('NFC');
-        const custName = (customer.name || '').toLowerCase().normalize('NFC');
-        const matchesQuery =
-          query === '' ||
-          custName.includes(query) ||
-          customer.phone.includes(query);
+    const q = searchQuery.trim().toLowerCase().normalize('NFC');
+    const matched = customers.filter((customer) => {
+      if (q && getCustomerSearchTier(customer.name, customer.phone, q) >= 999) {
+        return false;
+      }
 
-        if (!matchesQuery) return false;
+      // Balance type filter
+      const balanceType = getBalanceType(customer.currentBalancePaise);
+      if (activeFilter === 'GET') return balanceType === 'GET';
+      if (activeFilter === 'GIVE') return balanceType === 'GIVE';
+      if (activeFilter === 'SETTLED') return balanceType === 'SETTLED';
+      return true;
+    });
 
-        // Balance type filter
-        const balanceType = getBalanceType(customer.currentBalancePaise);
-        if (activeFilter === 'GET') return balanceType === 'GET';
-        if (activeFilter === 'GIVE') return balanceType === 'GIVE';
-        if (activeFilter === 'SETTLED') return balanceType === 'SETTLED';
-        return true;
-      })
-      .sort((a, b) => {
-        if (activeSort === 'NAME') {
-          return a.name.localeCompare(b.name, ['en', 'bn'], { sensitivity: 'base' });
-        }
-        if (activeSort === 'AMOUNT') {
-          return (
-            Math.abs(b.currentBalancePaise) - Math.abs(a.currentBalancePaise)
-          );
-        }
-        // RECENT (default): customer with most recent transaction / activity on top
-        const recencyA = getCustomerRecency(a);
-        const recencyB = getCustomerRecency(b);
-        if (recencyB !== recencyA) {
-          return recencyB - recencyA;
-        }
-        return a.name.localeCompare(b.name, ['en', 'bn'], { sensitivity: 'base' });
-      });
+    return rankAndSortCustomers(matched, searchQuery, activeSort, getCustomerRecency);
   }, [customers, searchQuery, activeFilter, activeSort, getCustomerRecency]);
 
   const handleCustomerLongPress = (cust: Customer) => {
@@ -297,6 +276,8 @@ export default function CustomersScreen() {
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
           { useNativeDriver: true }
@@ -314,6 +295,7 @@ export default function CustomersScreen() {
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
+              keyboardShouldPersistTaps="handled"
               contentContainerStyle={styles.filterScroll}
             >
               {(

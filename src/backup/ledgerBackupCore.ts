@@ -166,7 +166,12 @@ export function sanitizeTransactions(
         amountPaise: Math.abs(Math.round(Number(tx.amountPaise))),
         type: tx.type === 'GOT' ? 'GOT' : 'GAVE',
         date: tx.date,
-        description: tx.description ? String(tx.description).slice(0, 300) : undefined,
+        description:
+          tx.type === 'GAVE'
+            ? undefined
+            : tx.description
+            ? String(tx.description).slice(0, 300)
+            : undefined,
         billNumber: tx.billNumber ? String(tx.billNumber).slice(0, 100) : undefined,
         isOpeningBalance: Boolean(tx.isOpeningBalance),
         isVoided: false,

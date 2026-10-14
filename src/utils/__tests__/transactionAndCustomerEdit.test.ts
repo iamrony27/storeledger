@@ -4,6 +4,12 @@ import {
   normalizeCustomerPhone,
   findDuplicateCustomer,
 } from '../customerValidation';
+import {
+  DEFAULT_QUICK_AMOUNTS,
+  getQuickAmounts,
+  saveQuickAmounts,
+  subscribeQuickAmounts,
+} from '../../storage/quickAmountSettings';
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -410,4 +416,38 @@ assertEquals(
   'Customer whose transaction was recorded today (even backdated) MUST appear on top of customer list'
 );
 
-console.log('\nAll Transaction & Customer Edit and Quick Entry Tests Passed Successfully!\n');
+// 7. Testing Quick Amount Button Presets & Customization Invariants
+console.log('\n7. Testing Quick Amount Button Presets & Customization Invariants...');
+
+(async () => {
+  assertEquals(DEFAULT_QUICK_AMOUNTS[0], 50, 'Default button 1 must be 50');
+  assertEquals(DEFAULT_QUICK_AMOUNTS[1], 100, 'Default button 2 must be 100');
+  assertEquals(DEFAULT_QUICK_AMOUNTS[2], 200, 'Default button 3 must be 200');
+
+  let notifiedAmounts: [number, number, number] | null = null;
+  const unsub = subscribeQuickAmounts((updated) => {
+    notifiedAmounts = updated;
+  });
+
+  await saveQuickAmounts([150, 300, 750]);
+  const customAmounts = await getQuickAmounts();
+  assertEquals(customAmounts[0], 150, 'Custom button 1 must be 150');
+  assertEquals(customAmounts[1], 300, 'Custom button 2 must be 300');
+  assertEquals(customAmounts[2], 750, 'Custom button 3 must be 750');
+  assert(notifiedAmounts !== null, 'Subscriber must be notified on saveQuickAmounts');
+  assertEquals(notifiedAmounts![0], 150, 'Notified button 1 must be 150');
+
+  // Reset
+  await saveQuickAmounts([...DEFAULT_QUICK_AMOUNTS]);
+  const resetAmounts = await getQuickAmounts();
+  assertEquals(resetAmounts[0], 50, 'Reset button 1 must be 50');
+  assertEquals(resetAmounts[1], 100, 'Reset button 2 must be 100');
+  assertEquals(resetAmounts[2], 200, 'Reset button 3 must be 200');
+
+  unsub();
+
+  console.log('\nAll Transaction & Customer Edit and Quick Entry Tests Passed Successfully!\n');
+})().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

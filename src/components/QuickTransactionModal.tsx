@@ -10,6 +10,7 @@ import {
   Platform,
   Alert,
   Keyboard,
+  Dimensions,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useTheme } from '../theme/ThemeContext';
@@ -64,16 +65,25 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
   const [amountError, setAmountError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
   const amountInputRef = useRef<any>(null);
 
   useEffect(() => {
     const showSub = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-      () => setKeyboardVisible(true)
+      (e) => {
+        setKeyboardVisible(true);
+        if (e?.endCoordinates?.height) {
+          setKeyboardHeight(e.endCoordinates.height);
+        }
+      }
     );
     const hideSub = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-      () => setKeyboardVisible(false)
+      () => {
+        setKeyboardVisible(false);
+        setKeyboardHeight(0);
+      }
     );
     return () => {
       showSub.remove();
@@ -82,13 +92,10 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
   }, []);
 
   const focusAmountKeypad = useCallback(() => {
-    const timers = [
-      setTimeout(() => amountInputRef.current?.focus(), 50),
-      setTimeout(() => amountInputRef.current?.focus(), 150),
-      setTimeout(() => amountInputRef.current?.focus(), 280),
-      setTimeout(() => amountInputRef.current?.focus(), 450),
-    ];
-    return () => timers.forEach(clearTimeout);
+    const timer = setTimeout(() => {
+      amountInputRef.current?.focus();
+    }, 150);
+    return () => clearTimeout(timer);
   }, []);
 
   useEffect(() => {
@@ -255,7 +262,12 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={styles.overlay}
+        style={[
+          styles.overlay,
+          Platform.OS === 'android' && keyboardHeight > 0
+            ? { paddingBottom: keyboardHeight }
+            : null,
+        ]}
       >
         <View
           style={[
@@ -264,6 +276,10 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
               backgroundColor: colors.surface,
               borderColor: colors.border,
               borderRadius: borderRadius.xl,
+              maxHeight:
+                keyboardHeight > 0
+                  ? Math.max(Dimensions.get('window').height - keyboardHeight - 40, 280)
+                  : '96%',
             },
           ]}
         >
@@ -295,13 +311,36 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
               </View>
             </View>
 
-            <TouchableOpacity
-              onPress={onClose}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              style={styles.closeBtn}
-            >
-              <AppIcon name="x" size={20} color={colors.textSecondary} />
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              {selectedCustomer && (
+                <TouchableOpacity
+                  onPress={handleSave}
+                  disabled={isSubmitting}
+                  style={[
+                    styles.headerSaveBtn,
+                    {
+                      backgroundColor:
+                        txType === 'GAVE' ? colors.danger : colors.success,
+                      borderRadius: borderRadius.md,
+                    },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Save transaction"
+                >
+                  <AppIcon name="check" size={15} color="#FFFFFF" />
+                  <Text style={styles.headerSaveBtnText}>
+                    {isSubmitting ? '...' : 'Save'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              <TouchableOpacity
+                onPress={onClose}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                style={styles.closeBtn}
+              >
+                <AppIcon name="x" size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Body Content */}
@@ -587,8 +626,6 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                       }}
                       error={amountError}
                       keyboardType="numeric"
-                      selectTextOnFocus
-                      autoFocus
                     />
                   </View>
 
@@ -639,6 +676,21 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                   </View>
                 </View>
 
+                {/* Primary Save Button - RIGHT ON TOP directly below Amount! */}
+                <View style={{ marginTop: spacing.md, marginBottom: spacing.xs }}>
+                  <AppButton
+                    title={
+                      txType === 'GAVE'
+                        ? `Save You Gave ${amount ? `₹${amount}` : ''}`
+                        : `Save You Got ${amount ? `₹${amount}` : ''}`
+                    }
+                    onPress={handleSave}
+                    variant={txType === 'GAVE' ? 'danger' : 'success'}
+                    loading={isSubmitting}
+                    size="lg"
+                  />
+                </View>
+
                 {/* Description Input (Only for Payments / YOU GOT) */}
                 {txType !== 'GAVE' && (
                   <AppTextInput
@@ -659,21 +711,6 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                   keyboardType="number-pad"
                   onChangeText={(text) => setBillNumber(text.replace(/[^0-9]/g, ''))}
                 />
-
-                {/* Submit Button */}
-                <View style={{ marginTop: spacing.md }}>
-                  <AppButton
-                    title={
-                      txType === 'GAVE'
-                        ? `Save You Gave ${amount ? `₹${amount}` : ''}`
-                        : `Save You Got ${amount ? `₹${amount}` : ''}`
-                    }
-                    onPress={handleSave}
-                    variant={txType === 'GAVE' ? 'danger' : 'success'}
-                    loading={isSubmitting}
-                    size="lg"
-                  />
-                </View>
               </View>
             )}
           </ScrollView>
@@ -728,6 +765,18 @@ const styles = StyleSheet.create({
   },
   closeBtn: {
     padding: 6,
+  },
+  headerSaveBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  headerSaveBtnText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
   },
   scrollBody: {
     flex: 1,

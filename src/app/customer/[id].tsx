@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Keyboard,
+  Dimensions,
   Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -141,16 +142,16 @@ export default function CustomerDetailScreen() {
     };
   }, [loadData]);
 
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   useEffect(() => {
     const showSub = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-      () => setKeyboardVisible(true)
+      (e) => setKeyboardHeight(e.endCoordinates.height)
     );
     const hideSub = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-      () => setKeyboardVisible(false)
+      () => setKeyboardHeight(0)
     );
     return () => {
       showSub.remove();
@@ -161,16 +162,9 @@ export default function CustomerDetailScreen() {
   const focusAmountKeypad = useCallback(() => {
     const timer = setTimeout(() => {
       amountInputRef.current?.focus();
-    }, 120);
+    }, 150);
     return () => clearTimeout(timer);
   }, []);
-
-  useEffect(() => {
-    if (modalVisible) {
-      const cleanup = focusAmountKeypad();
-      return cleanup;
-    }
-  }, [modalVisible, focusAmountKeypad]);
 
   if (isLoading) {
     return (
@@ -257,7 +251,6 @@ export default function CustomerDetailScreen() {
     }
     setAmountError('');
     setModalVisible(true);
-    focusAmountKeypad();
   };
 
   const handleOpenEditCustomer = () => {
@@ -936,7 +929,12 @@ export default function CustomerDetailScreen() {
       >
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={styles.modalOverlay}
+          style={[
+            styles.modalOverlay,
+            Platform.OS === 'android' && keyboardHeight > 0
+              ? { paddingBottom: keyboardHeight }
+              : null,
+          ]}
         >
           <View
             style={[
@@ -945,7 +943,10 @@ export default function CustomerDetailScreen() {
                 backgroundColor: colors.surface,
                 borderColor: colors.border,
                 borderRadius: borderRadius.xl,
-                maxHeight: '92%',
+                maxHeight:
+                  keyboardHeight > 0
+                    ? Math.max(Dimensions.get('window').height - keyboardHeight - 40, 280)
+                    : '92%',
               },
             ]}
           >
@@ -992,12 +993,35 @@ export default function CustomerDetailScreen() {
                 </View>
               </View>
 
-              <TouchableOpacity
-                onPress={() => setModalVisible(false)}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                <AppIcon name="x" size={20} color={colors.textSecondary} />
-              </TouchableOpacity>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                {/* Header Direct Save Button */}
+                <TouchableOpacity
+                  onPress={handleSaveTransaction}
+                  disabled={isSubmitting}
+                  style={[
+                    styles.headerSaveBtn,
+                    {
+                      backgroundColor:
+                        modalType === 'GAVE' ? colors.danger : colors.success,
+                      borderRadius: borderRadius.md,
+                    },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Save transaction"
+                >
+                  <AppIcon name="check" size={15} color="#FFFFFF" />
+                  <Text style={styles.headerSaveBtnText}>
+                    {isSubmitting ? '...' : 'Save'}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => setModalVisible(false)}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                >
+                  <AppIcon name="x" size={20} color={colors.textSecondary} />
+                </TouchableOpacity>
+              </View>
             </View>
 
             <ScrollView
@@ -1006,7 +1030,7 @@ export default function CustomerDetailScreen() {
               keyboardDismissMode="interactive"
               contentContainerStyle={[
                 styles.modalBody,
-                { paddingBottom: keyboardVisible ? 260 : 20 },
+                { paddingBottom: 24 },
               ]}
             >
               {/* Type Switcher for Edit & Entry */}
@@ -1084,14 +1108,12 @@ export default function CustomerDetailScreen() {
                     prefixText="₹"
                     value={txAmount}
                     onChangeText={(text) => {
-                      const withoutDecimals = text.split('.')[0];
-                      const filtered = withoutDecimals.replace(/[^0-9]/g, '');
+                      const filtered = text.replace(/[^0-9]/g, '');
                       setTxAmount(filtered);
                       if (amountError) setAmountError('');
                     }}
                     error={amountError}
                     keyboardType="numeric"
-                    selectTextOnFocus
                   />
                 </View>
 
@@ -1142,6 +1164,23 @@ export default function CustomerDetailScreen() {
                 </View>
               </View>
 
+              {/* Primary "SAVE YOU GAVE" Button - RIGHT ON TOP directly below Amount! */}
+              <View style={styles.modalBtnRow}>
+                <AppButton
+                  title={
+                    editingTx
+                      ? 'Save Changes'
+                      : modalType === 'GAVE'
+                      ? `Save You Gave ${txAmount ? `₹${txAmount}` : ''}`
+                      : `Save You Got ${txAmount ? `₹${txAmount}` : ''}`
+                  }
+                  onPress={handleSaveTransaction}
+                  variant={modalType === 'GAVE' ? 'danger' : 'success'}
+                  loading={isSubmitting}
+                  size="lg"
+                />
+              </View>
+
               {modalType !== 'GAVE' && (
                 <AppTextInput
                   label="Payment Note / Description (Optional)"
@@ -1160,22 +1199,6 @@ export default function CustomerDetailScreen() {
                 keyboardType="number-pad"
                 onChangeText={(text) => setTxBill(text.replace(/[^0-9]/g, ''))}
               />
-
-              <View style={styles.modalBtnRow}>
-                <AppButton
-                  title={
-                    editingTx
-                      ? 'Save Changes'
-                      : modalType === 'GAVE'
-                      ? 'Save You Gave'
-                      : 'Save You Got'
-                  }
-                  onPress={handleSaveTransaction}
-                  variant={modalType === 'GAVE' ? 'danger' : 'success'}
-                  loading={isSubmitting}
-                  size="lg"
-                />
-              </View>
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
@@ -1598,6 +1621,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 16,
+  },
+  headerSaveBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+  headerSaveBtnText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 13,
   },
   modalTitleRow: {
     flexDirection: 'row',

@@ -1164,7 +1164,27 @@ export default function CustomerDetailScreen() {
                 </View>
               </View>
 
-              {/* Primary "SAVE YOU GAVE" Button - RIGHT ON TOP directly below Amount! */}
+              {/* Bill / Invoice Number Input */}
+              <AppTextInput
+                label="Bill / Invoice Number (Numbers Only)"
+                placeholder="e.g. 1042"
+                iconName="tag"
+                value={txBill}
+                keyboardType="number-pad"
+                onChangeText={(text) => setTxBill(text.replace(/[^0-9]/g, ''))}
+              />
+
+              {modalType !== 'GAVE' && (
+                <AppTextInput
+                  label="Payment Note / Description (Optional)"
+                  placeholder="e.g. Cash payment, GPay, Bank transfer, নগদ জমা"
+                  iconName="edit-3"
+                  value={txDesc}
+                  onChangeText={setTxDesc}
+                />
+              )}
+
+              {/* Primary "SAVE YOU GAVE" Button */}
               <View style={styles.modalBtnRow}>
                 <AppButton
                   title={
@@ -1180,25 +1200,6 @@ export default function CustomerDetailScreen() {
                   size="lg"
                 />
               </View>
-
-              {modalType !== 'GAVE' && (
-                <AppTextInput
-                  label="Payment Note / Description (Optional)"
-                  placeholder="e.g. Cash payment, GPay, Bank transfer, নগদ জমা"
-                  iconName="edit-3"
-                  value={txDesc}
-                  onChangeText={setTxDesc}
-                />
-              )}
-
-              <AppTextInput
-                label="Bill / Invoice Number (Numbers Only)"
-                placeholder="e.g. 1042"
-                iconName="tag"
-                value={txBill}
-                keyboardType="number-pad"
-                onChangeText={(text) => setTxBill(text.replace(/[^0-9]/g, ''))}
-              />
             </ScrollView>
           </View>
         </KeyboardAvoidingView>

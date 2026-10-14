@@ -676,7 +676,28 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                   </View>
                 </View>
 
-                {/* Primary Save Button - RIGHT ON TOP directly below Amount! */}
+                {/* Bill Number Input */}
+                <AppTextInput
+                  label="Bill / Invoice Number (Numbers Only)"
+                  placeholder="e.g. 1042"
+                  iconName="tag"
+                  value={billNumber}
+                  keyboardType="number-pad"
+                  onChangeText={(text) => setBillNumber(text.replace(/[^0-9]/g, ''))}
+                />
+
+                {/* Description Input (Only for Payments / YOU GOT) */}
+                {txType !== 'GAVE' && (
+                  <AppTextInput
+                    label="Payment Note / Description (Optional)"
+                    placeholder="e.g. Cash payment, UPI, Bank Transfer, নগদ জমা"
+                    iconName="edit-3"
+                    value={description}
+                    onChangeText={setDescription}
+                  />
+                )}
+
+                {/* Primary Save Button */}
                 <View style={{ marginTop: spacing.md, marginBottom: spacing.xs }}>
                   <AppButton
                     title={
@@ -690,27 +711,6 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                     size="lg"
                   />
                 </View>
-
-                {/* Description Input (Only for Payments / YOU GOT) */}
-                {txType !== 'GAVE' && (
-                  <AppTextInput
-                    label="Payment Note / Description (Optional)"
-                    placeholder="e.g. Cash payment, UPI, Bank Transfer, নগদ জমা"
-                    iconName="edit-3"
-                    value={description}
-                    onChangeText={setDescription}
-                  />
-                )}
-
-                {/* Bill Number Input */}
-                <AppTextInput
-                  label="Bill / Invoice Number (Numbers Only)"
-                  placeholder="e.g. 1042"
-                  iconName="tag"
-                  value={billNumber}
-                  keyboardType="number-pad"
-                  onChangeText={(text) => setBillNumber(text.replace(/[^0-9]/g, ''))}
-                />
               </View>
             )}
           </ScrollView>

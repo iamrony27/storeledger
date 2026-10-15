@@ -16,7 +16,7 @@ import {
 } from '../usage/supabaseUsageMonitor';
 
 export const CloudUsageCard: React.FC = () => {
-  const { colors, borderRadius, spacing } = useTheme();
+  const { colors, borderRadius, spacing, isDark } = useTheme();
   const [report, setReport] = useState<CloudUsageReport>(supabaseUsageMonitor.getReport());
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -83,8 +83,8 @@ export const CloudUsageCard: React.FC = () => {
         style={[
           styles.metricBlock,
           {
-            backgroundColor: colors.surface,
-            borderColor: colors.borderLight,
+            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : colors.surface,
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.borderLight,
             borderRadius: borderRadius.md,
           },
         ]}
@@ -139,8 +139,8 @@ export const CloudUsageCard: React.FC = () => {
       style={[
         styles.card,
         {
-          backgroundColor: colors.surface,
-          borderColor: colors.border,
+          backgroundColor: isDark ? '#131B2E' : colors.surface,
+          borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
           borderRadius: borderRadius.lg,
           padding: spacing.md,
         },

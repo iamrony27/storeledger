@@ -42,7 +42,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
   customers,
   allTransactions = [],
 }) => {
-  const { colors, borderRadius, spacing, isDark } = useTheme();
+  const { colors, spacing, isDark } = useTheme();
   const [activeTab, setActiveTab] = useState<ChartTab>('30days');
   const [selectedPoint, setSelectedPoint] = useState<ChartDataPoint | null>(null);
 
@@ -289,140 +289,93 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
         contentContainerStyle={styles.tabsScrollContent}
         style={styles.tabsScrollView}
       >
-        <TouchableOpacity
-          onPress={() => {
-            setActiveTab('30days');
-            setSelectedPoint(null);
-          }}
-          style={[
-            styles.tabBtn,
-            activeTab === '30days' && {
-              backgroundColor: colors.primary,
-              borderRadius: borderRadius.full,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.tabBtnText,
-              { color: activeTab === '30days' ? '#FFFFFF' : colors.textSecondary },
-            ]}
-          >
-            30 Days
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => {
-            setActiveTab('monthly');
-            setSelectedPoint(null);
-          }}
-          style={[
-            styles.tabBtn,
-            activeTab === 'monthly' && {
-              backgroundColor: colors.primary,
-              borderRadius: borderRadius.full,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.tabBtnText,
-              { color: activeTab === 'monthly' ? '#FFFFFF' : colors.textSecondary },
-            ]}
-          >
-            Monthly
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => {
-            setActiveTab('yearly');
-            setSelectedPoint(null);
-          }}
-          style={[
-            styles.tabBtn,
-            activeTab === 'yearly' && {
-              backgroundColor: colors.primary,
-              borderRadius: borderRadius.full,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.tabBtnText,
-              { color: activeTab === 'yearly' ? '#FFFFFF' : colors.textSecondary },
-            ]}
-          >
-            Yearly
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => {
-            setActiveTab('topDebtors');
-            setSelectedPoint(null);
-          }}
-          style={[
-            styles.tabBtn,
-            activeTab === 'topDebtors' && {
-              backgroundColor: colors.primary,
-              borderRadius: borderRadius.full,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.tabBtnText,
-              { color: activeTab === 'topDebtors' ? '#FFFFFF' : colors.textSecondary },
-            ]}
-          >
-            Top Due
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          onPress={() => {
-            setActiveTab('summary');
-            setSelectedPoint(null);
-          }}
-          style={[
-            styles.tabBtn,
-            activeTab === 'summary' && {
-              backgroundColor: colors.primary,
-              borderRadius: borderRadius.full,
-            },
-          ]}
-        >
-          <Text
-            style={[
-              styles.tabBtnText,
-              { color: activeTab === 'summary' ? '#FFFFFF' : colors.textSecondary },
-            ]}
-          >
-            Summary
-          </Text>
-        </TouchableOpacity>
+        {(
+          [
+            { key: '30days', label: '30 Days' },
+            { key: 'monthly', label: 'Monthly' },
+            { key: 'yearly', label: 'Yearly' },
+            { key: 'topDebtors', label: 'Top Due' },
+            { key: 'summary', label: 'Summary' },
+          ] as const
+        ).map((tab) => {
+          const isActive = activeTab === tab.key;
+          return (
+            <TouchableOpacity
+              key={tab.key}
+              onPress={() => {
+                setActiveTab(tab.key as ChartTab);
+                setSelectedPoint(null);
+              }}
+              style={[
+                styles.tabBtn,
+                {
+                  backgroundColor: isActive
+                    ? colors.primary
+                    : isDark
+                    ? 'rgba(255, 255, 255, 0.05)'
+                    : colors.borderLight,
+                  borderColor: isActive
+                    ? colors.primary
+                    : isDark
+                    ? 'rgba(255, 255, 255, 0.08)'
+                    : 'transparent',
+                  borderRadius: 9999,
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.tabBtnText,
+                  {
+                    color: isActive
+                      ? '#FFFFFF'
+                      : isDark
+                      ? '#94A3B8'
+                      : colors.textSecondary,
+                  },
+                ]}
+              >
+                {tab.label}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
       </ScrollView>
 
       {/* Legend & Stats Row */}
-      <View style={styles.legendRow}>
+      <View
+        style={[
+          styles.legendRow,
+          {
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0,0,0,0.05)',
+          },
+        ]}
+      >
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: colors.youWillGet }]} />
-          <Text style={[styles.legendText, { color: colors.textSecondary }]}>
+          <View style={[styles.legendDot, { backgroundColor: isDark ? '#F87171' : colors.youWillGet }]} />
+          <Text style={[styles.legendText, { color: isDark ? '#94A3B8' : colors.textSecondary }]}>
             You Gave (Credit)
           </Text>
         </View>
 
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: colors.youWillGive }]} />
-          <Text style={[styles.legendText, { color: colors.textSecondary }]}>
+          <View style={[styles.legendDot, { backgroundColor: isDark ? '#10B981' : colors.youWillGive }]} />
+          <Text style={[styles.legendText, { color: isDark ? '#94A3B8' : colors.textSecondary }]}>
             You Got (Payment)
           </Text>
         </View>
 
-        <View style={styles.rateBadge}>
-          <Text style={[styles.rateBadgeText, { color: colors.primary }]}>
+        <View
+          style={[
+            styles.rateBadge,
+            {
+              backgroundColor: isDark ? 'rgba(59, 130, 246, 0.15)' : 'rgba(37,99,235,0.08)',
+              borderColor: isDark ? 'rgba(59, 130, 246, 0.3)' : 'transparent',
+              borderWidth: isDark ? 1 : 0,
+            },
+          ]}
+        >
+          <Text style={[styles.rateBadgeText, { color: isDark ? '#60A5FA' : colors.primary }]}>
             Tap bar to view amount
           </Text>
         </View>
@@ -434,15 +387,15 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
           style={[
             styles.tappedDetailsCard,
             {
-              backgroundColor: isDark ? '#0B0F19' : colors.background,
-              borderColor: colors.primary,
+              backgroundColor: isDark ? '#090D16' : colors.background,
+              borderColor: isDark ? 'rgba(59, 130, 246, 0.45)' : colors.primary,
               borderRadius: 14,
             },
           ]}
         >
           <View style={styles.tappedHeaderRow}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <AppIcon name="calendar" size={14} color={colors.primary} />
+              <AppIcon name="calendar" size={14} color={isDark ? '#60A5FA' : colors.primary} />
               <Text style={[styles.tappedDateText, { color: colors.textPrimary }]}>
                 {selectedPoint.fullLabel || selectedPoint.label}
               </Text>
@@ -451,31 +404,41 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
               onPress={() => setSelectedPoint(null)}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <AppIcon name="x" size={16} color={colors.textSecondary} />
+              <AppIcon name="x" size={16} color={isDark ? '#94A3B8' : colors.textSecondary} />
             </TouchableOpacity>
           </View>
 
           <View style={styles.tappedAmountsRow}>
             <View style={styles.tappedCol}>
-              <Text style={[styles.tappedColLabel, { color: colors.youWillGet }]}>
+              <Text style={[styles.tappedColLabel, { color: isDark ? '#F87171' : colors.youWillGet }]}>
                 YOU GAVE
               </Text>
-              <Text style={[styles.tappedColAmount, { color: colors.youWillGet }]}>
+              <Text style={[styles.tappedColAmount, { color: isDark ? '#F87171' : colors.youWillGet }]}>
                 {formatINR(selectedPoint.gavePaise)}
               </Text>
             </View>
-            <View style={[styles.tappedColDivider, { backgroundColor: colors.borderLight }]} />
+            <View
+              style={[
+                styles.tappedColDivider,
+                { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.borderLight },
+              ]}
+            />
             <View style={styles.tappedCol}>
-              <Text style={[styles.tappedColLabel, { color: colors.youWillGive }]}>
+              <Text style={[styles.tappedColLabel, { color: isDark ? '#10B981' : colors.youWillGive }]}>
                 YOU GOT
               </Text>
-              <Text style={[styles.tappedColAmount, { color: colors.youWillGive }]}>
+              <Text style={[styles.tappedColAmount, { color: isDark ? '#10B981' : colors.youWillGive }]}>
                 {formatINR(selectedPoint.gotPaise)}
               </Text>
             </View>
-            <View style={[styles.tappedColDivider, { backgroundColor: colors.borderLight }]} />
+            <View
+              style={[
+                styles.tappedColDivider,
+                { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.borderLight },
+              ]}
+            />
             <View style={styles.tappedCol}>
-              <Text style={[styles.tappedColLabel, { color: colors.textSecondary }]}>
+              <Text style={[styles.tappedColLabel, { color: isDark ? '#94A3B8' : colors.textSecondary }]}>
                 NET FLOW
               </Text>
               <Text
@@ -484,9 +447,9 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                   {
                     color:
                       selectedPoint.gavePaise - selectedPoint.gotPaise > 0
-                        ? colors.youWillGet
+                        ? (isDark ? '#F87171' : colors.youWillGet)
                         : selectedPoint.gavePaise - selectedPoint.gotPaise < 0
-                        ? colors.youWillGive
+                        ? (isDark ? '#10B981' : colors.youWillGive)
                         : colors.textPrimary,
                   },
                 ]}
@@ -519,14 +482,14 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                         y1={y}
                         x2={svgCalculatedWidth - paddingRight}
                         y2={y}
-                        stroke={colors.border}
+                        stroke={isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border}
                         strokeDasharray="3, 3"
                         strokeWidth={1}
                       />
                       <SvgText
                         x={paddingLeft - 4}
                         y={y + 3}
-                        fill={colors.textMuted}
+                        fill={isDark ? '#64748B' : colors.textMuted}
                         fontSize={9}
                         textAnchor="end"
                       >
@@ -564,7 +527,9 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                         height={innerHeight}
                         fill={
                           isSelected
-                            ? 'rgba(59, 130, 246, 0.12)'
+                            ? isDark
+                              ? 'rgba(59, 130, 246, 0.2)'
+                              : 'rgba(59, 130, 246, 0.12)'
                             : 'transparent'
                         }
                         rx={4}
@@ -578,7 +543,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                           width={barWidth}
                           height={gaveHeight}
                           rx={3}
-                          fill={colors.youWillGet}
+                          fill={isDark ? '#F87171' : colors.youWillGet}
                         />
                       )}
 
@@ -590,7 +555,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                           width={barWidth}
                           height={gotHeight}
                           rx={3}
-                          fill={colors.youWillGive}
+                          fill={isDark ? '#10B981' : colors.youWillGive}
                         />
                       )}
 
@@ -601,7 +566,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                           y1={paddingTop}
                           x2={xCenter}
                           y2={paddingTop + innerHeight}
-                          stroke={colors.primary}
+                          stroke={isDark ? '#60A5FA' : colors.primary}
                           strokeWidth={1.5}
                         />
                       )}
@@ -610,7 +575,15 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                       <SvgText
                         x={xCenter}
                         y={chartHeight - 6}
-                        fill={isSelected ? colors.primary : colors.textSecondary}
+                        fill={
+                          isSelected
+                            ? isDark
+                              ? '#60A5FA'
+                              : colors.primary
+                            : isDark
+                            ? '#94A3B8'
+                            : colors.textSecondary
+                        }
                         fontSize={activeTab === '30days' ? 9 : 10}
                         fontWeight={isSelected ? '700' : '500'}
                         textAnchor="middle"
@@ -628,8 +601,8 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
             </ScrollView>
           ) : (
             <View style={styles.emptyActivityBox}>
-              <AppIcon name="calendar" size={24} color={colors.textMuted} />
-              <Text style={[styles.emptyActivityText, { color: colors.textSecondary }]}>
+              <AppIcon name="calendar" size={24} color={isDark ? '#64748B' : colors.textMuted} />
+              <Text style={[styles.emptyActivityText, { color: isDark ? '#94A3B8' : colors.textSecondary }]}>
                 No transaction activity recorded for this period.
               </Text>
             </View>
@@ -647,8 +620,17 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                 : 0;
             return (
               <View key={deb.id} style={styles.debtorRow}>
-                <View style={styles.debtorRankBadge}>
-                  <Text style={[styles.debtorRankText, { color: colors.primary }]}>
+                <View
+                  style={[
+                    styles.debtorRankBadge,
+                    isDark && {
+                      backgroundColor: 'rgba(59, 130, 246, 0.16)',
+                      borderColor: 'rgba(59, 130, 246, 0.3)',
+                      borderWidth: 1,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.debtorRankText, { color: isDark ? '#60A5FA' : colors.primary }]}>
                     #{index + 1}
                   </Text>
                 </View>
@@ -661,24 +643,29 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                     >
                       {deb.name}
                     </Text>
-                    <Text style={[styles.debtorAmount, { color: colors.youWillGet }]}>
+                    <Text style={[styles.debtorAmount, { color: isDark ? '#F87171' : colors.youWillGet }]}>
                       {formatINR(deb.currentBalancePaise)}
                     </Text>
                   </View>
 
-                  <View style={styles.debtorBarTrack}>
+                  <View
+                    style={[
+                      styles.debtorBarTrack,
+                      isDark && { backgroundColor: 'rgba(255, 255, 255, 0.08)' },
+                    ]}
+                  >
                     <View
                       style={[
                         styles.debtorBarFill,
                         {
                           width: `${Math.max(5, sharePct)}%`,
-                          backgroundColor: colors.youWillGet,
+                          backgroundColor: isDark ? '#F87171' : colors.youWillGet,
                         },
                       ]}
                     />
                   </View>
 
-                  <Text style={[styles.debtorSub, { color: colors.textMuted }]}>
+                  <Text style={[styles.debtorSub, { color: isDark ? '#94A3B8' : colors.textMuted }]}>
                     {sharePct}% of total dues {deb.phone ? `• ${deb.phone}` : ''}
                   </Text>
                 </View>
@@ -694,19 +681,22 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
           <View
             style={[
               styles.summaryCard,
-              { backgroundColor: colors.youWillGetBg, borderColor: colors.youWillGet },
+              {
+                backgroundColor: isDark ? 'rgba(248, 113, 113, 0.1)' : colors.youWillGetBg,
+                borderColor: isDark ? 'rgba(248, 113, 113, 0.35)' : colors.youWillGet,
+              },
             ]}
           >
             <View style={styles.summaryCardHeader}>
-              <AppIcon name="arrow-up-right" size={16} color={colors.youWillGet} />
-              <Text style={[styles.summaryCardTitle, { color: colors.youWillGet }]}>
+              <AppIcon name="arrow-up-right" size={16} color={isDark ? '#F87171' : colors.youWillGet} />
+              <Text style={[styles.summaryCardTitle, { color: isDark ? '#F87171' : colors.youWillGet }]}>
                 Total You&apos;ll Get
               </Text>
             </View>
-            <Text style={[styles.summaryCardAmount, { color: colors.youWillGet }]}>
+            <Text style={[styles.summaryCardAmount, { color: isDark ? '#F87171' : colors.youWillGet }]}>
               {formatINR(totalReceivablePaise)}
             </Text>
-            <Text style={[styles.summaryCardNote, { color: colors.textSecondary }]}>
+            <Text style={[styles.summaryCardNote, { color: isDark ? '#CBD5E1' : colors.textSecondary }]}>
               {activeDebtorsCount} customers have dues
             </Text>
           </View>
@@ -714,19 +704,22 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
           <View
             style={[
               styles.summaryCard,
-              { backgroundColor: colors.youWillGiveBg, borderColor: colors.youWillGive },
+              {
+                backgroundColor: isDark ? 'rgba(16, 185, 129, 0.1)' : colors.youWillGiveBg,
+                borderColor: isDark ? 'rgba(16, 185, 129, 0.35)' : colors.youWillGive,
+              },
             ]}
           >
             <View style={styles.summaryCardHeader}>
-              <AppIcon name="arrow-down-left" size={16} color={colors.youWillGive} />
-              <Text style={[styles.summaryCardTitle, { color: colors.youWillGive }]}>
+              <AppIcon name="arrow-down-left" size={16} color={isDark ? '#10B981' : colors.youWillGive} />
+              <Text style={[styles.summaryCardTitle, { color: isDark ? '#10B981' : colors.youWillGive }]}>
                 Total You Got
               </Text>
             </View>
-            <Text style={[styles.summaryCardAmount, { color: colors.youWillGive }]}>
+            <Text style={[styles.summaryCardAmount, { color: isDark ? '#10B981' : colors.youWillGive }]}>
               {formatINR(totalGotAmountPaise)}
             </Text>
-            <Text style={[styles.summaryCardNote, { color: colors.textSecondary }]}>
+            <Text style={[styles.summaryCardNote, { color: isDark ? '#CBD5E1' : colors.textSecondary }]}>
               Payments received
             </Text>
           </View>

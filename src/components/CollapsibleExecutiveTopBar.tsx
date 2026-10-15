@@ -14,6 +14,7 @@ import { SyncIndicator } from './SyncIndicator';
 import { useTabBarVisibility } from '../context/TabBarVisibilityContext';
 import { formatINR } from '../types/customer';
 import { COLOR_HUNT_PALETTE } from '../theme/colors';
+import { useTheme } from '../theme/ThemeContext';
 
 export interface CollapsibleExecutiveTopBarProps {
   appName?: string;
@@ -50,6 +51,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
 }) => {
   const insets = useSafeAreaInsets();
   const { topBarCollapseAnim, expandTopBar } = useTabBarVisibility();
+  const { isDark } = useTheme();
 
   // Metrics
   const hasSearchBar = onSearchQueryChange !== undefined || searchQuery !== undefined;
@@ -231,19 +233,32 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
           {/* Integrated Search Bar: IN THE SAME BAR DIRECTLY UNDER HERO CARDS */}
           {hasSearchBar && (
             <View style={styles.searchBarRow}>
-              <View style={styles.searchInputContainer}>
+              <View
+                style={[
+                  styles.searchInputContainer,
+                  isDark && {
+                    backgroundColor: '#1E293B',
+                    borderColor: 'rgba(241, 229, 161, 0.45)',
+                  },
+                ]}
+              >
                 <AppIcon
                   family="feather"
                   name="search"
                   size={16}
-                  color={COLOR_HUNT_PALETTE.crimsonRed}
+                  color={isDark ? COLOR_HUNT_PALETTE.creamYellow : COLOR_HUNT_PALETTE.crimsonRed}
                 />
                 <TextInput
-                  style={styles.searchInput}
+                  style={[
+                    styles.searchInput,
+                    isDark && { color: '#F8FAFC' },
+                  ]}
                   value={searchQuery}
                   onChangeText={onSearchQueryChange}
                   placeholder={searchPlaceholder}
-                  placeholderTextColor="rgba(100, 116, 139, 0.75)"
+                  placeholderTextColor={
+                    isDark ? 'rgba(241, 229, 161, 0.65)' : 'rgba(100, 116, 139, 0.75)'
+                  }
                   returnKeyType="search"
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -258,7 +273,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                     accessibilityLabel="Clear search text"
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   >
-                    <AppIcon family="feather" name="x" size={14} color="#64748B" />
+                    <AppIcon family="feather" name="x" size={14} color={isDark ? COLOR_HUNT_PALETTE.creamYellow : '#64748B'} />
                   </TouchableOpacity>
                 )}
               </View>

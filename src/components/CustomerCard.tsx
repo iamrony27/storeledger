@@ -207,8 +207,8 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
           <Text
             style={[
               styles.amountText,
-              hasDue && styles.amountDue,
-              hasAdvance && styles.amountAdvance,
+              hasDue && (isDark ? styles.amountDueDark : styles.amountDueLight),
+              hasAdvance && (isDark ? styles.amountAdvanceDark : styles.amountAdvanceLight),
               isSettled && (isDark ? styles.amountSettledDark : styles.amountSettledLight),
             ]}
             numberOfLines={1}
@@ -225,20 +225,45 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
             hitSlop={{ top: 8, bottom: 8, left: 10, right: 10 }}
             accessibilityRole="button"
             accessibilityLabel={`Remind ${customer.name} via WhatsApp`}
-            style={styles.remindPill}
+            style={[
+              styles.remindPill,
+              {
+                backgroundColor: isDark ? 'rgba(34, 197, 94, 0.16)' : 'rgba(34, 197, 94, 0.12)',
+                borderColor: isDark ? 'rgba(34, 197, 94, 0.3)' : 'transparent',
+                borderWidth: isDark ? 1 : 0,
+              },
+            ]}
           >
             <View style={styles.remindRow}>
-              <AppIcon family="material" name="whatsapp" size={12} color="#16A34A" />
-              <Text style={styles.remindText}>Remind</Text>
+              <AppIcon family="material" name="whatsapp" size={12} color={isDark ? '#4ADE80' : '#16A34A'} />
+              <Text style={[styles.remindText, { color: isDark ? '#4ADE80' : '#16A34A' }]}>Remind</Text>
             </View>
           </TouchableOpacity>
         ) : hasAdvance ? (
-          <View style={styles.advancePill}>
-            <Text style={styles.advanceLabel}>Advance</Text>
+          <View
+            style={[
+              styles.advancePill,
+              {
+                backgroundColor: isDark ? 'rgba(16, 185, 129, 0.16)' : 'rgba(16, 185, 129, 0.12)',
+                borderColor: isDark ? 'rgba(16, 185, 129, 0.3)' : 'transparent',
+                borderWidth: isDark ? 1 : 0,
+              },
+            ]}
+          >
+            <Text style={[styles.advanceLabel, { color: isDark ? '#34D399' : '#059669' }]}>Advance</Text>
           </View>
         ) : (
-          <View style={styles.settledPill}>
-            <Text style={styles.settledLabel}>Settled</Text>
+          <View
+            style={[
+              styles.settledPill,
+              {
+                backgroundColor: isDark ? 'rgba(148, 163, 184, 0.14)' : 'rgba(148, 163, 184, 0.12)',
+                borderColor: isDark ? 'rgba(148, 163, 184, 0.25)' : 'transparent',
+                borderWidth: isDark ? 1 : 0,
+              },
+            ]}
+          >
+            <Text style={[styles.settledLabel, { color: isDark ? '#94A3B8' : '#64748B' }]}>Settled</Text>
           </View>
         )}
       </View>
@@ -327,11 +352,17 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: -0.3,
   },
-  amountDue: {
-    color: '#EF4444', // Red due amount
+  amountDueDark: {
+    color: '#F87171', // Luminous coral for dark mode
   },
-  amountAdvance: {
-    color: '#10B981', // Green for advance
+  amountDueLight: {
+    color: '#EF4444', // Clean red for light mode
+  },
+  amountAdvanceDark: {
+    color: '#10B981', // Crisp emerald for dark mode
+  },
+  amountAdvanceLight: {
+    color: '#059669', // Deep green for light mode
   },
   amountSettledDark: {
     color: '#94A3B8',

@@ -41,7 +41,7 @@ type FilterType = 'ALL' | 'GET' | 'GIVE' | 'SETTLED';
 type SortType = 'RECENT' | 'AMOUNT' | 'NAME';
 
 export default function CustomersScreen() {
-  const { colors, borderRadius } = useTheme();
+  const { colors, borderRadius, isDark } = useTheme();
   const { t } = useLanguage();
   const { scrollY, diffClampedScrollY } = useTabBarVisibility();
   const insets = useSafeAreaInsets();
@@ -320,10 +320,10 @@ export default function CustomersScreen() {
                       {
                         backgroundColor: isActive
                           ? colors.primary
-                          : (colors.surfaceElevated || colors.surface),
+                          : (isDark ? '#131B2E' : (colors.surfaceElevated || colors.surface)),
                         borderColor: isActive
                           ? colors.primary
-                          : colors.border,
+                          : (isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border),
                         borderRadius: borderRadius.full,
                       },
                       isActive && styles.filterChipActiveShadow,
@@ -333,7 +333,7 @@ export default function CustomersScreen() {
                       style={[
                         styles.filterChipText,
                         {
-                          color: isActive ? '#FFFFFF' : colors.textSecondary,
+                          color: isActive ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary),
                           fontWeight: isActive ? '700' : '600',
                         },
                       ]}
@@ -348,7 +348,7 @@ export default function CustomersScreen() {
             {/* Sorting Controls and Customer Count */}
             <View style={styles.sortBar}>
               <Text
-                style={[styles.customerCountText, { color: colors.textSecondary }]}
+                style={[styles.customerCountText, { color: isDark ? '#94A3B8' : colors.textSecondary }]}
               >
                 {filteredCustomers.length}{' '}
                 {filteredCustomers.length === 1 ? 'Customer' : 'Customers'}
@@ -370,17 +370,17 @@ export default function CustomersScreen() {
                   style={[
                     styles.sortButton,
                     {
-                      backgroundColor: colors.surface,
-                      borderColor: colors.border,
+                      backgroundColor: isDark ? '#131B2E' : colors.surface,
+                      borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
                       borderRadius: borderRadius.sm,
                     },
                   ]}
                 >
-                  <AppIcon name="sliders" size={13} color={colors.textSecondary} />
+                  <AppIcon name="sliders" size={13} color={isDark ? '#94A3B8' : colors.textSecondary} />
                   <Text
                     style={[
                       styles.sortButtonText,
-                      { color: colors.textPrimary },
+                      { color: isDark ? '#F8FAFC' : colors.textPrimary },
                     ]}
                   >
                     {activeSort === 'RECENT'

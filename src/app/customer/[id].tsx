@@ -799,8 +799,8 @@ export default function CustomerDetailScreen() {
             style={[
               styles.sortFilterContainer,
               {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
+                backgroundColor: isDark ? '#131B2E' : colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
                 borderRadius: borderRadius.md,
               },
             ]}
@@ -812,7 +812,7 @@ export default function CustomerDetailScreen() {
                 style={[
                   styles.modeSegmentContainer,
                   {
-                    backgroundColor: colors.borderLight,
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : colors.borderLight,
                     borderRadius: borderRadius.sm,
                   },
                 ]}
@@ -832,13 +832,13 @@ export default function CustomerDetailScreen() {
                   <AppIcon
                     name="calendar"
                     size={12}
-                    color={sortMode === 'DATE' ? '#FFFFFF' : colors.textSecondary}
+                    color={sortMode === 'DATE' ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary)}
                   />
                   <Text
                     style={[
                       styles.modeSegmentText,
                       {
-                        color: sortMode === 'DATE' ? '#FFFFFF' : colors.textSecondary,
+                        color: sortMode === 'DATE' ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary),
                         fontWeight: sortMode === 'DATE' ? '700' : '500',
                       },
                     ]}
@@ -862,13 +862,13 @@ export default function CustomerDetailScreen() {
                   <AppIcon
                     name="clock"
                     size={12}
-                    color={sortMode === 'ENTRY' ? '#FFFFFF' : colors.textSecondary}
+                    color={sortMode === 'ENTRY' ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary)}
                   />
                   <Text
                     style={[
                       styles.modeSegmentText,
                       {
-                        color: sortMode === 'ENTRY' ? '#FFFFFF' : colors.textSecondary,
+                        color: sortMode === 'ENTRY' ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary),
                         fontWeight: sortMode === 'ENTRY' ? '700' : '500',
                       },
                     ]}
@@ -884,8 +884,8 @@ export default function CustomerDetailScreen() {
                 style={[
                   styles.directionBtn,
                   {
-                    backgroundColor: colors.surface,
-                    borderColor: colors.border,
+                    backgroundColor: isDark ? '#1E293B' : colors.surface,
+                    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
                     borderRadius: borderRadius.sm,
                   },
                 ]}
@@ -1276,8 +1276,8 @@ export default function CustomerDetailScreen() {
         style={[
           styles.bottomActionBar,
           {
-            backgroundColor: colors.surface,
-            borderTopColor: colors.border,
+            backgroundColor: isDark ? '#0B0F19' : colors.surface,
+            borderTopColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
           },
         ]}
       >
@@ -1331,8 +1331,8 @@ export default function CustomerDetailScreen() {
             style={[
               styles.modalSheet,
               {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
+                backgroundColor: isDark ? '#131B2E' : colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : colors.border,
                 borderTopLeftRadius: borderRadius.xl,
                 borderTopRightRadius: borderRadius.xl,
                 borderBottomLeftRadius: 0,
@@ -1639,8 +1639,8 @@ export default function CustomerDetailScreen() {
             style={[
               styles.modalSheet,
               {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
+                backgroundColor: isDark ? '#131B2E' : colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : colors.border,
                 borderTopLeftRadius: borderRadius.xl,
                 borderTopRightRadius: borderRadius.xl,
                 borderBottomLeftRadius: 0,

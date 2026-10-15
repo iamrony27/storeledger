@@ -489,8 +489,8 @@ export default function TransactionsScreen() {
                 style={[
                   styles.directionBtn,
                   {
-                    backgroundColor: colors.surface,
-                    borderColor: colors.border,
+                    backgroundColor: isDark ? '#1E293B' : colors.surface,
+                    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
                     borderRadius: borderRadius.sm,
                   },
                 ]}
@@ -534,8 +534,12 @@ export default function TransactionsScreen() {
                     style={[
                       styles.filterChip,
                       {
-                        backgroundColor: isActive ? colors.primary : colors.surface,
-                        borderColor: isActive ? colors.primary : colors.border,
+                        backgroundColor: isActive
+                          ? colors.primary
+                          : (isDark ? '#131B2E' : colors.surface),
+                        borderColor: isActive
+                          ? colors.primary
+                          : (isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border),
                         borderRadius: borderRadius.full,
                       },
                     ]}
@@ -543,7 +547,7 @@ export default function TransactionsScreen() {
                     <Text
                       style={[
                         styles.filterChipText,
-                        { color: isActive ? '#FFFFFF' : colors.textPrimary },
+                        { color: isActive ? '#FFFFFF' : (isDark ? '#F8FAFC' : colors.textPrimary) },
                       ]}
                     >
                       {f.label}
@@ -604,10 +608,10 @@ export default function TransactionsScreen() {
                       {
                         backgroundColor: isActive
                           ? tf.color || colors.primary
-                          : colors.surface,
+                          : (isDark ? '#131B2E' : colors.surface),
                         borderColor: isActive
                           ? tf.color || colors.primary
-                          : colors.border,
+                          : (isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border),
                         borderRadius: borderRadius.full,
                       },
                     ]}
@@ -615,7 +619,7 @@ export default function TransactionsScreen() {
                     <Text
                       style={[
                         styles.typeFilterText,
-                        { color: isActive ? '#FFFFFF' : colors.textSecondary },
+                        { color: isActive ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary) },
                       ]}
                     >
                       {tf.label}
@@ -697,8 +701,8 @@ export default function TransactionsScreen() {
               style={[
                 styles.summaryMetaBar,
                 {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.borderLight,
+                  backgroundColor: isDark ? '#131B2E' : colors.surface,
+                  borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.borderLight,
                   borderRadius: borderRadius.md,
                 },
               ]}
@@ -730,8 +734,8 @@ export default function TransactionsScreen() {
             style={[
               styles.emptyCard,
               {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
+                backgroundColor: isDark ? '#131B2E' : colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
                 borderRadius: borderRadius.lg,
               },
             ]}
@@ -990,8 +994,8 @@ export default function TransactionsScreen() {
             style={[
               styles.modalSheet,
               {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
+                backgroundColor: isDark ? '#131B2E' : colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : colors.border,
                 borderTopLeftRadius: borderRadius.xl,
                 borderTopRightRadius: borderRadius.xl,
                 borderBottomLeftRadius: 0,

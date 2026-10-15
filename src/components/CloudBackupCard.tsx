@@ -41,7 +41,7 @@ import {
 import { formatINR } from '../types/customer';
 
 export const CloudBackupCard: React.FC = () => {
-  const { colors, borderRadius, spacing } = useTheme();
+  const { colors, borderRadius, spacing, isDark } = useTheme();
   const [scheduleState, setScheduleState] = useState<BackupScheduleState>(
     backupScheduler.getState()
   );
@@ -275,8 +275,8 @@ export const CloudBackupCard: React.FC = () => {
       style={[
         styles.card,
         {
-          backgroundColor: colors.surface,
-          borderColor: colors.border,
+          backgroundColor: isDark ? '#131B2E' : colors.surface,
+          borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
           borderRadius: borderRadius.lg,
           padding: spacing.md,
         },
@@ -314,8 +314,8 @@ export const CloudBackupCard: React.FC = () => {
         style={[
           styles.intervalSelectorCard,
           {
-            backgroundColor: colors.background,
-            borderColor: colors.borderLight,
+            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : colors.background,
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.borderLight,
             borderRadius: borderRadius.md,
           },
         ]}
@@ -330,7 +330,11 @@ export const CloudBackupCard: React.FC = () => {
               styles.intervalChip,
               scheduleConfig.intervalHours === 96
                 ? { backgroundColor: colors.primary }
-                : { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 },
+                : {
+                    backgroundColor: isDark ? '#1E293B' : colors.surface,
+                    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
+                    borderWidth: 1,
+                  },
               { borderRadius: borderRadius.sm },
             ]}
           >
@@ -350,7 +354,11 @@ export const CloudBackupCard: React.FC = () => {
               styles.intervalChip,
               scheduleConfig.intervalHours === 120
                 ? { backgroundColor: colors.primary }
-                : { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 },
+                : {
+                    backgroundColor: isDark ? '#1E293B' : colors.surface,
+                    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
+                    borderWidth: 1,
+                  },
               { borderRadius: borderRadius.sm },
             ]}
           >
@@ -372,8 +380,8 @@ export const CloudBackupCard: React.FC = () => {
           style={[
             styles.infoBlock,
             {
-              backgroundColor: colors.background,
-              borderColor: colors.borderLight,
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : colors.background,
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.borderLight,
               borderRadius: borderRadius.md,
             },
           ]}
@@ -390,8 +398,8 @@ export const CloudBackupCard: React.FC = () => {
           style={[
             styles.infoBlock,
             {
-              backgroundColor: colors.background,
-              borderColor: colors.borderLight,
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : colors.background,
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.borderLight,
               borderRadius: borderRadius.md,
             },
           ]}
@@ -410,8 +418,8 @@ export const CloudBackupCard: React.FC = () => {
         style={[
           styles.persistentFolderCard,
           {
-            backgroundColor: colors.background,
-            borderColor: colors.borderLight,
+            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : colors.background,
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.borderLight,
             borderRadius: borderRadius.md,
           },
         ]}

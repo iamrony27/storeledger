@@ -277,8 +277,8 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
           style={[
             styles.sheet,
             {
-              backgroundColor: colors.surface,
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(15, 23, 42, 0.08)',
+              backgroundColor: isDark ? '#131B2E' : colors.surface,
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(15, 23, 42, 0.08)',
               borderTopLeftRadius: 24,
               borderTopRightRadius: 24,
               borderBottomLeftRadius: 0,
@@ -450,8 +450,8 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                         style={[
                           styles.customerPickItem,
                           {
-                            backgroundColor: colors.background,
-                            borderColor: colors.borderLight,
+                            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : colors.background,
+                            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.borderLight,
                             borderRadius: borderRadius.md,
                           },
                         ]}
@@ -461,8 +461,8 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                           style={[
                             styles.avatarBox,
                             {
-                              backgroundColor: colors.surface,
-                              borderColor: colors.border,
+                              backgroundColor: isDark ? '#1E293B' : colors.surface,
+                              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
                               borderRadius: borderRadius.full,
                             },
                           ]}
@@ -523,7 +523,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                   style={[
                     styles.selectedCustCard,
                     {
-                      backgroundColor: colors.background,
+                      backgroundColor: isDark ? 'rgba(59, 130, 246, 0.12)' : colors.background,
                       borderColor: colors.primary,
                       borderRadius: borderRadius.md,
                     },
@@ -562,7 +562,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                     style={[
                       styles.changeCustBtn,
                       {
-                        backgroundColor: colors.borderLight,
+                        backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.borderLight,
                         borderRadius: borderRadius.sm,
                       },
                     ]}
@@ -581,9 +581,13 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                       styles.typeToggleBtn,
                       {
                         backgroundColor:
-                          txType === 'GAVE' ? colors.danger : colors.borderLight,
+                          txType === 'GAVE'
+                            ? colors.danger
+                            : (isDark ? 'rgba(255, 255, 255, 0.06)' : colors.borderLight),
                         borderColor:
-                          txType === 'GAVE' ? colors.danger : colors.border,
+                          txType === 'GAVE'
+                            ? colors.danger
+                            : (isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border),
                         borderRadius: borderRadius.md,
                       },
                     ]}
@@ -591,13 +595,13 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                     <AppIcon
                       name="arrow-up-right"
                       size={18}
-                      color={txType === 'GAVE' ? '#FFFFFF' : colors.textSecondary}
+                      color={txType === 'GAVE' ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary)}
                     />
                     <Text
                       style={[
                         styles.typeToggleLabel,
                         {
-                          color: txType === 'GAVE' ? '#FFFFFF' : colors.textPrimary,
+                          color: txType === 'GAVE' ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textPrimary),
                         },
                       ]}
                     >
@@ -611,9 +615,13 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                       styles.typeToggleBtn,
                       {
                         backgroundColor:
-                          txType === 'GOT' ? colors.success : colors.borderLight,
+                          txType === 'GOT'
+                            ? colors.success
+                            : (isDark ? 'rgba(255, 255, 255, 0.06)' : colors.borderLight),
                         borderColor:
-                          txType === 'GOT' ? colors.success : colors.border,
+                          txType === 'GOT'
+                            ? colors.success
+                            : (isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border),
                         borderRadius: borderRadius.md,
                       },
                     ]}
@@ -621,13 +629,13 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                     <AppIcon
                       name="arrow-down-left"
                       size={18}
-                      color={txType === 'GOT' ? '#FFFFFF' : colors.textSecondary}
+                      color={txType === 'GOT' ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary)}
                     />
                     <Text
                       style={[
                         styles.typeToggleLabel,
                         {
-                          color: txType === 'GOT' ? '#FFFFFF' : colors.textPrimary,
+                          color: txType === 'GOT' ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textPrimary),
                         },
                       ]}
                     >
@@ -677,8 +685,12 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                             style={[
                               styles.quickAmtBtn,
                               {
-                                backgroundColor: isSelected ? colors.primary : colors.surface,
-                                borderColor: isSelected ? colors.primary : colors.border,
+                                backgroundColor: isSelected
+                                  ? colors.primary
+                                  : (isDark ? '#1E293B' : colors.surface),
+                                borderColor: isSelected
+                                  ? colors.primary
+                                  : (isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border),
                                 borderRadius: borderRadius.md,
                               },
                             ]}
@@ -689,7 +701,9 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                               style={[
                                 styles.quickAmtBtnText,
                                 {
-                                  color: isSelected ? '#FFFFFF' : colors.textPrimary,
+                                  color: isSelected
+                                    ? '#FFFFFF'
+                                    : (isDark ? '#F8FAFC' : colors.textPrimary),
                                   fontWeight: isSelected ? '800' : '700',
                                 },
                               ]}

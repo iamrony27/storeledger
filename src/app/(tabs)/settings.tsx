@@ -29,7 +29,7 @@ import { useQuickAmounts, DEFAULT_QUICK_AMOUNTS } from '../../storage/quickAmoun
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { colors, spacing, borderRadius, mode, setThemeMode } = useTheme();
+  const { colors, spacing, borderRadius, mode, setThemeMode, isDark } = useTheme();
   const { t } = useLanguage();
   const { handleScroll } = useTabBarVisibility();
   const {
@@ -216,8 +216,8 @@ export default function SettingsScreen() {
           style={[
             styles.sectionCard,
             {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
+              backgroundColor: isDark ? '#131B2E' : colors.surface,
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
               borderRadius: borderRadius.lg,
             },
           ]}
@@ -278,8 +278,8 @@ export default function SettingsScreen() {
           style={[
             styles.sectionCard,
             {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
+              backgroundColor: isDark ? '#131B2E' : colors.surface,
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
               borderRadius: borderRadius.lg,
             },
           ]}
@@ -374,8 +374,8 @@ export default function SettingsScreen() {
           style={[
             styles.sectionCard,
             {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
+              backgroundColor: isDark ? '#131B2E' : colors.surface,
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
               borderRadius: borderRadius.lg,
             },
           ]}
@@ -422,8 +422,8 @@ export default function SettingsScreen() {
           style={[
             styles.sectionCard,
             {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
+              backgroundColor: isDark ? '#131B2E' : colors.surface,
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
               borderRadius: borderRadius.lg,
             },
           ]}
@@ -505,8 +505,8 @@ export default function SettingsScreen() {
           style={[
             styles.sectionCard,
             {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
+              backgroundColor: isDark ? '#131B2E' : colors.surface,
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
               borderRadius: borderRadius.lg,
             },
           ]}
@@ -574,8 +574,8 @@ export default function SettingsScreen() {
           style={[
             styles.sectionCard,
             {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
+              backgroundColor: isDark ? '#131B2E' : colors.surface,
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
               borderRadius: borderRadius.lg,
             },
           ]}
@@ -615,8 +615,8 @@ export default function SettingsScreen() {
             style={[
               styles.modalCard,
               {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
+                backgroundColor: isDark ? '#131B2E' : colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : colors.border,
                 borderRadius: borderRadius.lg,
               },
             ]}
@@ -682,8 +682,8 @@ export default function SettingsScreen() {
             style={[
               styles.modalCard,
               {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
+                backgroundColor: isDark ? '#131B2E' : colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : colors.border,
                 borderRadius: borderRadius.lg,
               },
             ]}
@@ -751,8 +751,8 @@ export default function SettingsScreen() {
             style={[
               styles.modalCard,
               {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
+                backgroundColor: isDark ? '#131B2E' : colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : colors.border,
                 borderRadius: borderRadius.lg,
               },
             ]}

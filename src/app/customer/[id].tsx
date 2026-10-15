@@ -13,7 +13,7 @@ import {
   Dimensions,
   Platform,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
@@ -32,6 +32,9 @@ import {
   rupeesToPaise,
   paiseToRupees,
   calculateCustomerBreakdown,
+  sortTransactions,
+  TransactionSortMode,
+  TransactionSortOrder,
 } from '../../types/customer';
 import {
   getCustomerById,
@@ -63,10 +66,11 @@ import { useQuickAmounts } from '../../storage/quickAmountSettings';
 
 export default function CustomerDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { colors, spacing, borderRadius } = useTheme();
+  const { colors, spacing, borderRadius, isDark } = useTheme();
   const { t, language } = useLanguage();
   const { profile } = useAuth();
   const { quickAmounts } = useQuickAmounts();
+  const insets = useSafeAreaInsets();
 
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [transactions, setTransactions] = useState<LedgerTransaction[]>([]);
@@ -102,6 +106,19 @@ export default function CustomerDetailScreen() {
   const [custPhoneError, setCustPhoneError] = useState('');
   const [isSavingCustomer, setIsSavingCustomer] = useState(false);
 
+  // Sort & Filter state (Date Wise vs Entry Wise, Direction, & Filters)
+  const [sortMode, setSortMode] = useState<TransactionSortMode>('DATE');
+  const [sortOrder, setSortOrder] = useState<TransactionSortOrder>('DESC');
+  const [datePreset, setDatePreset] = useState<'ALL' | 'TODAY' | 'THIS_MONTH' | 'LAST_MONTH' | 'CUSTOM'>('ALL');
+  const [typeFilter, setTypeFilter] = useState<'ALL' | 'GAVE' | 'GOT'>('ALL');
+  const [customStartDate, setCustomStartDate] = useState(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 30);
+    return d.toISOString();
+  });
+  const [customEndDate, setCustomEndDate] = useState(() => new Date().toISOString());
+  const [customRangeModalVisible, setCustomRangeModalVisible] = useState(false);
+
   const breakdown = useMemo(() => {
     return calculateCustomerBreakdown(
       customer?.openingBalancePaise || 0,
@@ -114,23 +131,70 @@ export default function CustomerDetailScreen() {
     const cust = await getCustomerById(id);
     const txs = await getCustomerTransactions(id);
     setCustomer(cust);
-    // Sort transactions so newly created entries (even with past dates) appear on top
-    const sortedTxs = [...txs].sort((a, b) => {
-      const createdA = new Date(a.createdAt || a.date).getTime();
-      const createdB = new Date(b.createdAt || b.date).getTime();
-      if (createdB !== createdA) {
-        return createdB - createdA;
-      }
-      const dateA = new Date(a.date || a.createdAt).getTime();
-      const dateB = new Date(b.date || b.createdAt).getTime();
-      if (dateB !== dateA) {
-        return dateB - dateA;
-      }
-      return (b.id || '').localeCompare(a.id || '');
-    });
-    setTransactions(sortedTxs);
+    setTransactions(txs);
     setIsLoading(false);
   }, [id]);
+
+  // Dynamically filter and sort customer transactions
+  const displayedTransactions = useMemo(() => {
+    const now = new Date();
+    const todayStr = now.toDateString();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    const customStart = new Date(customStartDate);
+    customStart.setHours(0, 0, 0, 0);
+    const customEnd = new Date(customEndDate);
+    customEnd.setHours(23, 59, 59, 999);
+
+    const filtered = transactions.filter((tx) => {
+      if (tx.isVoided) return false;
+
+      // 1. Type Filter
+      if (typeFilter === 'GAVE' && tx.type !== 'GAVE') return false;
+      if (typeFilter === 'GOT' && tx.type !== 'GOT') return false;
+
+      // 2. Date Filter
+      const txDate = new Date(tx.date || tx.createdAt);
+      if (isNaN(txDate.getTime())) return false;
+
+      if (datePreset === 'TODAY') {
+        if (txDate.toDateString() !== todayStr) return false;
+      } else if (datePreset === 'THIS_MONTH') {
+        if (
+          txDate.getFullYear() !== currentYear ||
+          txDate.getMonth() !== currentMonth
+        ) {
+          return false;
+        }
+      } else if (datePreset === 'LAST_MONTH') {
+        const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+        const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+        if (
+          txDate.getFullYear() !== lastMonthYear ||
+          txDate.getMonth() !== lastMonth
+        ) {
+          return false;
+        }
+      } else if (datePreset === 'CUSTOM') {
+        if (txDate < customStart || txDate > customEnd) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    return sortTransactions(filtered, sortMode, sortOrder);
+  }, [
+    transactions,
+    sortMode,
+    sortOrder,
+    datePreset,
+    typeFilter,
+    customStartDate,
+    customEndDate,
+  ]);
 
   useEffect(() => {
     loadData();
@@ -147,11 +211,17 @@ export default function CustomerDetailScreen() {
   useEffect(() => {
     const showSub = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
-      (e) => setKeyboardHeight(e.endCoordinates.height)
+      (e) => {
+        if (e?.endCoordinates?.height) {
+          setKeyboardHeight(e.endCoordinates.height);
+        }
+      }
     );
     const hideSub = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
-      () => setKeyboardHeight(0)
+      () => {
+        setKeyboardHeight(0);
+      }
     );
     return () => {
       showSub.remove();
@@ -239,8 +309,8 @@ export default function CustomerDetailScreen() {
       setModalType(existingTx.type);
       setTxAmount(paiseToRupees(existingTx.amountPaise).toString());
       setTxDate(existingTx.date || new Date().toISOString());
-      setTxDesc(existingTx.type === 'GAVE' ? '' : (existingTx.description || ''));
-      setTxBill(existingTx.billNumber || '');
+      setTxDesc(existingTx.description || '');
+      setTxBill(existingTx.type === 'GAVE' ? (existingTx.billNumber || '') : '');
     } else {
       setEditingTx(null);
       setModalType(type);
@@ -345,8 +415,8 @@ export default function CustomerDetailScreen() {
           transactionId: editingTx.id,
           amountPaise: parsedPaise,
           type: modalType,
-          description: modalType === 'GAVE' ? undefined : (txDesc?.trim() || undefined),
-          billNumber: txBill || undefined,
+          description: modalType === 'GOT' && txDesc.trim() ? txDesc.trim() : undefined,
+          billNumber: modalType === 'GAVE' && txBill.trim() ? txBill.trim() : undefined,
           date: txDate,
         });
         Alert.alert('Transaction Updated', 'Transaction details updated successfully.');
@@ -355,8 +425,8 @@ export default function CustomerDetailScreen() {
           customerId: customer.id,
           amountPaise: parsedPaise,
           type: modalType,
-          description: modalType === 'GAVE' ? undefined : (txDesc?.trim() || undefined),
-          billNumber: txBill || undefined,
+          description: modalType === 'GOT' && txDesc.trim() ? txDesc.trim() : undefined,
+          billNumber: modalType === 'GAVE' && txBill.trim() ? txBill.trim() : undefined,
           date: txDate,
         });
       }
@@ -456,8 +526,7 @@ export default function CustomerDetailScreen() {
             <TopBarActionButton
               iconFamily="material"
               iconName="whatsapp"
-              variant="default"
-              iconColor={colors.youWillGet}
+              variant="whatsapp"
               onPress={handleWhatsApp}
               accessibilityLabel={`Send WhatsApp reminder to ${customer.name}`}
             />
@@ -665,8 +734,8 @@ export default function CustomerDetailScreen() {
               style={[
                 styles.quickActionBtn,
                 {
-                  backgroundColor: colors.youWillGetBg,
-                  borderColor: colors.youWillGet,
+                  backgroundColor: isDark ? 'rgba(37, 211, 102, 0.16)' : '#E7FCE8',
+                  borderColor: '#25D366',
                   borderRadius: borderRadius.md,
                 },
               ]}
@@ -675,9 +744,9 @@ export default function CustomerDetailScreen() {
                 family="material"
                 name="whatsapp"
                 size={16}
-                color={colors.youWillGet}
+                color="#25D366"
               />
-              <Text style={[styles.quickActionText, { color: colors.youWillGet }]}>
+              <Text style={[styles.quickActionText, { color: isDark ? '#25D366' : '#128C7E' }]}>
                 WhatsApp
               </Text>
             </TouchableOpacity>
@@ -717,11 +786,258 @@ export default function CustomerDetailScreen() {
             <Text
               style={[styles.historyCount, { color: colors.textSecondary }]}
             >
-              {transactions.length} entries
+              {displayedTransactions.length} of {transactions.filter((tx) => !tx.isVoided).length} entries
             </Text>
           </View>
 
-          {transactions.length === 0 ? (
+          {/* Filter & Sort Controls Card */}
+          <View
+            style={[
+              styles.sortFilterContainer,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+                borderRadius: borderRadius.md,
+              },
+            ]}
+          >
+            {/* Top Row: Date Wise / Entry Wise Mode Toggle & Direction Button */}
+            <View style={styles.sortModeRow}>
+              {/* Segmented Sort Mode Buttons */}
+              <View
+                style={[
+                  styles.modeSegmentContainer,
+                  {
+                    backgroundColor: colors.borderLight,
+                    borderRadius: borderRadius.sm,
+                  },
+                ]}
+              >
+                <TouchableOpacity
+                  onPress={() => setSortMode('DATE')}
+                  style={[
+                    styles.modeSegmentBtn,
+                    sortMode === 'DATE' && {
+                      backgroundColor: colors.primary,
+                      borderRadius: borderRadius.sm,
+                    },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Sort Date Wise"
+                >
+                  <AppIcon
+                    name="calendar"
+                    size={12}
+                    color={sortMode === 'DATE' ? '#FFFFFF' : colors.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.modeSegmentText,
+                      {
+                        color: sortMode === 'DATE' ? '#FFFFFF' : colors.textSecondary,
+                        fontWeight: sortMode === 'DATE' ? '700' : '500',
+                      },
+                    ]}
+                  >
+                    {t.customerDetail.dateWise}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => setSortMode('ENTRY')}
+                  style={[
+                    styles.modeSegmentBtn,
+                    sortMode === 'ENTRY' && {
+                      backgroundColor: colors.primary,
+                      borderRadius: borderRadius.sm,
+                    },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Sort Entry Wise"
+                >
+                  <AppIcon
+                    name="clock"
+                    size={12}
+                    color={sortMode === 'ENTRY' ? '#FFFFFF' : colors.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.modeSegmentText,
+                      {
+                        color: sortMode === 'ENTRY' ? '#FFFFFF' : colors.textSecondary,
+                        fontWeight: sortMode === 'ENTRY' ? '700' : '500',
+                      },
+                    ]}
+                  >
+                    {t.customerDetail.entryWise}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Direction Toggle Button (Newest First / Oldest First) */}
+              <TouchableOpacity
+                onPress={() => setSortOrder((prev) => (prev === 'DESC' ? 'ASC' : 'DESC'))}
+                style={[
+                  styles.directionBtn,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                    borderRadius: borderRadius.sm,
+                  },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel={`Toggle sort order: currently ${sortOrder === 'DESC' ? 'Newest First' : 'Oldest First'}`}
+              >
+                <AppIcon
+                  name={sortOrder === 'DESC' ? 'arrow-down' : 'arrow-up'}
+                  size={12}
+                  color={colors.primary}
+                />
+                <Text style={[styles.directionBtnText, { color: colors.primary }]}>
+                  {sortOrder === 'DESC' ? t.customerDetail.newestFirst : t.customerDetail.oldestFirst}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Filter Chips Scroll Row (Horizontal) */}
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.filterChipsScroll}
+            >
+              {/* Date Presets */}
+              {[
+                { key: 'ALL', label: t.customerDetail.filterAll },
+                { key: 'TODAY', label: 'Today' },
+                { key: 'THIS_MONTH', label: t.customerDetail.filterMonth },
+                { key: 'LAST_MONTH', label: t.customerDetail.filterLastMonth },
+                { key: 'CUSTOM', label: t.customerDetail.filterCustom },
+              ].map((item) => {
+                const isActive = datePreset === item.key;
+                return (
+                  <TouchableOpacity
+                    key={item.key}
+                    onPress={() => {
+                      if (item.key === 'CUSTOM') {
+                        setCustomRangeModalVisible(true);
+                      }
+                      setDatePreset(item.key as any);
+                    }}
+                    style={[
+                      styles.filterChip,
+                      {
+                        backgroundColor: isActive ? colors.primary : 'transparent',
+                        borderColor: isActive ? colors.primary : colors.border,
+                        borderRadius: borderRadius.full,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.filterChipText,
+                        { color: isActive ? '#FFFFFF' : colors.textSecondary },
+                      ]}
+                    >
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+
+              <View style={[styles.filterChipDivider, { backgroundColor: colors.border }]} />
+
+              {/* Type Presets */}
+              {[
+                { key: 'ALL', label: 'All Types' },
+                { key: 'GAVE', label: t.customerDetail.youGave, color: colors.youWillGet },
+                { key: 'GOT', label: t.customerDetail.youGot, color: colors.youWillGive },
+              ].map((item) => {
+                const isActive = typeFilter === item.key;
+                return (
+                  <TouchableOpacity
+                    key={item.key}
+                    onPress={() => setTypeFilter(item.key as any)}
+                    style={[
+                      styles.filterChip,
+                      {
+                        backgroundColor: isActive
+                          ? item.color || colors.primary
+                          : 'transparent',
+                        borderColor: isActive
+                          ? item.color || colors.primary
+                          : colors.border,
+                        borderRadius: borderRadius.full,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={[
+                        styles.filterChipText,
+                        { color: isActive ? '#FFFFFF' : colors.textSecondary },
+                      ]}
+                    >
+                      {item.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+
+            {/* Custom Date Range Active Banner */}
+            {datePreset === 'CUSTOM' && (
+              <TouchableOpacity
+                onPress={() => setCustomRangeModalVisible(true)}
+                style={[
+                  styles.customRangeBanner,
+                  {
+                    backgroundColor: colors.primaryLight,
+                    borderColor: colors.primary,
+                    borderRadius: borderRadius.sm,
+                  },
+                ]}
+              >
+                <AppIcon name="calendar" size={12} color={colors.primary} />
+                <Text style={[styles.customRangeBannerText, { color: colors.primary }]}>
+                  {new Date(customStartDate).toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })}{' '}
+                  &rarr;{' '}
+                  {new Date(customEndDate).toLocaleDateString('en-IN', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                  })}
+                </Text>
+                <Text style={[styles.customRangeEditLabel, { color: colors.primary }]}>
+                  Edit
+                </Text>
+              </TouchableOpacity>
+            )}
+
+            {/* If any filter is active, show count badge & reset button */}
+            {(datePreset !== 'ALL' || typeFilter !== 'ALL') && (
+              <View style={styles.filterStatusRow}>
+                <Text style={[styles.filterStatusText, { color: colors.textSecondary }]}>
+                  Filtered: {displayedTransactions.length} of {transactions.filter((tx) => !tx.isVoided).length}
+                </Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    setDatePreset('ALL');
+                    setTypeFilter('ALL');
+                  }}
+                  hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                >
+                  <Text style={[styles.resetFilterText, { color: colors.primary }]}>
+                    Reset Filters
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+
+          {transactions.filter((tx) => !tx.isVoided).length === 0 ? (
             <View
               style={[
                 styles.noTxCard,
@@ -736,10 +1052,41 @@ export default function CustomerDetailScreen() {
                 {t.customerDetail.noTransactions}
               </Text>
             </View>
+          ) : displayedTransactions.length === 0 ? (
+            <View
+              style={[
+                styles.noTxCard,
+                {
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
+                  borderRadius: borderRadius.md,
+                },
+              ]}
+            >
+              <Text style={[styles.noTxText, { color: colors.textSecondary, marginBottom: 8 }]}>
+                No transactions match the selected filter.
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setDatePreset('ALL');
+                  setTypeFilter('ALL');
+                }}
+                style={[
+                  styles.filterChip,
+                  {
+                    backgroundColor: colors.primary,
+                    borderColor: colors.primary,
+                    borderRadius: borderRadius.sm,
+                  },
+                ]}
+              >
+                <Text style={[styles.filterChipText, { color: '#FFFFFF' }]}>
+                  Reset Filters
+                </Text>
+              </TouchableOpacity>
+            </View>
           ) : (
-            transactions
-              .filter((tx) => !tx.isVoided)
-              .map((tx) => {
+            displayedTransactions.map((tx) => {
                 const isGave = tx.type === 'GAVE';
                 return (
                   <View
@@ -778,9 +1125,7 @@ export default function CustomerDetailScreen() {
                               { color: colors.textPrimary },
                             ]}
                           >
-                            {isGave
-                              ? 'You Gave'
-                              : (tx.description || 'You Got')}
+                            {tx.description || (isGave ? 'You Gave' : 'You Got')}
                           </Text>
                           <Text
                             style={[
@@ -793,9 +1138,48 @@ export default function CustomerDetailScreen() {
                               month: 'short',
                               year: 'numeric',
                             })}
-                            {tx.billNumber ? ` • Bill #${tx.billNumber}` : ''}
                             {tx.isOpeningBalance ? ' • Opening' : ''}
                           </Text>
+
+                          {/* Show entry date badge if entered on a different day or when Entry Wise is active */}
+                          {Boolean(
+                            tx.createdAt &&
+                            (sortMode === 'ENTRY' ||
+                              new Date(tx.createdAt).toDateString() !== new Date(tx.date).toDateString())
+                          ) && (
+                            <View style={styles.txEntryTimeRow}>
+                              <AppIcon name="clock" size={9} color={colors.textSecondary} />
+                              <Text style={[styles.txEntryTimeText, { color: colors.textSecondary }]}>
+                                Entered: {new Date(tx.createdAt).toLocaleDateString('en-IN', {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  year: 'numeric',
+                                })}
+                              </Text>
+                            </View>
+                          )}
+                          {tx.type === 'GAVE' && tx.billNumber ? (
+                            <View
+                              style={[
+                                styles.txBillBadge,
+                                {
+                                  backgroundColor: colors.borderLight,
+                                  borderColor: colors.border,
+                                  borderRadius: borderRadius.sm,
+                                },
+                              ]}
+                            >
+                              <AppIcon name="tag" size={10} color={colors.primary} />
+                              <Text
+                                style={[
+                                  styles.txBillBadgeText,
+                                  { color: colors.textPrimary },
+                                ]}
+                              >
+                                Slip/Inv: {tx.billNumber}
+                              </Text>
+                            </View>
+                          ) : null}
                         </View>
                       </View>
 
@@ -852,7 +1236,7 @@ export default function CustomerDetailScreen() {
                             hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                             style={styles.shareTxBtn}
                           >
-                            <AppIcon name="share-2" size={13} color={colors.primary} />
+                            <AppIcon family="material" name="whatsapp" size={14} color="#25D366" />
                           </TouchableOpacity>
 
                           <TouchableOpacity
@@ -922,6 +1306,7 @@ export default function CustomerDetailScreen() {
         visible={modalVisible}
         transparent
         animationType="slide"
+        statusBarTranslucent
         onShow={() => {
           focusAmountKeypad();
         }}
@@ -929,24 +1314,29 @@ export default function CustomerDetailScreen() {
       >
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={[
-            styles.modalOverlay,
-            Platform.OS === 'android' && keyboardHeight > 0
-              ? { paddingBottom: keyboardHeight }
-              : null,
-          ]}
+          style={[styles.modalOverlay, { paddingTop: insets.top + 8 }]}
         >
+          {/* Backdrop Dismiss on Outside Tap */}
+          <TouchableOpacity
+            style={StyleSheet.absoluteFill}
+            activeOpacity={1}
+            onPress={() => setModalVisible(false)}
+          />
           <View
             style={[
               styles.modalSheet,
               {
                 backgroundColor: colors.surface,
                 borderColor: colors.border,
-                borderRadius: borderRadius.xl,
-                maxHeight:
-                  keyboardHeight > 0
-                    ? Math.max(Dimensions.get('window').height - keyboardHeight - 40, 280)
-                    : '92%',
+                borderTopLeftRadius: borderRadius.xl,
+                borderTopRightRadius: borderRadius.xl,
+                borderBottomLeftRadius: 0,
+                borderBottomRightRadius: 0,
+                maxHeight: Dimensions.get('window').height - insets.top - 16,
+                paddingBottom:
+                  Platform.OS === 'android' && keyboardHeight > 0
+                    ? keyboardHeight + 20
+                    : (insets.bottom || 16),
               },
             ]}
           >
@@ -1025,9 +1415,10 @@ export default function CustomerDetailScreen() {
             </View>
 
             <ScrollView
+              style={{ flexShrink: 1 }}
               showsVerticalScrollIndicator={true}
               keyboardShouldPersistTaps="handled"
-              keyboardDismissMode="interactive"
+              keyboardDismissMode="none"
               contentContainerStyle={[
                 styles.modalBody,
                 { paddingBottom: 24 },
@@ -1164,17 +1555,40 @@ export default function CustomerDetailScreen() {
                 </View>
               </View>
 
-              {/* Bill / Invoice Number Input */}
-              <AppTextInput
-                label="Bill / Invoice Number (Numbers Only)"
-                placeholder="e.g. 1042"
-                iconName="tag"
-                value={txBill}
-                keyboardType="number-pad"
-                onChangeText={(text) => setTxBill(text.replace(/[^0-9]/g, ''))}
-              />
+              {/* Invoice / Slip Number Input (Only for YOU GAVE) */}
+              {modalType === 'GAVE' && (
+                <AppTextInput
+                  label="Invoice / Slip No. (Optional)"
+                  placeholder="e.g. 1042, 12-4, 2026-99"
+                  iconName="tag"
+                  value={txBill}
+                  onChangeText={setTxBill}
+                  keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
+                  autoCapitalize="characters"
+                  rightElement={
+                    <TouchableOpacity
+                      onPress={() => setTxBill((prev) => (prev ? `${prev}-` : '-'))}
+                      style={[
+                        styles.hyphenBtn,
+                        {
+                          backgroundColor: colors.borderLight,
+                          borderColor: colors.border,
+                          borderRadius: borderRadius.sm,
+                        },
+                      ]}
+                      accessibilityRole="button"
+                      accessibilityLabel="Insert hyphen"
+                    >
+                      <Text style={[styles.hyphenBtnText, { color: colors.primary }]}>
+                        — Dash
+                      </Text>
+                    </TouchableOpacity>
+                  }
+                />
+              )}
 
-              {modalType !== 'GAVE' && (
+              {/* Note / Description Input (Only for YOU GOT) */}
+              {modalType === 'GOT' && (
                 <AppTextInput
                   label="Payment Note / Description (Optional)"
                   placeholder="e.g. Cash payment, GPay, Bank transfer, নগদ জমা"
@@ -1222,7 +1636,15 @@ export default function CustomerDetailScreen() {
               {
                 backgroundColor: colors.surface,
                 borderColor: colors.border,
-                borderRadius: borderRadius.xl,
+                borderTopLeftRadius: borderRadius.xl,
+                borderTopRightRadius: borderRadius.xl,
+                borderBottomLeftRadius: 0,
+                borderBottomRightRadius: 0,
+                maxHeight: Dimensions.get('window').height - insets.top - 16,
+                paddingBottom:
+                  Platform.OS === 'android' && keyboardHeight > 0
+                    ? keyboardHeight + 20
+                    : (insets.bottom || 16),
               },
             ]}
           >
@@ -1347,6 +1769,76 @@ export default function CustomerDetailScreen() {
             </ScrollView>
           </View>
         </KeyboardAvoidingView>
+      </Modal>
+
+      {/* Custom Date Range Picker Modal */}
+      <Modal
+        visible={customRangeModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setCustomRangeModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View
+            style={[
+              styles.customRangeCard,
+              {
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
+                borderRadius: borderRadius.lg,
+              },
+            ]}
+          >
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
+                Select Custom Date Range
+              </Text>
+              <TouchableOpacity onPress={() => setCustomRangeModalVisible(false)}>
+                <AppIcon name="x" size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={{ padding: 16, gap: 14 }}>
+              <View>
+                <Text style={[styles.rangeLabel, { color: colors.textSecondary }]}>
+                  FROM DATE (START)
+                </Text>
+                <TransactionDatePicker
+                  date={customStartDate}
+                  onDateChange={setCustomStartDate}
+                />
+              </View>
+
+              <View>
+                <Text style={[styles.rangeLabel, { color: colors.textSecondary }]}>
+                  TO DATE (END)
+                </Text>
+                <TransactionDatePicker
+                  date={customEndDate}
+                  onDateChange={setCustomEndDate}
+                />
+              </View>
+
+              <View style={styles.modalButtonsRow}>
+                <AppButton
+                  title={t.common.cancel}
+                  variant="outline"
+                  onPress={() => setCustomRangeModalVisible(false)}
+                  style={{ flex: 1 }}
+                />
+                <AppButton
+                  title={t.common.confirm}
+                  variant="primary"
+                  onPress={() => {
+                    setDatePreset('CUSTOM');
+                    setCustomRangeModalVisible(false);
+                  }}
+                  style={{ flex: 1 }}
+                />
+              </View>
+            </View>
+          </View>
+        </View>
       </Modal>
 
       {/* Executive WhatsApp Due & Last Payment Share Modal */}
@@ -1763,5 +2255,149 @@ const styles = StyleSheet.create({
   },
   quickAmtBtnText: {
     fontSize: 13,
+  },
+  txBillBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginTop: 4,
+    borderWidth: 1,
+  },
+  txBillBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  sortFilterContainer: {
+    borderWidth: 1,
+    padding: 10,
+    marginBottom: 12,
+    gap: 8,
+  },
+  sortModeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  modeSegmentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 2,
+    gap: 2,
+  },
+  modeSegmentBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+  },
+  modeSegmentText: {
+    fontSize: 11,
+  },
+  directionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderWidth: 1,
+  },
+  directionBtnText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  filterChipsScroll: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 2,
+  },
+  filterChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderWidth: 1,
+  },
+  filterChipText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  filterChipDivider: {
+    width: 1,
+    height: 16,
+    marginHorizontal: 3,
+  },
+  customRangeBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderWidth: 1,
+  },
+  customRangeBannerText: {
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  customRangeEditLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    textDecorationLine: 'underline',
+  },
+  filterStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 2,
+  },
+  filterStatusText: {
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  resetFilterText: {
+    fontSize: 11,
+    fontWeight: '700',
+    textDecorationLine: 'underline',
+  },
+  txEntryTimeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 2,
+  },
+  txEntryTimeText: {
+    fontSize: 10,
+    fontWeight: '500',
+  },
+  customRangeCard: {
+    width: '90%',
+    maxWidth: 400,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  rangeLabel: {
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    marginBottom: 6,
+  },
+  modalButtonsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 10,
+  },
+  hyphenBtn: {
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  hyphenBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
   },
 });

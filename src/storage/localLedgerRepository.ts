@@ -137,20 +137,7 @@ async function initializeIfNeeded(): Promise<void> {
       }
     }
 
-    // Check and delete description of any GAVE (credit given) transactions so they are not stored locally or in backups
-    let cleanedGaveDesc = false;
-    if (currentTxCache) {
-      for (const txList of Object.values(currentTxCache)) {
-        for (const t of txList || []) {
-          if (t.type === 'GAVE' && t.description !== undefined) {
-            delete t.description;
-            cleanedGaveDesc = true;
-          }
-        }
-      }
-    }
-
-    if (purgedAny || cleanedGaveDesc) {
+    if (purgedAny) {
       await persist();
     }
   } catch (error) {
@@ -497,7 +484,14 @@ export async function restoreLedgerSnapshot(
     for (const rt of cleanList) {
       const cleanTx: LedgerTransaction = {
         ...rt,
-        description: rt.type === 'GAVE' ? undefined : (rt.description || undefined),
+        description:
+          rt.description && String(rt.description).trim().length > 0
+            ? String(rt.description).trim()
+            : undefined,
+        billNumber:
+          rt.type === 'GAVE' && rt.billNumber && String(rt.billNumber).trim().length > 0
+            ? String(rt.billNumber).trim()
+            : undefined,
       };
       const existingTxIndex = transactionsCache[custId].findIndex((t) => t.id === rt.id);
       if (existingTxIndex >= 0) {
@@ -553,8 +547,8 @@ export async function addTransaction(
     amountPaise: absAmount,
     type: input.type,
     date: txDate,
-    description: input.type === 'GAVE' ? undefined : (input.description?.trim() || undefined),
-    billNumber: input.billNumber?.trim(),
+    description: input.description?.trim() ? input.description.trim() : undefined,
+    billNumber: input.type === 'GAVE' && input.billNumber?.trim() ? input.billNumber.trim() : undefined,
     createdAt: now,
     updatedAt: now,
     syncStatus: 'pending_insert',
@@ -724,8 +718,8 @@ export async function updateTransaction(
     amountPaise: absAmount,
     type: input.type,
     date: input.date || customerTx[txIndex].date,
-    description: input.type === 'GAVE' ? undefined : (input.description?.trim() || undefined),
-    billNumber: input.billNumber?.trim(),
+    description: input.description?.trim() ? input.description.trim() : undefined,
+    billNumber: input.type === 'GAVE' && input.billNumber?.trim() ? input.billNumber.trim() : undefined,
     updatedAt: now,
     syncStatus: 'pending_update',
   };
@@ -921,7 +915,10 @@ export async function mergeRemoteDataIntoLocal(
       amountPaise: Number(rt.amount_paise),
       type: rt.type as any,
       date: rt.transaction_date,
-      description: rt.type === 'GAVE' ? undefined : (rt.description || undefined),
+      description: rt.description ? String(rt.description).trim() : undefined,
+      billNumber: rt.type === 'GAVE' && (rt.bill_number || rt.billNumber)
+        ? String(rt.bill_number || rt.billNumber).trim()
+        : undefined,
       isOpeningBalance: isOpening,
       isVoided: false,
       createdAt: rt.created_at,

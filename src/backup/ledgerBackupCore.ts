@@ -167,12 +167,13 @@ export function sanitizeTransactions(
         type: tx.type === 'GOT' ? 'GOT' : 'GAVE',
         date: tx.date,
         description:
-          tx.type === 'GAVE'
-            ? undefined
-            : tx.description
-            ? String(tx.description).slice(0, 300)
+          tx.description && String(tx.description).trim().length > 0
+            ? String(tx.description).trim().slice(0, 300)
             : undefined,
-        billNumber: tx.billNumber ? String(tx.billNumber).slice(0, 100) : undefined,
+        billNumber:
+          tx.type === 'GAVE' && tx.billNumber && String(tx.billNumber).trim().length > 0
+            ? String(tx.billNumber).trim().slice(0, 100)
+            : undefined,
         isOpeningBalance: Boolean(tx.isOpeningBalance),
         isVoided: false,
         createdAt: tx.createdAt,

@@ -58,6 +58,14 @@ export interface Translations {
     totalGave: string;
     totalGot: string;
     netAmount: string;
+    dateWise: string;
+    entryWise: string;
+    newestFirst: string;
+    oldestFirst: string;
+    filterAll: string;
+    filterMonth: string;
+    filterLastMonth: string;
+    filterCustom: string;
   };
   addCustomer: {
     title: string;
@@ -158,6 +166,14 @@ export const translations: Record<SupportedLanguage, Translations> = {
       totalGave: 'You Gave',
       totalGot: 'You Got',
       netAmount: 'Net Amount',
+      dateWise: 'Date Wise',
+      entryWise: 'Entry Wise',
+      newestFirst: 'Newest First',
+      oldestFirst: 'Oldest First',
+      filterAll: 'All',
+      filterMonth: 'This Month',
+      filterLastMonth: 'Last Month',
+      filterCustom: 'Custom Date',
     },
     addCustomer: {
       title: 'Add New Customer',
@@ -256,6 +272,14 @@ export const translations: Record<SupportedLanguage, Translations> = {
       totalGave: 'You Gave',
       totalGot: 'You Got',
       netAmount: 'নিট ব্যালেন্স',
+      dateWise: 'তারিখ অনুসারে',
+      entryWise: 'এন্ট্রি অনুসারে',
+      newestFirst: 'নতুনটি আগে',
+      oldestFirst: 'পুরোনোটি আগে',
+      filterAll: 'সব',
+      filterMonth: 'চলতি মাস',
+      filterLastMonth: 'গত মাস',
+      filterCustom: 'কাস্টম তারিখ',
     },
     addCustomer: {
       title: 'নতুন গ্রাহক যোগ',
@@ -354,6 +378,14 @@ export const translations: Record<SupportedLanguage, Translations> = {
       totalGave: 'You Gave',
       totalGot: 'You Got',
       netAmount: 'कुल शेष',
+      dateWise: 'तारीख अनुसार',
+      entryWise: 'प्रविष्टि अनुसार',
+      newestFirst: 'नया पहले',
+      oldestFirst: 'पुराना पहले',
+      filterAll: 'सभी',
+      filterMonth: 'इस महीने',
+      filterLastMonth: 'पिछले महीने',
+      filterCustom: 'कस्टम तारीख',
     },
     addCustomer: {
       title: 'नया ग्राहक जोड़ें',

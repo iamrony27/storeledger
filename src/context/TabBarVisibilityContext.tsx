@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useRef, useState, useCallback } from 'react';
-import { Animated, NativeSyntheticEvent, NativeScrollEvent, Easing } from 'react-native';
+import { Animated, NativeSyntheticEvent, NativeScrollEvent, Easing, Platform } from 'react-native';
 
 export interface TabBarVisibilityContextType {
   tabBarTranslateY: Animated.Value | Animated.AnimatedInterpolation<number>;
@@ -65,7 +65,7 @@ export const TabBarVisibilityProvider: React.FC<{ children: React.ReactNode }> =
         toValue: 0,
         duration: 260,
         easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS !== 'web',
       }).start();
     }
   }, [tabBarTranslateY]);
@@ -78,7 +78,7 @@ export const TabBarVisibilityProvider: React.FC<{ children: React.ReactNode }> =
         toValue: 120,
         duration: 280,
         easing: Easing.out(Easing.cubic),
-        useNativeDriver: true,
+        useNativeDriver: Platform.OS !== 'web',
       }).start();
     }
   }, [tabBarTranslateY]);

@@ -34,7 +34,7 @@ export function formatTransactionReceiptText(
     `Date: ${formattedDate}`,
     `Transaction: *${typeLabel}*`,
     `Amount: *${amountStr}*`,
-    tx.billNumber ? `Bill No: ${tx.billNumber}` : null,
+    tx.billNumber ? `Invoice/Slip No: ${tx.billNumber}` : null,
     tx.description ? `Note: ${tx.description}` : null,
     `--------------------------------`,
     `Updated Balance: *${balanceStr}*`,

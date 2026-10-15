@@ -3,15 +3,10 @@
     "name": "GWD book",
     "slug": "gwd-book",
     "scheme": "gwdbook",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#EF6905"
-    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.gwd.book"

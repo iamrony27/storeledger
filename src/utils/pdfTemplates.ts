@@ -152,8 +152,15 @@ export function generateCustomerStatementHtml(
 
       const gaveCol = t.type === 'GAVE' ? formatINR(t.amountPaise) : '-';
       const gotCol = t.type === 'GOT' ? formatINR(t.amountPaise) : '-';
-      const descEscaped = escapeHtml(t.description) || (t.isOpeningBalance ? 'Opening Balance' : 'Ledger Entry');
-      const billEscaped = t.billNumber ? `<br/><small style="color: #64748b; font-weight: 500;">Bill #: ${escapeHtml(t.billNumber)}</small>` : '';
+      const defaultDesc = t.isOpeningBalance
+        ? 'Opening Balance'
+        : t.type === 'GAVE'
+        ? 'Credit Given'
+        : 'Payment Received';
+      const descEscaped = escapeHtml(t.description) || defaultDesc;
+      const billEscaped = t.billNumber
+        ? `<div style="margin-top: 3px;"><span style="display: inline-block; background-color: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; border-radius: 3px; padding: 1px 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.3px;">Slip/Inv #: ${escapeHtml(t.billNumber)}</span></div>`
+        : '';
 
       let runningBalColor = '#475569';
       let runningBalSuffix = '';

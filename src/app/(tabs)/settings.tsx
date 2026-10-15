@@ -595,7 +595,7 @@ export default function SettingsScreen() {
         {/* App Version Info */}
         <View style={styles.footerInfo}>
           <Text style={[styles.versionText, { color: colors.textMuted }]}>
-            GWD Book v1.0.1 (Expo SDK 57)
+            GWD Book v1.0.3 (Expo SDK 57)
           </Text>
           <Text style={[styles.versionSub, { color: colors.textMuted }]}>
             Mobile Customer Ledger Application

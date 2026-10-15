@@ -11,7 +11,10 @@ import {
   Modal,
   KeyboardAvoidingView,
   Platform,
+  Keyboard,
+  Dimensions,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '../../theme/ThemeContext';
 import { useAuth } from '../../auth/AuthContext';
@@ -28,6 +31,9 @@ import {
   formatINR,
   rupeesToPaise,
   paiseToRupees,
+  sortTransactions,
+  TransactionSortMode,
+  TransactionSortOrder,
 } from '../../types/customer';
 import {
   getAllTransactionsList,
@@ -46,6 +52,29 @@ export default function TransactionsScreen() {
   const { colors, spacing, borderRadius } = useTheme();
   const { profile } = useAuth();
   const { handleScroll } = useTabBarVisibility();
+  const insets = useSafeAreaInsets();
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+
+  useEffect(() => {
+    const showSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+      (e) => {
+        if (e?.endCoordinates?.height) {
+          setKeyboardHeight(e.endCoordinates.height);
+        }
+      }
+    );
+    const hideSub = Keyboard.addListener(
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+      () => {
+        setKeyboardHeight(0);
+      }
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   const [transactions, setTransactions] = useState<LedgerTransaction[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -60,6 +89,8 @@ export default function TransactionsScreen() {
     return params.filter === 'TODAY' ? 'TODAY' : 'ALL';
   });
   const [typeFilter, setTypeFilter] = useState<TypeFilterPreset>('ALL');
+  const [sortMode, setSortMode] = useState<TransactionSortMode>('DATE');
+  const [sortOrder, setSortOrder] = useState<TransactionSortOrder>('DESC');
 
   useEffect(() => {
     if (params.filter === 'TODAY') {
@@ -159,8 +190,7 @@ export default function TransactionsScreen() {
 
     const q = searchQuery.trim().toLowerCase().normalize('NFC');
 
-    return transactions
-      .filter((tx) => {
+    const filtered = transactions.filter((tx) => {
         // Exclude voided transactions: never show voided entries
         if (tx.isVoided) return false;
 
@@ -209,27 +239,16 @@ export default function TransactionsScreen() {
         }
 
         return true;
-      })
-      .sort((a, b) => {
-        // Sort newest created / entered first so transactions added today (even with previous dates) are on top.
-        // Fall back to transaction date if created timestamp is equal.
-        const createdA = new Date(a.createdAt || a.date).getTime();
-        const createdB = new Date(b.createdAt || b.date).getTime();
-        if (createdB !== createdA) {
-          return createdB - createdA;
-        }
-        const dateA = new Date(a.date || a.createdAt).getTime();
-        const dateB = new Date(b.date || b.createdAt).getTime();
-        if (dateB !== dateA) {
-          return dateB - dateA;
-        }
-        return (b.id || '').localeCompare(a.id || '');
       });
+
+    return sortTransactions(filtered, sortMode, sortOrder);
   }, [
     transactions,
     customerMap,
     dateFilter,
     typeFilter,
+    sortMode,
+    sortOrder,
     searchQuery,
     customStartDate,
     customEndDate,
@@ -262,8 +281,8 @@ export default function TransactionsScreen() {
     setEditAmount(paiseToRupees(tx.amountPaise).toString());
     setEditType(tx.type);
     setEditDate(tx.date || new Date().toISOString());
-    setEditDesc(tx.type === 'GAVE' ? '' : (tx.description || ''));
-    setEditBill(tx.billNumber || '');
+    setEditDesc(tx.description || '');
+    setEditBill(tx.type === 'GAVE' ? (tx.billNumber || '') : '');
     setEditAmountError('');
     setEditModalVisible(true);
     setTimeout(() => editAmountInputRef.current?.focus(), 80);
@@ -286,8 +305,8 @@ export default function TransactionsScreen() {
         transactionId: editingTx.id,
         amountPaise: parsedPaise,
         type: editType,
-        description: editType === 'GAVE' ? undefined : (editDesc.trim() || undefined),
-        billNumber: editBill.trim() || undefined,
+        description: editType === 'GOT' && editDesc.trim() ? editDesc.trim() : undefined,
+        billNumber: editType === 'GAVE' && editBill.trim() ? editBill.trim() : undefined,
         date: editDate,
       });
 
@@ -390,6 +409,102 @@ export default function TransactionsScreen() {
               onClear={() => setSearchQuery('')}
               autoFocus={false}
             />
+
+            {/* Sort Mode & Direction Controls (Date Wise vs Entry Wise) */}
+            <View style={styles.sortModeRow}>
+              <View
+                style={[
+                  styles.modeSegmentContainer,
+                  {
+                    backgroundColor: colors.borderLight,
+                    borderRadius: borderRadius.sm,
+                  },
+                ]}
+              >
+                <TouchableOpacity
+                  onPress={() => setSortMode('DATE')}
+                  style={[
+                    styles.modeSegmentBtn,
+                    sortMode === 'DATE' && {
+                      backgroundColor: colors.primary,
+                      borderRadius: borderRadius.sm,
+                    },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Sort Date Wise"
+                >
+                  <AppIcon
+                    name="calendar"
+                    size={12}
+                    color={sortMode === 'DATE' ? '#FFFFFF' : colors.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.modeSegmentText,
+                      {
+                        color: sortMode === 'DATE' ? '#FFFFFF' : colors.textSecondary,
+                        fontWeight: sortMode === 'DATE' ? '700' : '500',
+                      },
+                    ]}
+                  >
+                    Date Wise
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  onPress={() => setSortMode('ENTRY')}
+                  style={[
+                    styles.modeSegmentBtn,
+                    sortMode === 'ENTRY' && {
+                      backgroundColor: colors.primary,
+                      borderRadius: borderRadius.sm,
+                    },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Sort Entry Wise"
+                >
+                  <AppIcon
+                    name="clock"
+                    size={12}
+                    color={sortMode === 'ENTRY' ? '#FFFFFF' : colors.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.modeSegmentText,
+                      {
+                        color: sortMode === 'ENTRY' ? '#FFFFFF' : colors.textSecondary,
+                        fontWeight: sortMode === 'ENTRY' ? '700' : '500',
+                      },
+                    ]}
+                  >
+                    Entry Wise
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <TouchableOpacity
+                onPress={() => setSortOrder((prev) => (prev === 'DESC' ? 'ASC' : 'DESC'))}
+                style={[
+                  styles.directionBtn,
+                  {
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
+                    borderRadius: borderRadius.sm,
+                  },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel={`Toggle sort order: currently ${sortOrder === 'DESC' ? 'Newest First' : 'Oldest First'}`}
+              >
+                <AppIcon
+                  name={sortOrder === 'DESC' ? 'arrow-down' : 'arrow-up'}
+                  size={12}
+                  color={colors.primary}
+                />
+                <Text style={[styles.directionBtnText, { color: colors.primary }]}>
+                  {sortOrder === 'DESC' ? 'Newest First' : 'Oldest First'}
+                </Text>
+              </TouchableOpacity>
+            </View>
 
             {/* Date Preset Filter Bar (Day, Month, Year, Custom) */}
             <ScrollView
@@ -703,6 +818,21 @@ export default function TransactionsScreen() {
                     <Text style={[styles.txTimeText, { color: colors.textSecondary }]}>
                       {formattedDate} {formattedTime ? `• ${formattedTime}` : ''}
                     </Text>
+                    {Boolean(
+                      tx.createdAt &&
+                      (sortMode === 'ENTRY' ||
+                        new Date(tx.createdAt).toDateString() !== new Date(tx.date).toDateString())
+                    ) && (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 1 }}>
+                        <AppIcon name="clock" size={9} color={colors.textSecondary} />
+                        <Text style={{ fontSize: 10, color: colors.textSecondary }}>
+                          Entered: {new Date(tx.createdAt).toLocaleDateString('en-IN', {
+                            day: 'numeric',
+                            month: 'short',
+                          })}
+                        </Text>
+                      </View>
+                    )}
                   </View>
                 </TouchableOpacity>
 
@@ -742,14 +872,14 @@ export default function TransactionsScreen() {
               </View>
 
               {/* Note / Bill Description Row */}
-              {((tx.type !== 'GAVE' && tx.description) || tx.billNumber) && (
+              {(tx.description || (tx.type === 'GAVE' && tx.billNumber)) && (
                 <View
                   style={[
                     styles.txMetaDetailsRow,
                     { borderTopColor: colors.borderLight },
                   ]}
                 >
-                  {tx.type !== 'GAVE' && tx.description ? (
+                  {tx.description ? (
                     <Text
                       style={[styles.txDescText, { color: colors.textSecondary }]}
                       numberOfLines={2}
@@ -757,19 +887,21 @@ export default function TransactionsScreen() {
                       {tx.description}
                     </Text>
                   ) : null}
-                  {tx.billNumber ? (
+                  {tx.type === 'GAVE' && tx.billNumber ? (
                     <View
                       style={[
                         styles.billBadge,
                         {
                           backgroundColor: colors.borderLight,
+                          borderColor: colors.border,
+                          borderWidth: 1,
                           borderRadius: borderRadius.sm,
                         },
                       ]}
                     >
-                      <AppIcon name="tag" size={11} color={colors.textSecondary} />
-                      <Text style={[styles.billText, { color: colors.textSecondary }]}>
-                        Bill #{tx.billNumber}
+                      <AppIcon name="tag" size={11} color={colors.primary} />
+                      <Text style={[styles.billText, { color: colors.textPrimary }]}>
+                        Slip/Inv: {tx.billNumber}
                       </Text>
                     </View>
                   ) : null}
@@ -790,8 +922,8 @@ export default function TransactionsScreen() {
                     accessibilityRole="button"
                     accessibilityLabel="Share digital receipt on WhatsApp"
                   >
-                    <AppIcon name="share-2" size={13} color={colors.primary} />
-                    <Text style={[styles.actionFooterText, { color: colors.primary }]}>
+                    <AppIcon family="material" name="whatsapp" size={14} color="#25D366" />
+                    <Text style={[styles.actionFooterText, { color: '#25D366', fontWeight: '700' }]}>
                       Share Receipt
                     </Text>
                   </TouchableOpacity>
@@ -835,6 +967,7 @@ export default function TransactionsScreen() {
         visible={editModalVisible}
         transparent
         animationType="slide"
+        statusBarTranslucent
         onShow={() => {
           setTimeout(() => editAmountInputRef.current?.focus(), 80);
         }}
@@ -842,15 +975,29 @@ export default function TransactionsScreen() {
       >
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          style={styles.modalOverlay}
+          style={[styles.modalOverlay, { paddingTop: insets.top + 8 }]}
         >
+          {/* Backdrop Dismiss on Outside Tap */}
+          <TouchableOpacity
+            style={StyleSheet.absoluteFill}
+            activeOpacity={1}
+            onPress={() => setEditModalVisible(false)}
+          />
           <View
             style={[
               styles.modalSheet,
               {
                 backgroundColor: colors.surface,
                 borderColor: colors.border,
-                borderRadius: borderRadius.xl,
+                borderTopLeftRadius: borderRadius.xl,
+                borderTopRightRadius: borderRadius.xl,
+                borderBottomLeftRadius: 0,
+                borderBottomRightRadius: 0,
+                maxHeight: Dimensions.get('window').height - insets.top - 16,
+                paddingBottom:
+                  Platform.OS === 'android' && keyboardHeight > 0
+                    ? keyboardHeight + 20
+                    : (insets.bottom || 16),
               },
             ]}
           >
@@ -979,26 +1126,50 @@ export default function TransactionsScreen() {
                 autoFocus
               />
 
-              {/* Description Input (Only for Payments / YOU GOT) */}
+              {/* Invoice / Slip Number Input (Only for YOU GAVE) */}
+              {editType === 'GAVE' && (
+                <AppTextInput
+                  label="Invoice / Slip No. (Optional)"
+                  placeholder="e.g. 1042, 12-4, 2026-99"
+                  iconName="tag"
+                  value={editBill}
+                  onChangeText={setEditBill}
+                  keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
+                  autoCapitalize="characters"
+                  rightElement={
+                    <TouchableOpacity
+                      onPress={() => setEditBill((prev) => (prev ? `${prev}-` : '-'))}
+                      style={{
+                        backgroundColor: colors.borderLight,
+                        borderColor: colors.border,
+                        borderWidth: 1,
+                        borderRadius: borderRadius.sm,
+                        paddingHorizontal: 8,
+                        paddingVertical: 4,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                      accessibilityRole="button"
+                      accessibilityLabel="Insert hyphen"
+                    >
+                      <Text style={{ fontSize: 12, fontWeight: '700', color: colors.primary }}>
+                        — Dash
+                      </Text>
+                    </TouchableOpacity>
+                  }
+                />
+              )}
+
+              {/* Note / Description Input (Only for YOU GOT) */}
               {editType === 'GOT' && (
                 <AppTextInput
                   label="Payment Note / Description (Optional)"
-                  placeholder="e.g. Cash, UPI, Cheque payment"
+                  placeholder="e.g. Cash, UPI, Cheque payment, নগদ জমা"
                   iconName="edit-3"
                   value={editDesc}
                   onChangeText={setEditDesc}
                 />
               )}
-
-              {/* Bill Number Input (Numbers Only) */}
-              <AppTextInput
-                label="Bill / Invoice Number (Numbers Only)"
-                placeholder="e.g. 1042"
-                iconName="tag"
-                value={editBill}
-                keyboardType="number-pad"
-                onChangeText={(text) => setEditBill(text.replace(/[^0-9]/g, ''))}
-              />
 
               <View style={{ marginTop: 12 }}>
                 <AppButton
@@ -1431,5 +1602,40 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginBottom: 6,
     textTransform: 'uppercase',
+  },
+  sortModeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: 4,
+    gap: 8,
+  },
+  modeSegmentContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 2,
+    gap: 2,
+  },
+  modeSegmentBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+  },
+  modeSegmentText: {
+    fontSize: 11,
+  },
+  directionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderWidth: 1,
+  },
+  directionBtnText: {
+    fontSize: 11,
+    fontWeight: '600',
   },
 });

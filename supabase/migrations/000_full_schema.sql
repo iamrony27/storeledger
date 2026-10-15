@@ -88,6 +88,7 @@ CREATE TABLE IF NOT EXISTS public.ledger_transactions (
     type TEXT NOT NULL CHECK (type IN ('GAVE', 'GOT')),
     amount_paise BIGINT NOT NULL CHECK (amount_paise > 0),
     description TEXT,
+    bill_number TEXT,
     transaction_date TIMESTAMPTZ NOT NULL DEFAULT timezone('utc'::text, now()),
     bill_photo_url TEXT,
     is_opening_balance BOOLEAN NOT NULL DEFAULT false,
@@ -105,6 +106,10 @@ CREATE INDEX IF NOT EXISTS idx_transactions_cust_void
 
 CREATE INDEX IF NOT EXISTS idx_transactions_business_id 
     ON public.ledger_transactions(business_id);
+
+CREATE INDEX IF NOT EXISTS idx_transactions_bill_number 
+    ON public.ledger_transactions(business_id, bill_number) 
+    WHERE bill_number IS NOT NULL;
 
 DROP TRIGGER IF EXISTS set_transactions_updated_at ON public.ledger_transactions;
 CREATE TRIGGER set_transactions_updated_at

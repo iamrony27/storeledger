@@ -43,7 +43,7 @@ const AnimatedTabItem: React.FC<TabItemProps> = ({
       toValue: isFocused ? 1.06 : 1,
       friction: 6,
       tension: 180,
-      useNativeDriver: true,
+      useNativeDriver: Platform.OS !== 'web',
     }).start();
   }, [isFocused, scaleAnim]);
 

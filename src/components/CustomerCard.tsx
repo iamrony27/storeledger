@@ -10,6 +10,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { useLanguage } from '../i18n/LanguageContext';
 import { Customer } from '../types/customer';
 import { openWhatsAppReminder } from '../utils/communication';
+import { AppIcon } from './AppIcon';
 
 export interface CustomerCardProps {
   customer: Customer;
@@ -210,7 +211,10 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
             accessibilityLabel={`Remind ${customer.name} via WhatsApp`}
             style={styles.remindButton}
           >
-            <Text style={styles.remindText}>REMIND &gt;</Text>
+            <View style={styles.remindRow}>
+              <AppIcon family="material" name="whatsapp" size={13} color="#25D366" />
+              <Text style={styles.remindText}>REMIND &gt;</Text>
+            </View>
           </TouchableOpacity>
         ) : hasAdvance ? (
           <Text style={styles.advanceLabel}>Advance</Text>
@@ -317,10 +321,15 @@ const styles = StyleSheet.create({
   remindButton: {
     marginTop: 3,
   },
+  remindRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   remindText: {
     fontSize: 11.5,
     fontWeight: '800',
-    color: '#38BDF8', // Cyan/Light Blue matching screenshot "REMIND >"
+    color: '#25D366', // WhatsApp Green
     letterSpacing: 0.4,
   },
   advanceLabel: {

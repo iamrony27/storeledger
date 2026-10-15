@@ -17,6 +17,7 @@ interface AppTextInputProps extends TextInputProps {
   iconName?: string;
   iconFamily?: IconFamily;
   prefixText?: string;
+  rightElement?: React.ReactNode;
   onClear?: () => void;
   containerStyle?: ViewStyle;
 }
@@ -28,6 +29,7 @@ export const AppTextInput = React.forwardRef<TextInput, AppTextInputProps>((
     iconName,
     iconFamily = 'feather',
     prefixText,
+    rightElement,
     onClear,
     containerStyle,
     value,
@@ -107,6 +109,9 @@ export const AppTextInput = React.forwardRef<TextInput, AppTextInputProps>((
           >
             <AppIcon name="x" size={16} color={colors.textSecondary} />
           </TouchableOpacity>
+        ) : null}
+        {rightElement ? (
+          <View style={{ marginLeft: 6 }}>{rightElement}</View>
         ) : null}
       </View>
       {error && (

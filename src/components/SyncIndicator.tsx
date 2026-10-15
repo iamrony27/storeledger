@@ -7,6 +7,7 @@ import {
   Alert,
   Animated,
   Easing,
+  Platform,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { syncEngine } from '../sync/syncEngine';
@@ -46,7 +47,7 @@ export const SyncIndicator: React.FC<SyncIndicatorProps> = ({
           toValue: 1,
           duration: 900,
           easing: Easing.linear,
-          useNativeDriver: true,
+          useNativeDriver: Platform.OS !== 'web',
         })
       );
       spinLoop.start();
@@ -56,12 +57,12 @@ export const SyncIndicator: React.FC<SyncIndicatorProps> = ({
           Animated.timing(pulseAnim, {
             toValue: 0.6,
             duration: 450,
-            useNativeDriver: true,
+            useNativeDriver: Platform.OS !== 'web',
           }),
           Animated.timing(pulseAnim, {
             toValue: 1,
             duration: 450,
-            useNativeDriver: true,
+            useNativeDriver: Platform.OS !== 'web',
           }),
         ])
       );
@@ -92,7 +93,7 @@ export const SyncIndicator: React.FC<SyncIndicatorProps> = ({
       toValue: 1,
       duration: 700,
       easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
+      useNativeDriver: Platform.OS !== 'web',
     }).start();
 
     // 3. Inform user if offline or if there is an active error

@@ -10,6 +10,11 @@ import {
   saveQuickAmounts,
   subscribeQuickAmounts,
 } from '../../storage/quickAmountSettings';
+import {
+  sortTransactionsDateWise,
+  sortTransactionsEntryWise,
+  sortTransactions,
+} from '../transactionSort';
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -339,27 +344,33 @@ const backdatedTx: LedgerTransaction = {
   createdAt: '2026-10-13T18:00:00.000Z', // Recorded right now today!
 };
 
-// Sorting algorithm used across app (transactions.tsx & customer/[id].tsx)
-function sortTransactionsNewestFirst(txs: LedgerTransaction[]): LedgerTransaction[] {
-  return [...txs].sort((a, b) => {
-    const createdA = new Date(a.createdAt || a.date).getTime();
-    const createdB = new Date(b.createdAt || b.date).getTime();
-    if (createdB !== createdA) {
-      return createdB - createdA;
-    }
-    const dateA = new Date(a.date || a.createdAt).getTime();
-    const dateB = new Date(b.date || b.createdAt).getTime();
-    if (dateB !== dateA) {
-      return dateB - dateA;
-    }
-    return (b.id || '').localeCompare(a.id || '');
-  });
-}
+// 1. In Date Wise (DESC - default "date by date from up to down"):
+// Even though backdatedTx was entered today (2026-10-13), its transaction date is 2026-10-01 (oldest).
+// So it MUST be placed at the bottom, following date by date order!
+const dateWiseDesc = sortTransactionsDateWise([existingTx1, existingTx2, backdatedTx], 'DESC');
+assertEquals(dateWiseDesc[0].id, 'tx-hist-2', 'Newest transaction date (2026-10-12) MUST be on top in Date-Wise DESC');
+assertEquals(dateWiseDesc[1].id, 'tx-hist-1', 'Middle transaction date (2026-10-10) MUST be in the middle');
+assertEquals(dateWiseDesc[2].id, 'tx-backdated-today', 'Backdated transaction date (2026-10-01) MUST be at the bottom in Date-Wise DESC');
 
-const sortedList = sortTransactionsNewestFirst([existingTx1, existingTx2, backdatedTx]);
-assertEquals(sortedList[0].id, 'tx-backdated-today', 'Transaction entered today with previous date MUST be on top');
-assertEquals(sortedList[1].id, 'tx-hist-2', 'Second transaction must be the next most recently recorded');
-assertEquals(sortedList[2].id, 'tx-hist-1', 'Oldest recorded transaction must be at the bottom');
+// 2. In Date Wise (ASC - oldest date to newest date from up to down):
+const dateWiseAsc = sortTransactionsDateWise([existingTx1, existingTx2, backdatedTx], 'ASC');
+assertEquals(dateWiseAsc[0].id, 'tx-backdated-today', 'Earliest transaction date (2026-10-01) MUST be on top in Date-Wise ASC');
+assertEquals(dateWiseAsc[1].id, 'tx-hist-1', 'Middle transaction date (2026-10-10) MUST be in the middle');
+assertEquals(dateWiseAsc[2].id, 'tx-hist-2', 'Latest transaction date (2026-10-12) MUST be at the bottom in Date-Wise ASC');
+
+// 3. In Entry Wise (DESC):
+// Transactions are sorted by record creation time (createdAt).
+// The backdated transaction was created today (2026-10-13), so it MUST be on top!
+const entryWiseDesc = sortTransactionsEntryWise([existingTx1, existingTx2, backdatedTx], 'DESC');
+assertEquals(entryWiseDesc[0].id, 'tx-backdated-today', 'Transaction entered today MUST be on top in Entry-Wise DESC');
+assertEquals(entryWiseDesc[1].id, 'tx-hist-2', 'Second transaction must be the next most recently recorded');
+assertEquals(entryWiseDesc[2].id, 'tx-hist-1', 'Oldest recorded transaction must be at the bottom');
+
+// 4. Verify sortTransactions dispatcher matches the individual sorters
+const dispatchedDateWise = sortTransactions([existingTx1, existingTx2, backdatedTx], 'DATE', 'DESC');
+assertEquals(dispatchedDateWise[0].id, 'tx-hist-2', 'Dispatched DATE sort matches sortTransactionsDateWise');
+const dispatchedEntryWise = sortTransactions([existingTx1, existingTx2, backdatedTx], 'ENTRY', 'DESC');
+assertEquals(dispatchedEntryWise[0].id, 'tx-backdated-today', 'Dispatched ENTRY sort matches sortTransactionsEntryWise');
 
 // Also test Customer Recency Ranking when a transaction is added today with previous date
 const testCustomers: Customer[] = [

@@ -8,6 +8,15 @@ export {
   calculateCustomerBreakdown,
   calculateLedgerTotals,
 } from '../utils/ledgerMath';
+export type {
+  TransactionSortMode,
+  TransactionSortOrder,
+} from '../utils/transactionSort';
+export {
+  sortTransactions,
+  sortTransactionsDateWise,
+  sortTransactionsEntryWise,
+} from '../utils/transactionSort';
 
 export type SyncStatus = 'synced' | 'pending_insert' | 'pending_update' | 'pending_delete';
 

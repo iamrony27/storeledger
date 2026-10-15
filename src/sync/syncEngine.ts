@@ -26,6 +26,7 @@ class SyncEngine {
   private syncDebounceTimer: any = null;
   private netInfoUnsubscribe: (() => void) | null = null;
   private realtimeChannel: any = null;
+  private isBillNumberMissingOnRemote = false;
 
   constructor() {
     this.init();
@@ -212,7 +213,7 @@ class SyncEngine {
 
     // Ensure Realtime channel is connected to receive instant remote changes
     if (!this.realtimeChannel) {
-      this.setupRealtimeSubscription(userId);
+      void this.setupRealtimeSubscription(userId);
     }
 
     try {
@@ -293,23 +294,46 @@ class SyncEngine {
             tx.description?.toLowerCase().includes('opening') ||
             tx.id.includes('init')
           );
-          const { error } = await supabase.from('ledger_transactions').upsert(
-            {
-              id: tx.id,
-              business_id: userId,
-              customer_id: tx.customerId,
-              type: tx.type,
-              amount_paise: tx.amountPaise,
-              description: tx.type === 'GAVE' ? null : (tx.description || null),
-              transaction_date: tx.date,
-              is_opening_balance: isOpening,
-              is_void: Boolean(tx.isVoided),
-              void_reason: tx.voidReason || null,
-              created_at: tx.createdAt,
-              updated_at: tx.updatedAt || tx.createdAt,
-            },
+          const txPayload: any = {
+            id: tx.id,
+            business_id: userId,
+            customer_id: tx.customerId,
+            type: tx.type,
+            amount_paise: tx.amountPaise,
+            description: tx.description?.trim() || null,
+            transaction_date: tx.date,
+            is_opening_balance: isOpening,
+            is_void: Boolean(tx.isVoided),
+            void_reason: tx.voidReason || null,
+            created_at: tx.createdAt,
+            updated_at: tx.updatedAt || tx.createdAt,
+          };
+
+          if (!this.isBillNumberMissingOnRemote && tx.type === 'GAVE' && tx.billNumber?.trim()) {
+            txPayload.bill_number = tx.billNumber.trim();
+          }
+
+          let { error } = await supabase.from('ledger_transactions').upsert(
+            txPayload,
             { onConflict: 'id' }
           );
+
+          // Graceful backward-compatibility / schema cache resilience:
+          // If remote Supabase schema is missing 'bill_number' column (PGRST204),
+          // fallback without bill_number so the transaction is never stuck in the outbox queue.
+          if (
+            error &&
+            error.code === 'PGRST204' &&
+            (error.message?.includes('bill_number') || (error.details && String(error.details).includes('bill_number')))
+          ) {
+            this.isBillNumberMissingOnRemote = true;
+            delete txPayload.bill_number;
+            const retryRes = await supabase.from('ledger_transactions').upsert(
+              txPayload,
+              { onConflict: 'id' }
+            );
+            error = retryRes.error;
+          }
 
           if (error) throw error;
         }
@@ -355,18 +379,42 @@ class SyncEngine {
   }
 
   // Set up live Realtime websocket subscription for cross-device synchronization
-  public setupRealtimeSubscription(userId?: string): void {
+  public async setupRealtimeSubscription(userId?: string): Promise<void> {
     if (!isSupabaseConfigured()) return;
+
+    // 1. If we already have an active/connecting channel, avoid re-subscribing
     if (this.realtimeChannel) {
+      const state = (this.realtimeChannel as any).state;
+      if (state === 'joined' || state === 'joining') {
+        return;
+      }
       try {
-        supabase.removeChannel(this.realtimeChannel);
+        await supabase.removeChannel(this.realtimeChannel);
       } catch {}
       this.realtimeChannel = null;
     }
 
+    // 2. Check Supabase client's internal channels registry for any existing channel with our topic
     try {
-      this.realtimeChannel = supabase
-        .channel('public:realtime_ledger_sync')
+      const allChannels = typeof (supabase as any).getChannels === 'function'
+        ? (supabase as any).getChannels()
+        : [];
+      const stale = allChannels.find(
+        (c: any) => c.topic === 'realtime:public:realtime_ledger_sync' || c.subTopic === 'public:realtime_ledger_sync'
+      );
+      if (stale) {
+        if (stale.state === 'joined' || stale.state === 'joining') {
+          this.realtimeChannel = stale;
+          return;
+        }
+        await supabase.removeChannel(stale);
+      }
+    } catch {}
+
+    // 3. Create fresh channel with event listeners before subscribe()
+    try {
+      const channel = supabase.channel('public:realtime_ledger_sync');
+      channel
         .on(
           'postgres_changes',
           { event: '*', schema: 'public', table: 'ledger_transactions' },
@@ -386,9 +434,21 @@ class SyncEngine {
               this.syncNow();
             }
           }
-        )
-        .subscribe();
+        );
+
+      this.realtimeChannel = channel;
+      channel.subscribe((status) => {
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          try {
+            supabase.removeChannel(channel);
+          } catch {}
+          if (this.realtimeChannel === channel) {
+            this.realtimeChannel = null;
+          }
+        }
+      });
     } catch (e) {
+      this.realtimeChannel = null;
       console.warn('Failed to setup Realtime subscription:', e);
     }
   }

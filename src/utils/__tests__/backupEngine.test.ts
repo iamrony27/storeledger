@@ -130,6 +130,7 @@ export async function runAllBackupEngineTests() {
         customerId: 'cust-test-1',
         amountPaise: 150000,
         type: 'GAVE',
+        billNumber: 'SLIP-401',
         date: '2026-01-03T10:00:00.000Z',
         createdAt: '2026-01-03T10:00:00.000Z',
       },
@@ -155,6 +156,7 @@ export async function runAllBackupEngineTests() {
   assert(snapshot.metadata.dataSizeBytes > 0, 'Data size in bytes must be positive');
   assertEquals(snapshot.metadata.totalCustomers, 2, 'Total customers must be 2');
   assertEquals(snapshot.metadata.totalTransactions, 2, 'Total transactions must be 2');
+  assertEquals(snapshot.transactions['cust-test-1'][0].billNumber, 'SLIP-401', 'Backup snapshot preserves billNumber');
 
   // Voided Transaction Exclusion Invariant: Backup files must NEVER contain voided transactions
   const txMapWithVoided: Record<string, LedgerTransaction[]> = {
@@ -178,8 +180,8 @@ export async function runAllBackupEngineTests() {
     'Voided transaction must be completely removed from backup snapshot'
   );
 
-  // GAVE Transaction Description Exclusion Invariant: Backup files must NEVER store descriptions for GAVE transactions
-  const txMapWithGaveDesc: Record<string, LedgerTransaction[]> = {
+  // Transaction Description Preservation Invariant: Backup files must preserve descriptions for both GAVE and GOT
+  const txMapWithDesc: Record<string, LedgerTransaction[]> = {
     'cust-test-1': [
       {
         id: 'tx-gave-desc-1',
@@ -187,7 +189,7 @@ export async function runAllBackupEngineTests() {
         amountPaise: 120000,
         type: 'GAVE',
         date: '2026-01-05T00:00:00.000Z',
-        description: 'Should not be in backup',
+        description: 'Goods credit allowed',
         createdAt: '2026-01-05T00:00:00.000Z',
       },
       {
@@ -201,10 +203,10 @@ export async function runAllBackupEngineTests() {
       },
     ],
   };
-  const snapshotCleanDesc = assembleBackupSnapshot(sampleCustomers, txMapWithGaveDesc, cleanProfile);
+  const snapshotCleanDesc = assembleBackupSnapshot(sampleCustomers, txMapWithDesc, cleanProfile);
   const gaveTxInBackup = snapshotCleanDesc.transactions['cust-test-1'].find((t) => t.id === 'tx-gave-desc-1');
   const gotTxInBackup = snapshotCleanDesc.transactions['cust-test-1'].find((t) => t.id === 'tx-got-desc-2');
-  assertEquals(gaveTxInBackup?.description, undefined, 'GAVE transaction description must be undefined in backup');
+  assertEquals(gaveTxInBackup?.description, 'Goods credit allowed', 'GAVE transaction description must be preserved in backup');
   assertEquals(gotTxInBackup?.description, 'Payment receipt allowed', 'GOT payment description should be preserved in backup');
 
   // ==========================================================================

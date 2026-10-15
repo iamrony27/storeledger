@@ -12,6 +12,7 @@ import {
   Keyboard,
   Dimensions,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '../theme/ThemeContext';
 import { AppIcon } from './AppIcon';
@@ -50,6 +51,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
 }) => {
   const { colors, spacing, borderRadius } = useTheme();
   const { quickAmounts } = useQuickAmounts();
+  const insets = useSafeAreaInsets();
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [transactions, setTransactions] = useState<LedgerTransaction[]>([]);
@@ -221,8 +223,8 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
         customerId: selectedCustomer.id,
         amountPaise: parsedPaise,
         type: txType,
-        description: txType === 'GAVE' ? undefined : (description.trim() || undefined),
-        billNumber: billNumber.trim() || undefined,
+        description: txType === 'GOT' && description.trim() ? description.trim() : undefined,
+        billNumber: txType === 'GAVE' && billNumber.trim() ? billNumber.trim() : undefined,
         date: date,
       });
 
@@ -251,6 +253,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
       visible={visible}
       transparent
       animationType="slide"
+      statusBarTranslucent
       onShow={() => {
         if (selectedCustomer) {
           focusAmountKeypad();
@@ -262,24 +265,29 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
     >
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={[
-          styles.overlay,
-          Platform.OS === 'android' && keyboardHeight > 0
-            ? { paddingBottom: keyboardHeight }
-            : null,
-        ]}
+        style={[styles.overlay, { paddingTop: insets.top + 8 }]}
       >
+        {/* Backdrop Dismiss on Outside Tap */}
+        <TouchableOpacity
+          style={StyleSheet.absoluteFill}
+          activeOpacity={1}
+          onPress={onClose}
+        />
         <View
           style={[
             styles.sheet,
             {
               backgroundColor: colors.surface,
               borderColor: colors.border,
-              borderRadius: borderRadius.xl,
-              maxHeight:
-                keyboardHeight > 0
-                  ? Math.max(Dimensions.get('window').height - keyboardHeight - 40, 280)
-                  : '96%',
+              borderTopLeftRadius: borderRadius.xl,
+              borderTopRightRadius: borderRadius.xl,
+              borderBottomLeftRadius: 0,
+              borderBottomRightRadius: 0,
+              maxHeight: Dimensions.get('window').height - insets.top - 16,
+              paddingBottom:
+                Platform.OS === 'android' && keyboardHeight > 0
+                  ? keyboardHeight + 20
+                  : (Platform.OS === 'ios' ? 24 : 12),
             },
           ]}
         >
@@ -676,18 +684,42 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                   </View>
                 </View>
 
-                {/* Bill Number Input */}
-                <AppTextInput
-                  label="Bill / Invoice Number (Numbers Only)"
-                  placeholder="e.g. 1042"
-                  iconName="tag"
-                  value={billNumber}
-                  keyboardType="number-pad"
-                  onChangeText={(text) => setBillNumber(text.replace(/[^0-9]/g, ''))}
-                />
+                {/* Invoice / Slip Number Input (Only for YOU GAVE) */}
+                {txType === 'GAVE' && (
+                  <AppTextInput
+                    label="Invoice / Slip No. (Optional)"
+                    placeholder="e.g. 1042, 12-4, 2026-99"
+                    iconName="tag"
+                    value={billNumber}
+                    onChangeText={setBillNumber}
+                    keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
+                    autoCapitalize="characters"
+                    rightElement={
+                      <TouchableOpacity
+                        onPress={() => setBillNumber((prev) => (prev ? `${prev}-` : '-'))}
+                        style={{
+                          backgroundColor: colors.borderLight,
+                          borderColor: colors.border,
+                          borderWidth: 1,
+                          borderRadius: borderRadius.sm,
+                          paddingHorizontal: 8,
+                          paddingVertical: 4,
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                        }}
+                        accessibilityRole="button"
+                        accessibilityLabel="Insert hyphen"
+                      >
+                        <Text style={{ fontSize: 12, fontWeight: '700', color: colors.primary }}>
+                          — Dash
+                        </Text>
+                      </TouchableOpacity>
+                    }
+                  />
+                )}
 
-                {/* Description Input (Only for Payments / YOU GOT) */}
-                {txType !== 'GAVE' && (
+                {/* Description Input (Only for YOU GOT) */}
+                {txType === 'GOT' && (
                   <AppTextInput
                     label="Payment Note / Description (Optional)"
                     placeholder="e.g. Cash payment, UPI, Bank Transfer, নগদ জমা"
@@ -727,9 +759,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   sheet: {
-    height: '95%',
-    maxHeight: '96%',
-    minHeight: '85%',
+    maxHeight: '94%',
     borderTopWidth: 1,
     borderLeftWidth: 1,
     borderRightWidth: 1,

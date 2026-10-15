@@ -330,4 +330,120 @@ function triggerSync() {
 triggerSync();
 assertEquals(syncPendingAfterCurrent, true, 'Subsequent sync during in-flight sync must set pending flag');
 
+// 7. Testing Invoice / Slip Number (bill_number) Database Sync & Mapping Invariants
+console.log('7. Testing Invoice / Slip Number (bill_number) Database Sync & Mapping Invariants...');
+
+function buildSupabaseTxUpsertPayload(tx: LedgerTransaction, userId: string) {
+  const isOpening = Boolean(
+    tx.isOpeningBalance ||
+    tx.description?.toLowerCase().includes('opening') ||
+    tx.id.includes('init')
+  );
+  return {
+    id: tx.id,
+    business_id: userId,
+    customer_id: tx.customerId,
+    type: tx.type,
+    amount_paise: tx.amountPaise,
+    description: tx.description?.trim() || null,
+    bill_number: tx.type === 'GAVE' ? (tx.billNumber?.trim() || null) : null,
+    transaction_date: tx.date,
+    is_opening_balance: isOpening,
+    is_void: Boolean(tx.isVoided),
+    void_reason: tx.voidReason || null,
+    created_at: tx.createdAt,
+    updated_at: tx.updatedAt || tx.createdAt,
+  };
+}
+
+function mapRemoteTxToLocal(rt: any): LedgerTransaction {
+  const isOpening =
+    Boolean(rt.is_opening_balance) ||
+    (typeof rt.description === 'string' && rt.description.toLowerCase().includes('opening')) ||
+    (typeof rt.id === 'string' && rt.id.includes('init'));
+
+  return {
+    id: rt.id,
+    customerId: rt.customer_id,
+    amountPaise: Number(rt.amount_paise),
+    type: rt.type as any,
+    date: rt.transaction_date,
+    description: rt.description ? String(rt.description).trim() : undefined,
+    billNumber: rt.type === 'GAVE' && (rt.bill_number || rt.billNumber)
+      ? String(rt.bill_number || rt.billNumber).trim()
+      : undefined,
+    isOpeningBalance: isOpening,
+    isVoided: false,
+    createdAt: rt.created_at,
+    updatedAt: rt.updated_at,
+    syncStatus: 'synced',
+  };
+}
+
+// 7a. Alphanumeric slip number & description on GAVE sync to database
+const txWithSlip: LedgerTransaction = {
+  id: 'tx-slip-101',
+  customerId: 'cust-1',
+  amountPaise: 45000,
+  type: 'GAVE',
+  description: '50 Bags Paddy weighment',
+  date: '2026-10-14T10:00:00Z',
+  billNumber: 'SLIP-8902',
+  createdAt: '2026-10-14T10:00:00Z',
+};
+
+const payloadWithSlip = buildSupabaseTxUpsertPayload(txWithSlip, 'user-123');
+assertEquals(payloadWithSlip.bill_number, 'SLIP-8902', 'Database payload must contain bill_number when set on GAVE');
+assertEquals(payloadWithSlip.description, '50 Bags Paddy weighment', 'Database payload must preserve description on GAVE');
+
+// 7b. GOT transaction MUST NOT have bill_number in database, but MUST have description
+const txGot: LedgerTransaction = {
+  id: 'tx-slip-102',
+  customerId: 'cust-1',
+  amountPaise: 20000,
+  type: 'GOT',
+  description: 'GPay payment',
+  billNumber: 'SHOULD-BE-IGNORED',
+  date: '2026-10-14T10:00:00Z',
+  createdAt: '2026-10-14T10:00:00Z',
+};
+
+const payloadGot = buildSupabaseTxUpsertPayload(txGot, 'user-123');
+assertEquals(payloadGot.bill_number, null, 'GOT transactions must never store bill_number in database');
+assertEquals(payloadGot.description, 'GPay payment', 'GOT transaction description must be stored in database');
+
+// 7c. Remote database pull mapping back to local transaction for both GAVE and GOT
+const remoteRowGave = {
+  id: 'tx-remote-201',
+  customer_id: 'cust-1',
+  type: 'GAVE',
+  amount_paise: 95000,
+  description: 'Potato load weighment',
+  bill_number: 'INV-2026-99',
+  transaction_date: '2026-10-14T10:00:00Z',
+  created_at: '2026-10-14T10:00:00Z',
+  updated_at: '2026-10-14T10:00:00Z',
+};
+
+const localFromRemoteGave = mapRemoteTxToLocal(remoteRowGave);
+assertEquals(localFromRemoteGave.billNumber, 'INV-2026-99', 'Remote bill_number must be preserved in local LedgerTransaction for GAVE');
+assertEquals(localFromRemoteGave.description, 'Potato load weighment', 'Remote description must be preserved in local LedgerTransaction for GAVE');
+
+const remoteRowGot = {
+  id: 'tx-remote-202',
+  customer_id: 'cust-1',
+  type: 'GOT',
+  amount_paise: 50000,
+  description: 'Cash deposit at counter',
+  bill_number: 'LEFTOVER-ACCIDENTAL-BILL',
+  transaction_date: '2026-10-14T10:00:00Z',
+  created_at: '2026-10-14T10:00:00Z',
+  updated_at: '2026-10-14T10:00:00Z',
+};
+
+const localFromRemoteGot = mapRemoteTxToLocal(remoteRowGot);
+assertEquals(localFromRemoteGot.billNumber, undefined, 'GOT transactions must never map billNumber locally');
+assertEquals(localFromRemoteGot.description, 'Cash deposit at counter', 'GOT transactions must preserve description locally');
+
 console.log('\nAll Sync Engine & Conflict Resolution test suites passed successfully!\n');
+

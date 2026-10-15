@@ -9,6 +9,7 @@ import {
   ScrollView,
   RefreshControl,
   Alert,
+  Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -280,7 +281,7 @@ export default function CustomersScreen() {
         keyboardDismissMode="on-drag"
         onScroll={Animated.event(
           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
+          { useNativeDriver: Platform.OS !== 'web' }
         )}
         contentContainerStyle={[
           styles.listContainer,

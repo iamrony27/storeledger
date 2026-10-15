@@ -21,7 +21,7 @@ export interface TopBarActionButtonProps {
   accessibilityLabel: string;
   accessibilityHint?: string;
   badge?: number | string;
-  variant?: 'default' | 'primary' | 'danger' | 'ghost';
+  variant?: 'default' | 'primary' | 'danger' | 'ghost' | 'whatsapp';
 }
 
 export const TopBarActionButton: React.FC<TopBarActionButtonProps> = ({
@@ -36,6 +36,12 @@ export const TopBarActionButton: React.FC<TopBarActionButtonProps> = ({
 }) => {
   const getVariantStyles = () => {
     switch (variant) {
+      case 'whatsapp':
+        return {
+          bg: '#25D366',
+          border: 'rgba(255, 255, 255, 0.45)',
+          color: '#FFFFFF',
+        };
       case 'primary':
         return {
           bg: COLOR_HUNT_PALETTE.forestGreen, // #486C2F (Forest Green)

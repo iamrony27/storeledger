@@ -11,7 +11,14 @@ import {
 import { useTheme } from '../theme/ThemeContext';
 import { AppIcon, IconFamily } from './AppIcon';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'danger' | 'success';
+export type ButtonVariant =
+  | 'primary'
+  | 'secondary'
+  | 'outline'
+  | 'danger'
+  | 'success'
+  | 'flat'
+  | 'light';
 
 interface AppButtonProps {
   title: string;
@@ -24,6 +31,7 @@ interface AppButtonProps {
   style?: ViewStyle;
   textStyle?: TextStyle;
   size?: 'sm' | 'md' | 'lg';
+  radius?: 'none' | 'sm' | 'md' | 'lg' | 'full';
   accessibilityLabel?: string;
   accessibilityHint?: string;
 }
@@ -39,23 +47,36 @@ export const AppButton: React.FC<AppButtonProps> = ({
   style,
   textStyle,
   size = 'md',
+  radius = 'lg',
   accessibilityLabel,
   accessibilityHint,
 }) => {
-  const { colors, borderRadius, spacing } = useTheme();
+  const { colors, borderRadius, spacing, isDark } = useTheme();
 
   const getVariantStyles = () => {
     switch (variant) {
+      case 'flat':
+        return {
+          bg: isDark ? 'rgba(59, 130, 246, 0.16)' : 'rgba(37, 99, 235, 0.12)',
+          border: 'transparent',
+          text: colors.primary,
+        };
+      case 'light':
+        return {
+          bg: 'transparent',
+          border: 'transparent',
+          text: colors.textPrimary,
+        };
       case 'secondary':
         return {
-          bg: colors.borderLight,
+          bg: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.05)',
           border: colors.border,
           text: colors.textPrimary,
         };
       case 'outline':
         return {
           bg: 'transparent',
-          border: colors.border,
+          border: isDark ? 'rgba(255, 255, 255, 0.2)' : colors.border,
           text: colors.textPrimary,
         };
       case 'danger':
@@ -82,18 +103,34 @@ export const AppButton: React.FC<AppButtonProps> = ({
 
   const vStyles = getVariantStyles();
 
-  const minHeight = size === 'sm' ? 34 : size === 'lg' ? 50 : 42;
+  const minHeight = size === 'sm' ? 34 : size === 'lg' ? 52 : 44;
   const paddingVertical =
-    size === 'sm' ? spacing.xs + 2 : size === 'lg' ? spacing.lg : 10;
+    size === 'sm' ? spacing.xs + 2 : size === 'lg' ? spacing.md + 2 : 11;
   const paddingHorizontal =
-    size === 'sm' ? spacing.sm : size === 'lg' ? spacing.xl : 12;
+    size === 'sm' ? spacing.md : size === 'lg' ? spacing.xl : 16;
   const fontSize = size === 'sm' ? 12 : size === 'lg' ? 15 : 13.5;
+
+  const getButtonRadius = () => {
+    switch (radius) {
+      case 'none':
+        return 0;
+      case 'sm':
+        return borderRadius.sm;
+      case 'md':
+        return borderRadius.md;
+      case 'full':
+        return borderRadius.full;
+      case 'lg':
+      default:
+        return 14;
+    }
+  };
 
   return (
     <TouchableOpacity
       onPress={onPress}
       disabled={disabled || loading}
-      activeOpacity={0.8}
+      activeOpacity={0.75}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel || title}
       accessibilityHint={accessibilityHint}
@@ -102,12 +139,12 @@ export const AppButton: React.FC<AppButtonProps> = ({
         styles.button,
         {
           minHeight,
-          backgroundColor: disabled ? colors.border : vStyles.bg,
-          borderColor: disabled ? colors.border : vStyles.border,
-          borderRadius: borderRadius.md,
+          backgroundColor: disabled ? (isDark ? 'rgba(255, 255, 255, 0.06)' : colors.border) : vStyles.bg,
+          borderColor: disabled ? (isDark ? 'transparent' : colors.border) : vStyles.border,
+          borderRadius: getButtonRadius(),
           paddingVertical,
           paddingHorizontal,
-          opacity: disabled ? 0.6 : 1,
+          opacity: disabled ? 0.5 : 1,
         },
         style,
       ]}

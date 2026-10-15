@@ -276,7 +276,13 @@ export const CloudUsageCard: React.FC = () => {
 const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
+    borderRadius: 18,
     marginVertical: 6,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 1.5,
   },
   headerRow: {
     flexDirection: 'row',
@@ -292,7 +298,7 @@ const styles = StyleSheet.create({
   iconWrapper: {
     width: 38,
     height: 38,
-    borderRadius: 19,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -310,8 +316,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 6,
+    borderRadius: 9999,
   },
   refreshText: {
     fontSize: 12,
@@ -321,8 +328,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    padding: 10,
+    padding: 12,
     borderWidth: 1,
+    borderRadius: 14,
     marginBottom: 12,
   },
   warningTextContainer: {
@@ -338,6 +346,7 @@ const styles = StyleSheet.create({
   metricBlock: {
     padding: 12,
     borderWidth: 1,
+    borderRadius: 14,
   },
   metricHeaderRow: {
     flexDirection: 'row',

@@ -25,7 +25,7 @@ import {
 
 export default function LoginScreen() {
   const router = useRouter();
-  const { colors, spacing, borderRadius } = useTheme();
+  const { colors, spacing, borderRadius, isDark } = useTheme();
   const {
     isConfigured,
     reloadConfig,
@@ -184,8 +184,10 @@ export default function LoginScreen() {
               style={[
                 styles.logoBadge,
                 {
-                  backgroundColor: colors.primaryLight,
-                  borderRadius: borderRadius.full,
+                  backgroundColor: isDark ? 'rgba(239, 105, 5, 0.15)' : colors.primaryLight,
+                  borderRadius: 20,
+                  borderWidth: 1,
+                  borderColor: isDark ? 'rgba(239, 105, 5, 0.3)' : 'transparent',
                 },
               ]}
             >
@@ -207,10 +209,12 @@ export default function LoginScreen() {
               styles.statusBanner,
               {
                 backgroundColor: isConfigured
-                  ? colors.surface
+                  ? (isDark ? '#131B2E' : colors.surface)
                   : colors.warningBg,
-                borderColor: isConfigured ? colors.border : colors.warning,
-                borderRadius: borderRadius.md,
+                borderColor: isConfigured
+                  ? (isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border)
+                  : colors.warning,
+                borderRadius: 14,
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -243,9 +247,9 @@ export default function LoginScreen() {
             style={[
               styles.tabRow,
               {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
-                borderRadius: borderRadius.md,
+                backgroundColor: isDark ? '#131B2E' : colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+                borderRadius: 9999,
               },
             ]}
           >
@@ -258,7 +262,7 @@ export default function LoginScreen() {
                 styles.tabButton,
                 mode === 'signin' && {
                   backgroundColor: colors.primary,
-                  borderRadius: borderRadius.sm,
+                  borderRadius: 9999,
                 },
               ]}
             >
@@ -283,7 +287,7 @@ export default function LoginScreen() {
                 styles.tabButton,
                 mode === 'signup' && {
                   backgroundColor: colors.primary,
-                  borderRadius: borderRadius.sm,
+                  borderRadius: 9999,
                 },
               ]}
             >
@@ -417,9 +421,9 @@ export default function LoginScreen() {
             style={[
               styles.offlineButton,
               {
-                borderColor: colors.border,
-                borderRadius: borderRadius.md,
-                backgroundColor: colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
+                borderRadius: 14,
+                backgroundColor: isDark ? '#131B2E' : colors.surface,
               },
             ]}
           >
@@ -448,9 +452,9 @@ export default function LoginScreen() {
             style={[
               styles.modalCard,
               {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
-                borderRadius: borderRadius.lg,
+                backgroundColor: isDark ? '#131B2E' : colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(15, 23, 42, 0.08)',
+                borderRadius: 24,
               },
             ]}
           >
@@ -526,6 +530,7 @@ const styles = StyleSheet.create({
   logoBadge: {
     width: 64,
     height: 64,
+    borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 12,
@@ -546,6 +551,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 12,
     borderWidth: 1,
+    borderRadius: 14,
     marginBottom: 16,
     gap: 8,
   },
@@ -558,11 +564,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 4,
     borderWidth: 1,
+    borderRadius: 9999,
     marginBottom: 16,
   },
   tabButton: {
     flex: 1,
     paddingVertical: 10,
+    borderRadius: 9999,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -575,6 +583,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 12,
     borderWidth: 1,
+    borderRadius: 14,
     marginBottom: 16,
     gap: 8,
   },
@@ -609,6 +618,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 14,
     borderWidth: 1,
+    borderRadius: 14,
     gap: 8,
   },
   offlineButtonText: {
@@ -617,14 +627,20 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.55)',
+    backgroundColor: 'rgba(0, 0, 0, 0.65)',
     justifyContent: 'center',
     padding: 20,
   },
   modalCard: {
     borderWidth: 1,
-    padding: 20,
+    borderRadius: 24,
+    padding: 22,
     gap: 16,
+    elevation: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 10 },
   },
   modalHeader: {
     flexDirection: 'row',

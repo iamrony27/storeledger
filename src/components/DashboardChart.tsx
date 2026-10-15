@@ -42,7 +42,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
   customers,
   allTransactions = [],
 }) => {
-  const { colors, borderRadius, spacing } = useTheme();
+  const { colors, borderRadius, spacing, isDark } = useTheme();
   const [activeTab, setActiveTab] = useState<ChartTab>('30days');
   const [selectedPoint, setSelectedPoint] = useState<ChartDataPoint | null>(null);
 
@@ -252,9 +252,9 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
       style={[
         styles.container,
         {
-          backgroundColor: colors.surface,
-          borderColor: colors.border,
-          borderRadius: borderRadius.lg,
+          backgroundColor: isDark ? '#131B2E' : colors.surface,
+          borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+          borderRadius: 20,
           padding: spacing.md,
         },
       ]}
@@ -434,9 +434,9 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
           style={[
             styles.tappedDetailsCard,
             {
-              backgroundColor: colors.background,
+              backgroundColor: isDark ? '#0B0F19' : colors.background,
               borderColor: colors.primary,
-              borderRadius: borderRadius.md,
+              borderRadius: 14,
             },
           ]}
         >
@@ -739,7 +739,13 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
 const styles = StyleSheet.create({
   container: {
     borderWidth: 1,
+    borderRadius: 20,
     marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 3,
   },
   headerRow: {
     flexDirection: 'row',
@@ -817,8 +823,14 @@ const styles = StyleSheet.create({
   },
   tappedDetailsCard: {
     borderWidth: 1.5,
-    padding: 10,
+    borderRadius: 14,
+    padding: 12,
     marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
   },
   tappedHeaderRow: {
     flexDirection: 'row',
@@ -877,9 +889,9 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   debtorRankBadge: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 26,
+    height: 26,
+    borderRadius: 8,
     backgroundColor: 'rgba(37,99,235,0.08)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -929,7 +941,7 @@ const styles = StyleSheet.create({
   summaryCard: {
     flex: 1,
     borderWidth: 1,
-    borderRadius: 10,
+    borderRadius: 14,
     padding: 10,
   },
   summaryCardHeader: {

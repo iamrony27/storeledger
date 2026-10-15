@@ -49,7 +49,7 @@ type DateFilterPreset = 'TODAY' | 'MONTH' | 'YEAR' | 'ALL' | 'CUSTOM';
 type TypeFilterPreset = 'ALL' | 'GAVE' | 'GOT';
 
 export default function TransactionsScreen() {
-  const { colors, spacing, borderRadius } = useTheme();
+  const { colors, spacing, borderRadius, isDark } = useTheme();
   const { profile } = useAuth();
   const { handleScroll } = useTabBarVisibility();
   const insets = useSafeAreaInsets();
@@ -416,18 +416,19 @@ export default function TransactionsScreen() {
                 style={[
                   styles.modeSegmentContainer,
                   {
-                    backgroundColor: colors.borderLight,
-                    borderRadius: borderRadius.sm,
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : colors.borderLight,
+                    borderRadius: borderRadius.full,
                   },
                 ]}
               >
                 <TouchableOpacity
                   onPress={() => setSortMode('DATE')}
+                  activeOpacity={0.75}
                   style={[
                     styles.modeSegmentBtn,
                     sortMode === 'DATE' && {
                       backgroundColor: colors.primary,
-                      borderRadius: borderRadius.sm,
+                      borderRadius: borderRadius.full,
                     },
                   ]}
                   accessibilityRole="button"
@@ -453,11 +454,12 @@ export default function TransactionsScreen() {
 
                 <TouchableOpacity
                   onPress={() => setSortMode('ENTRY')}
+                  activeOpacity={0.75}
                   style={[
                     styles.modeSegmentBtn,
                     sortMode === 'ENTRY' && {
                       backgroundColor: colors.primary,
-                      borderRadius: borderRadius.sm,
+                      borderRadius: borderRadius.full,
                     },
                   ]}
                   accessibilityRole="button"
@@ -596,6 +598,7 @@ export default function TransactionsScreen() {
                   <TouchableOpacity
                     key={tf.key}
                     onPress={() => setTypeFilter(tf.key as TypeFilterPreset)}
+                    activeOpacity={0.75}
                     style={[
                       styles.typeFilterBtn,
                       {
@@ -605,7 +608,7 @@ export default function TransactionsScreen() {
                         borderColor: isActive
                           ? tf.color || colors.primary
                           : colors.border,
-                        borderRadius: borderRadius.md,
+                        borderRadius: borderRadius.full,
                       },
                     ]}
                   >
@@ -629,9 +632,9 @@ export default function TransactionsScreen() {
                 style={[
                   styles.kpiCard,
                   {
-                    backgroundColor: colors.surface,
-                    borderColor: colors.border,
-                    borderRadius: borderRadius.lg,
+                    backgroundColor: isDark ? '#131B2E' : colors.surface,
+                    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+                    borderRadius: 18,
                   },
                 ]}
               >
@@ -642,7 +645,7 @@ export default function TransactionsScreen() {
                       { backgroundColor: colors.dangerBg },
                     ]}
                   >
-                    <AppIcon name="arrow-up-right" size={14} color={colors.danger} />
+                    <AppIcon name="arrow-up-right" size={13} color={colors.danger} />
                   </View>
                   <Text style={[styles.kpiTitle, { color: colors.textSecondary }]}>
                     You Gave
@@ -661,9 +664,9 @@ export default function TransactionsScreen() {
                 style={[
                   styles.kpiCard,
                   {
-                    backgroundColor: colors.surface,
-                    borderColor: colors.border,
-                    borderRadius: borderRadius.lg,
+                    backgroundColor: isDark ? '#131B2E' : colors.surface,
+                    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+                    borderRadius: 18,
                   },
                 ]}
               >
@@ -674,7 +677,7 @@ export default function TransactionsScreen() {
                       { backgroundColor: colors.successBg },
                     ]}
                   >
-                    <AppIcon name="arrow-down-left" size={14} color={colors.success} />
+                    <AppIcon name="arrow-down-left" size={13} color={colors.success} />
                   </View>
                   <Text style={[styles.kpiTitle, { color: colors.textSecondary }]}>
                     You Got
@@ -778,9 +781,9 @@ export default function TransactionsScreen() {
               style={[
                 styles.txCard,
                 {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                  borderRadius: borderRadius.lg,
+                  backgroundColor: isDark ? '#131B2E' : colors.surface,
+                  borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+                  borderRadius: 16,
                 },
               ]}
             >
@@ -799,7 +802,7 @@ export default function TransactionsScreen() {
                       {
                         backgroundColor: colors.primaryLight,
                         borderColor: colors.primary,
-                        borderRadius: borderRadius.full,
+                        borderRadius: 12,
                       },
                     ]}
                   >
@@ -853,7 +856,7 @@ export default function TransactionsScreen() {
                       styles.txBadgeBox,
                       {
                         backgroundColor: isGave ? colors.dangerBg : colors.successBg,
-                        borderRadius: borderRadius.sm,
+                        borderRadius: borderRadius.full,
                       },
                     ]}
                   >

@@ -25,7 +25,7 @@ export const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
   date,
   onDateChange,
 }) => {
-  const { colors, borderRadius } = useTheme();
+  const { colors, borderRadius, isDark } = useTheme();
   const [modalVisible, setModalVisible] = useState(false);
 
   const parsedDate = date ? new Date(date) : new Date();
@@ -142,9 +142,9 @@ export const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
           style={[
             styles.chip,
             {
-              backgroundColor: currentlyToday ? colors.primary : colors.inputBg,
-              borderColor: currentlyToday ? colors.primary : colors.border,
-              borderRadius: borderRadius.sm,
+              backgroundColor: currentlyToday ? colors.primary : (isDark ? 'rgba(255,255,255,0.06)' : colors.inputBg),
+              borderColor: currentlyToday ? colors.primary : (isDark ? 'rgba(255,255,255,0.1)' : colors.border),
+              borderRadius: 10,
             },
           ]}
         >
@@ -165,9 +165,9 @@ export const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
             {
               backgroundColor: currentlyYesterday
                 ? colors.primary
-                : colors.inputBg,
-              borderColor: currentlyYesterday ? colors.primary : colors.border,
-              borderRadius: borderRadius.sm,
+                : (isDark ? 'rgba(255,255,255,0.06)' : colors.inputBg),
+              borderColor: currentlyYesterday ? colors.primary : (isDark ? 'rgba(255,255,255,0.1)' : colors.border),
+              borderRadius: 10,
             },
           ]}
         >
@@ -189,12 +189,12 @@ export const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
               backgroundColor:
                 !currentlyToday && !currentlyYesterday
                   ? colors.primaryLight
-                  : colors.inputBg,
+                  : (isDark ? 'rgba(255,255,255,0.06)' : colors.inputBg),
               borderColor:
                 !currentlyToday && !currentlyYesterday
                   ? colors.primary
-                  : colors.border,
-              borderRadius: borderRadius.sm,
+                  : (isDark ? 'rgba(255,255,255,0.1)' : colors.border),
+              borderRadius: 10,
             },
           ]}
         >
@@ -236,9 +236,9 @@ export const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
             style={[
               styles.calendarCard,
               {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
-                borderRadius: borderRadius.lg,
+                backgroundColor: isDark ? '#131B2E' : colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(15, 23, 42, 0.08)',
+                borderRadius: 24,
               },
             ]}
           >
@@ -320,7 +320,10 @@ export const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
                 onPress={() => setModalVisible(false)}
                 style={[
                   styles.cancelBtn,
-                  { borderColor: colors.border, borderRadius: borderRadius.sm },
+                  {
+                    borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : colors.border,
+                    borderRadius: 12,
+                  },
                 ]}
               >
                 <Text style={[styles.cancelBtnText, { color: colors.textSecondary }]}>
@@ -332,7 +335,7 @@ export const TransactionDatePicker: React.FC<TransactionDatePickerProps> = ({
                 onPress={handleConfirmDate}
                 style={[
                   styles.confirmBtn,
-                  { backgroundColor: colors.primary, borderRadius: borderRadius.sm },
+                  { backgroundColor: colors.primary, borderRadius: 12 },
                 ]}
               >
                 <Text style={styles.confirmBtnText}>Set Date</Text>
@@ -390,13 +393,14 @@ const styles = StyleSheet.create({
   calendarCard: {
     width: '100%',
     maxWidth: 340,
-    padding: 18,
+    padding: 20,
     borderWidth: 1,
-    elevation: 8,
+    borderRadius: 24,
+    elevation: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.2,
+    shadowRadius: 20,
   },
   calendarHeader: {
     flexDirection: 'row',
@@ -450,17 +454,19 @@ const styles = StyleSheet.create({
     borderTopColor: '#E2E8F0',
   },
   cancelBtn: {
-    paddingVertical: 8,
+    paddingVertical: 10,
     paddingHorizontal: 16,
     borderWidth: 1,
+    borderRadius: 12,
   },
   cancelBtnText: {
     fontSize: 14,
     fontWeight: '600',
   },
   confirmBtn: {
-    paddingVertical: 8,
+    paddingVertical: 10,
     paddingHorizontal: 18,
+    borderRadius: 12,
   },
   confirmBtnText: {
     color: '#FFFFFF',

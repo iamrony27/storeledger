@@ -312,6 +312,7 @@ export default function CustomersScreen() {
                   <TouchableOpacity
                     key={f.key}
                     onPress={() => setActiveFilter(f.key)}
+                    activeOpacity={0.75}
                     accessibilityRole="button"
                     accessibilityLabel={`Filter by ${f.label}`}
                     style={[
@@ -319,20 +320,21 @@ export default function CustomersScreen() {
                       {
                         backgroundColor: isActive
                           ? colors.primary
-                          : colors.surface,
+                          : (colors.surfaceElevated || colors.surface),
                         borderColor: isActive
                           ? colors.primary
                           : colors.border,
                         borderRadius: borderRadius.full,
                       },
+                      isActive && styles.filterChipActiveShadow,
                     ]}
                   >
                     <Text
                       style={[
                         styles.filterChipText,
                         {
-                          color: isActive ? '#FFFFFF' : colors.textPrimary,
-                          fontWeight: isActive ? '700' : '500',
+                          color: isActive ? '#FFFFFF' : colors.textSecondary,
+                          fontWeight: isActive ? '700' : '600',
                         },
                       ]}
                     >
@@ -583,17 +585,25 @@ const styles = StyleSheet.create({
   filterChipText: {
     fontSize: 12,
   },
+  filterChipActiveShadow: {
+    shadowColor: '#2563EB',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
+  },
   sortBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 10,
+    paddingHorizontal: 4,
   },
   customerCountText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.6,
   },
   sortGroup: {
     flexDirection: 'row',
@@ -603,27 +613,29 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 6,
     borderWidth: 1,
+    borderRadius: 9999,
   },
   sortButtonText: {
-    fontSize: 11,
+    fontSize: 11.5,
     fontWeight: '600',
   },
   todayDueCard: {
     borderWidth: 1,
+    borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
     marginBottom: 12,
-    elevation: 1,
+    elevation: 2,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
   },
   todayDueLeft: {
     flexDirection: 'row',

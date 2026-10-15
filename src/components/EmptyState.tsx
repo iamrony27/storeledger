@@ -21,7 +21,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   actionTitle,
   onAction,
 }) => {
-  const { colors, spacing, borderRadius } = useTheme();
+  const { colors, spacing, isDark } = useTheme();
 
   return (
     <View style={[styles.container, { padding: spacing.xxl }]}>
@@ -29,9 +29,9 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
         style={[
           styles.iconCircle,
           {
-            backgroundColor: colors.borderLight,
-            borderColor: colors.border,
-            borderRadius: borderRadius.full,
+            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : colors.borderLight,
+            borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
+            borderRadius: 24,
           },
         ]}
       >

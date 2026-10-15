@@ -556,8 +556,8 @@ export default function CustomerDetailScreen() {
             styles.balanceCard,
             {
               backgroundColor: colors.surface,
-              borderColor: colors.border,
-              borderRadius: borderRadius.lg,
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+              borderRadius: 20,
             },
           ]}
         >
@@ -572,6 +572,7 @@ export default function CustomerDetailScreen() {
             </Text>
             <Badge
               type={balanceType}
+              showDot={true}
               label={
                 balanceType === 'GET'
                   ? t.dashboard.filterGet
@@ -603,10 +604,10 @@ export default function CustomerDetailScreen() {
             style={[
               styles.customerKpiContainer,
               {
-                backgroundColor: colors.background,
-                borderColor: colors.borderLight,
-                borderRadius: borderRadius.md,
-                padding: spacing.sm,
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(15, 23, 42, 0.03)',
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(15, 23, 42, 0.06)',
+                borderRadius: 14,
+                padding: spacing.sm + 2,
                 marginVertical: spacing.sm,
               },
             ]}
@@ -628,7 +629,7 @@ export default function CustomerDetailScreen() {
               </Text>
             </View>
 
-            <View style={[styles.kpiVerticalDivider, { backgroundColor: colors.border }]} />
+            <View style={[styles.kpiVerticalDivider, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : colors.border }]} />
 
             <View style={styles.customerKpiItem}>
               <View style={styles.kpiHeaderRow}>
@@ -647,7 +648,7 @@ export default function CustomerDetailScreen() {
               </Text>
             </View>
 
-            <View style={[styles.kpiVerticalDivider, { backgroundColor: colors.border }]} />
+            <View style={[styles.kpiVerticalDivider, { backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : colors.border }]} />
 
             <View style={[styles.customerKpiItem, { alignItems: 'flex-end' }]}>
               <View style={styles.kpiHeaderRow}>
@@ -679,10 +680,10 @@ export default function CustomerDetailScreen() {
             style={[
               styles.addressBox,
               {
-                backgroundColor: colors.background,
-                borderColor: colors.borderLight,
-                borderRadius: borderRadius.md,
-                padding: spacing.sm,
+                backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(15, 23, 42, 0.03)',
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(15, 23, 42, 0.06)',
+                borderRadius: 14,
+                padding: spacing.sm + 2,
                 marginVertical: spacing.xs,
               },
             ]}
@@ -714,16 +715,17 @@ export default function CustomerDetailScreen() {
           <View style={styles.quickActionRow}>
             <TouchableOpacity
               onPress={handleCall}
+              activeOpacity={0.75}
               style={[
                 styles.quickActionBtn,
                 {
-                  backgroundColor: colors.borderLight,
-                  borderColor: colors.border,
-                  borderRadius: borderRadius.md,
+                  backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : colors.borderLight,
+                  borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : colors.border,
+                  borderRadius: borderRadius.full,
                 },
               ]}
             >
-              <AppIcon name="phone" size={14} color={colors.primary} />
+              <AppIcon name="phone" size={13} color={colors.primary} />
               <Text style={[styles.quickActionText, { color: colors.primary }]}>
                 Call
               </Text>
@@ -731,19 +733,20 @@ export default function CustomerDetailScreen() {
 
             <TouchableOpacity
               onPress={handleWhatsApp}
+              activeOpacity={0.75}
               style={[
                 styles.quickActionBtn,
                 {
                   backgroundColor: isDark ? 'rgba(37, 211, 102, 0.16)' : '#E7FCE8',
                   borderColor: '#25D366',
-                  borderRadius: borderRadius.md,
+                  borderRadius: borderRadius.full,
                 },
               ]}
             >
               <AppIcon
                 family="material"
                 name="whatsapp"
-                size={16}
+                size={15}
                 color="#25D366"
               />
               <Text style={[styles.quickActionText, { color: isDark ? '#25D366' : '#128C7E' }]}>
@@ -754,19 +757,20 @@ export default function CustomerDetailScreen() {
             <TouchableOpacity
               onPress={handleSharePdf}
               disabled={isGeneratingPdf}
+              activeOpacity={0.75}
               style={[
                 styles.quickActionBtn,
                 {
                   backgroundColor: colors.primaryLight,
                   borderColor: colors.primary,
-                  borderRadius: borderRadius.md,
+                  borderRadius: borderRadius.full,
                 },
               ]}
             >
               {isGeneratingPdf ? (
                 <ActivityIndicator size="small" color={colors.primary} />
               ) : (
-                <AppIcon name="download" size={14} color={colors.primary} />
+                <AppIcon name="download" size={13} color={colors.primary} />
               )}
               <Text style={[styles.quickActionText, { color: colors.primary }]}>
                 Statement
@@ -1094,9 +1098,9 @@ export default function CustomerDetailScreen() {
                     style={[
                       styles.txCard,
                       {
-                        backgroundColor: colors.surface,
-                        borderColor: colors.border,
-                        borderRadius: borderRadius.md,
+                        backgroundColor: isDark ? '#131B2E' : colors.surface,
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+                        borderRadius: 16,
                       },
                     ]}
                   >
@@ -1109,6 +1113,7 @@ export default function CustomerDetailScreen() {
                               backgroundColor: isGave
                                 ? colors.youWillGetBg
                                 : colors.youWillGiveBg,
+                              borderRadius: 12,
                             },
                           ]}
                         >
@@ -1163,9 +1168,9 @@ export default function CustomerDetailScreen() {
                               style={[
                                 styles.txBillBadge,
                                 {
-                                  backgroundColor: colors.borderLight,
-                                  borderColor: colors.border,
-                                  borderRadius: borderRadius.sm,
+                                  backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : colors.borderLight,
+                                  borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : colors.border,
+                                  borderRadius: borderRadius.full,
                                 },
                               ]}
                             >
@@ -1201,7 +1206,7 @@ export default function CustomerDetailScreen() {
                             backgroundColor: isGave
                               ? colors.youWillGetBg
                               : colors.youWillGiveBg,
-                            borderRadius: borderRadius.sm,
+                            borderRadius: borderRadius.full,
                           },
                         ]}
                       >
@@ -1278,25 +1283,25 @@ export default function CustomerDetailScreen() {
       >
         <TouchableOpacity
           onPress={() => openTxModal('GAVE')}
-          activeOpacity={0.85}
+          activeOpacity={0.78}
           style={[
             styles.actionButtonSplit,
-            { backgroundColor: colors.danger, borderRadius: borderRadius.md },
+            { backgroundColor: colors.danger, borderRadius: 16 },
           ]}
         >
-          <AppIcon name="arrow-up-right" size={18} color="#FFFFFF" />
+          <AppIcon name="arrow-up-right" size={17} color="#FFFFFF" />
           <Text style={styles.actionBtnLabel}>YOU GAVE</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => openTxModal('GOT')}
-          activeOpacity={0.85}
+          activeOpacity={0.78}
           style={[
             styles.actionButtonSplit,
-            { backgroundColor: colors.success, borderRadius: borderRadius.md },
+            { backgroundColor: colors.success, borderRadius: 16 },
           ]}
         >
-          <AppIcon name="arrow-down-left" size={18} color="#FFFFFF" />
+          <AppIcon name="arrow-down-left" size={17} color="#FFFFFF" />
           <Text style={styles.actionBtnLabel}>YOU GOT</Text>
         </TouchableOpacity>
       </View>
@@ -1925,7 +1930,13 @@ const styles = StyleSheet.create({
   },
   balanceCard: {
     borderWidth: 1,
-    padding: 16,
+    borderRadius: 20,
+    padding: 18,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 3,
   },
   balanceCardHeader: {
     flexDirection: 'row',
@@ -2078,13 +2089,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 14,
+    borderRadius: 16,
     gap: 8,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 4,
+    elevation: 2,
   },
   actionBtnLabel: {
     color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 0.3,
+    fontSize: 12.5,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   backBtn: {
     paddingHorizontal: 20,

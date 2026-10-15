@@ -26,7 +26,7 @@ import {
 import { resetLedgerToGoldenWeighBridge } from '../storage/localLedgerRepository';
 
 export default function ImportScreen() {
-  const { colors, borderRadius } = useTheme();
+  const { colors, borderRadius, isDark } = useTheme();
 
   const [isImporting, setIsImporting] = useState(false);
   const [status, setStatus] = useState<MockDataStatus | null>(null);
@@ -165,9 +165,11 @@ export default function ImportScreen() {
           style={[
             styles.heroCard,
             {
-              backgroundColor: colors.surface,
-              borderColor: isAlreadyPresent ? colors.success : colors.primary,
-              borderRadius: borderRadius.lg,
+              backgroundColor: isDark ? '#131B2E' : colors.surface,
+              borderColor: isAlreadyPresent
+                ? (isDark ? 'rgba(72, 108, 47, 0.5)' : colors.success)
+                : (isDark ? 'rgba(239, 105, 5, 0.4)' : colors.primary),
+              borderRadius: 20,
             },
           ]}
         >
@@ -179,6 +181,7 @@ export default function ImportScreen() {
                   backgroundColor: isAlreadyPresent
                     ? colors.successBg
                     : colors.primaryLight,
+                  borderRadius: 14,
                 },
               ]}
             >
@@ -211,9 +214,9 @@ export default function ImportScreen() {
             style={[
               styles.statsGrid,
               {
-                backgroundColor: colors.background,
-                borderRadius: borderRadius.md,
-                borderColor: colors.border,
+                backgroundColor: isDark ? '#0B0F19' : colors.background,
+                borderRadius: 14,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
               },
             ]}
           >
@@ -333,9 +336,9 @@ export default function ImportScreen() {
           style={[
             styles.searchContainer,
             {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-              borderRadius: borderRadius.md,
+              backgroundColor: isDark ? '#131B2E' : colors.surface,
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+              borderRadius: 14,
             },
           ]}
         >
@@ -370,8 +373,8 @@ export default function ImportScreen() {
                 style={[
                   styles.filterPill,
                   {
-                    backgroundColor: isSelected ? colors.primary : colors.surface,
-                    borderColor: isSelected ? colors.primary : colors.border,
+                    backgroundColor: isSelected ? colors.primary : (isDark ? '#131B2E' : colors.surface),
+                    borderColor: isSelected ? colors.primary : (isDark ? 'rgba(255,255,255,0.08)' : colors.border),
                     borderRadius: borderRadius.full,
                   },
                 ]}
@@ -400,9 +403,9 @@ export default function ImportScreen() {
               style={[
                 styles.customerCard,
                 {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                  borderRadius: borderRadius.md,
+                  backgroundColor: isDark ? '#131B2E' : colors.surface,
+                  borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+                  borderRadius: 16,
                 },
               ]}
             >
@@ -411,8 +414,10 @@ export default function ImportScreen() {
                   style={[
                     styles.custAvatar,
                     {
-                      backgroundColor: hasDue ? colors.youWillGetBg : colors.surfaceElevated,
-                      borderRadius: borderRadius.full,
+                      backgroundColor: hasDue
+                        ? colors.youWillGetBg
+                        : (isDark ? 'rgba(255,255,255,0.06)' : colors.surfaceElevated),
+                      borderRadius: 12,
                     },
                   ]}
                 >
@@ -472,9 +477,9 @@ export default function ImportScreen() {
             style={[
               styles.modalCard,
               {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
-                borderRadius: borderRadius.xl,
+                backgroundColor: isDark ? '#131B2E' : colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(15, 23, 42, 0.08)',
+                borderRadius: 24,
               },
             ]}
           >
@@ -482,7 +487,7 @@ export default function ImportScreen() {
             <View
               style={[
                 styles.modalIconBox,
-                { backgroundColor: colors.primaryLight, borderRadius: borderRadius.full },
+                { backgroundColor: colors.primaryLight, borderRadius: 16 },
               ]}
             >
               <AppIcon name="lock" size={24} color={colors.primary} />
@@ -503,9 +508,11 @@ export default function ImportScreen() {
               style={[
                 styles.passwordInputContainer,
                 {
-                  backgroundColor: colors.background,
-                  borderColor: passwordError ? colors.danger : colors.border,
-                  borderRadius: borderRadius.md,
+                  backgroundColor: isDark ? '#0B0F19' : colors.background,
+                  borderColor: passwordError
+                    ? colors.danger
+                    : (isDark ? 'rgba(255, 255, 255, 0.12)' : colors.border),
+                  borderRadius: 14,
                 },
               ]}
             >
@@ -611,13 +618,14 @@ const styles = StyleSheet.create({
   },
   heroCard: {
     borderWidth: 1.5,
-    padding: 16,
+    borderRadius: 20,
+    padding: 18,
     marginBottom: 20,
-    elevation: 2,
+    elevation: 3,
     shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
   },
   heroHeader: {
     flexDirection: 'row',
@@ -628,7 +636,7 @@ const styles = StyleSheet.create({
   heroIconBox: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -644,6 +652,7 @@ const styles = StyleSheet.create({
   statsGrid: {
     flexDirection: 'row',
     borderWidth: 1,
+    borderRadius: 14,
     paddingVertical: 12,
     paddingHorizontal: 8,
     marginBottom: 14,
@@ -668,6 +677,7 @@ const styles = StyleSheet.create({
   infoBanner: {
     flexDirection: 'row',
     alignItems: 'center',
+    borderRadius: 12,
     padding: 10,
     gap: 8,
     marginBottom: 14,
@@ -695,8 +705,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
+    borderRadius: 14,
     paddingHorizontal: 12,
-    height: 40,
+    height: 44,
     marginBottom: 12,
     gap: 8,
   },
@@ -724,8 +735,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
+    borderRadius: 16,
     padding: 12,
     marginBottom: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.03,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
   custLeft: {
     flexDirection: 'row',
@@ -734,8 +751,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   custAvatar: {
-    width: 36,
-    height: 36,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -776,17 +794,19 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 360,
     borderWidth: 1,
+    borderRadius: 24,
     padding: 24,
     alignItems: 'center',
-    elevation: 8,
+    elevation: 12,
     shadowColor: '#000',
     shadowOpacity: 0.25,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 10 },
   },
   modalIconBox: {
-    width: 52,
-    height: 52,
+    width: 54,
+    height: 54,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 14,
@@ -808,6 +828,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     borderWidth: 1.5,
+    borderRadius: 14,
     paddingHorizontal: 12,
     height: 48,
     marginBottom: 8,

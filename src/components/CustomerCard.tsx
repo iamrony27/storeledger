@@ -122,10 +122,10 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
   return (
     <View
       style={[
-        styles.rowContainer,
+        styles.cardContainer,
         {
-          borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.07)' : 'rgba(15, 23, 42, 0.08)',
-          backgroundColor: isDark ? '#000000' : colors.surface,
+          borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+          backgroundColor: isDark ? '#131B2E' : colors.surface,
         },
       ]}
     >
@@ -139,12 +139,25 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
         accessibilityHint="Tap to view customer ledger details"
         style={styles.leftCol}
       >
-        {/* Circular Avatar (White background with dark bold initials like screenshot) */}
+        {/* Squircle Avatar with HeroUI smooth geometry */}
         {customer.avatarUrl ? (
           <Image source={{ uri: customer.avatarUrl }} style={styles.avatarImage} />
         ) : (
-          <View style={styles.avatarCircle}>
-            <Text style={styles.avatarText}>
+          <View
+            style={[
+              styles.avatarSquircle,
+              {
+                backgroundColor: isDark ? '#1E293B' : '#F1F5F9',
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(15, 23, 42, 0.08)',
+              },
+            ]}
+          >
+            <Text
+              style={[
+                styles.avatarText,
+                { color: isDark ? '#F8FAFC' : '#0F172A' },
+              ]}
+            >
               {getInitials(customer.name)}
             </Text>
           </View>
@@ -161,25 +174,28 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
           >
             {customer.name}
           </Text>
-          <Text
-            style={[
-              styles.timeText,
-              { color: isDark ? '#94A3B8' : '#64748B' },
-            ]}
-            numberOfLines={1}
-          >
-            {relativeTime}
-          </Text>
+          <View style={styles.metaRow}>
+            <AppIcon
+              family="feather"
+              name="clock"
+              size={11}
+              color={isDark ? '#64748B' : '#94A3B8'}
+            />
+            <Text
+              style={[
+                styles.timeText,
+                { color: isDark ? '#94A3B8' : '#64748B' },
+              ]}
+              numberOfLines={1}
+            >
+              {relativeTime}
+            </Text>
+          </View>
         </View>
       </TouchableOpacity>
 
-      {/* Right Column: Due Amount + REMIND > link (Sibling controls, NOT nested!) */}
-      <View
-        style={[
-          styles.rightCol,
-          hasDue && (isDark ? styles.rightColDueDark : styles.rightColDueLight),
-        ]}
-      >
+      {/* Right Column: Due Amount + REMIND > pill */}
+      <View style={styles.rightCol}>
         <TouchableOpacity
           activeOpacity={0.7}
           onPress={onPress}
@@ -209,62 +225,69 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
             hitSlop={{ top: 8, bottom: 8, left: 10, right: 10 }}
             accessibilityRole="button"
             accessibilityLabel={`Remind ${customer.name} via WhatsApp`}
-            style={styles.remindButton}
+            style={styles.remindPill}
           >
             <View style={styles.remindRow}>
-              <AppIcon family="material" name="whatsapp" size={13} color="#25D366" />
-              <Text style={styles.remindText}>REMIND &gt;</Text>
+              <AppIcon family="material" name="whatsapp" size={12} color="#16A34A" />
+              <Text style={styles.remindText}>Remind</Text>
             </View>
           </TouchableOpacity>
         ) : hasAdvance ? (
-          <Text style={styles.advanceLabel}>Advance</Text>
-        ) : null}
+          <View style={styles.advancePill}>
+            <Text style={styles.advanceLabel}>Advance</Text>
+          </View>
+        ) : (
+          <View style={styles.settledPill}>
+            <Text style={styles.settledLabel}>Settled</Text>
+          </View>
+        )}
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  rowContainer: {
+  cardContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    minHeight: 64,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    minHeight: 68,
+    marginHorizontal: 12,
+    marginVertical: 4.5,
+    borderRadius: 16,
+    borderWidth: 1,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 1.5,
+    overflow: 'hidden',
   },
   leftCol: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    paddingLeft: 16,
-    paddingRight: 10,
+    paddingLeft: 12,
+    paddingRight: 8,
     paddingVertical: 10,
-    gap: 13,
+    gap: 12,
   },
-  avatarCircle: {
+  avatarSquircle: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: '#FFFFFF', // Solid crisp white circle matching screenshot
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(0, 0, 0, 0.08)',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
   },
   avatarImage: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: 14,
   },
   avatarText: {
     fontSize: 15,
     fontWeight: '800',
-    color: '#0F172A', // Dark initials inside white circle
     letterSpacing: -0.2,
   },
   nameBlock: {
@@ -272,29 +295,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   customerName: {
-    fontSize: 16,
+    fontSize: 15.5,
     fontWeight: '700',
     letterSpacing: -0.2,
   },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: 3,
+  },
   timeText: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '400',
-    marginTop: 2.5,
   },
   rightCol: {
-    minWidth: 110,
-    alignSelf: 'stretch',
+    minWidth: 105,
     alignItems: 'flex-end',
     justifyContent: 'center',
-    paddingRight: 16,
-    paddingLeft: 12,
+    paddingRight: 14,
+    paddingLeft: 8,
     paddingVertical: 10,
-  },
-  rightColDueDark: {
-    backgroundColor: 'rgba(139, 38, 38, 0.14)', // Subtle deep crimson column tint in dark mode
-  },
-  rightColDueLight: {
-    backgroundColor: 'rgba(239, 68, 68, 0.05)', // Subtle rose tint in light mode
   },
   amountTouchArea: {
     alignItems: 'flex-end',
@@ -302,40 +323,62 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
   },
   amountText: {
-    fontSize: 17,
+    fontSize: 16.5,
     fontWeight: '700',
-    letterSpacing: -0.2,
+    letterSpacing: -0.3,
   },
   amountDue: {
-    color: '#F87171', // Red / Rose due amount matching screenshot
+    color: '#EF4444', // Red due amount
   },
   amountAdvance: {
-    color: '#34D399', // Green for advance
+    color: '#10B981', // Green for advance
   },
   amountSettledDark: {
-    color: '#94A3B8', // Grey for ₹ 0
+    color: '#94A3B8',
   },
   amountSettledLight: {
     color: '#64748B',
   },
-  remindButton: {
-    marginTop: 3,
+  remindPill: {
+    marginTop: 4,
+    backgroundColor: 'rgba(34, 197, 94, 0.12)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 9999,
   },
   remindRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 3.5,
   },
   remindText: {
-    fontSize: 11.5,
-    fontWeight: '800',
-    color: '#25D366', // WhatsApp Green
-    letterSpacing: 0.4,
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#16A34A',
+    letterSpacing: 0.2,
+  },
+  advancePill: {
+    marginTop: 4,
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    paddingHorizontal: 7,
+    paddingVertical: 2.5,
+    borderRadius: 9999,
   },
   advanceLabel: {
-    fontSize: 11,
+    fontSize: 10.5,
+    fontWeight: '700',
+    color: '#059669',
+  },
+  settledPill: {
+    marginTop: 4,
+    backgroundColor: 'rgba(148, 163, 184, 0.12)',
+    paddingHorizontal: 7,
+    paddingVertical: 2.5,
+    borderRadius: 9999,
+  },
+  settledLabel: {
+    fontSize: 10.5,
     fontWeight: '600',
-    color: '#34D399',
-    marginTop: 3,
+    color: '#64748B',
   },
 });

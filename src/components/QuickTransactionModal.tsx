@@ -49,7 +49,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
   initialCustomerId,
   initialType,
 }) => {
-  const { colors, spacing, borderRadius } = useTheme();
+  const { colors, spacing, borderRadius, isDark } = useTheme();
   const { quickAmounts } = useQuickAmounts();
   const insets = useSafeAreaInsets();
 
@@ -278,9 +278,9 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
             styles.sheet,
             {
               backgroundColor: colors.surface,
-              borderColor: colors.border,
-              borderTopLeftRadius: borderRadius.xl,
-              borderTopRightRadius: borderRadius.xl,
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(15, 23, 42, 0.08)',
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
               borderBottomLeftRadius: 0,
               borderBottomRightRadius: 0,
               maxHeight: Dimensions.get('window').height - insets.top - 16,
@@ -291,18 +291,33 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
             },
           ]}
         >
+          {/* HeroUI Drag Handle Indicator */}
+          <View
+            style={[
+              styles.dragHandle,
+              {
+                backgroundColor: isDark
+                  ? 'rgba(255, 255, 255, 0.2)'
+                  : 'rgba(15, 23, 42, 0.15)',
+              },
+            ]}
+          />
+
           {/* Header */}
           <View
             style={[
               styles.header,
-              { borderBottomColor: colors.borderLight },
+              { borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.07)' : colors.borderLight },
             ]}
           >
             <View style={styles.headerTitleRow}>
               <View
                 style={[
                   styles.headerIconBox,
-                  { backgroundColor: colors.primaryLight, borderRadius: borderRadius.sm },
+                  {
+                    backgroundColor: colors.primaryLight,
+                    borderRadius: 12,
+                  },
                 ]}
               >
                 <AppIcon name="plus" size={18} color={colors.primary} />
@@ -324,18 +339,19 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                 <TouchableOpacity
                   onPress={handleSave}
                   disabled={isSubmitting}
+                  activeOpacity={0.8}
                   style={[
                     styles.headerSaveBtn,
                     {
                       backgroundColor:
                         txType === 'GAVE' ? colors.danger : colors.success,
-                      borderRadius: borderRadius.md,
+                      borderRadius: borderRadius.full,
                     },
                   ]}
                   accessibilityRole="button"
                   accessibilityLabel="Save transaction"
                 >
-                  <AppIcon name="check" size={15} color="#FFFFFF" />
+                  <AppIcon name="check" size={14} color="#FFFFFF" />
                   <Text style={styles.headerSaveBtnText}>
                     {isSubmitting ? '...' : 'Save'}
                   </Text>
@@ -344,9 +360,15 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
               <TouchableOpacity
                 onPress={onClose}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                style={styles.closeBtn}
+                style={[
+                  styles.closeBtn,
+                  {
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.05)',
+                    borderRadius: borderRadius.full,
+                  },
+                ]}
               >
-                <AppIcon name="x" size={20} color={colors.textSecondary} />
+                <AppIcon name="x" size={18} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
           </View>
@@ -765,12 +787,20 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
     paddingBottom: Platform.OS === 'ios' ? 24 : 12,
   },
+  dragHandle: {
+    width: 40,
+    height: 4.5,
+    borderRadius: 3,
+    alignSelf: 'center',
+    marginTop: 8,
+    marginBottom: 2,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 18,
-    paddingVertical: 14,
+    paddingVertical: 12,
     borderBottomWidth: 1,
   },
   headerTitleRow: {
@@ -779,8 +809,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   headerIconBox: {
-    width: 34,
-    height: 34,
+    width: 36,
+    height: 36,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -790,7 +820,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.2,
   },
   headerSub: {
-    fontSize: 11,
+    fontSize: 11.5,
     marginTop: 1,
   },
   closeBtn: {
@@ -800,8 +830,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 13,
+    paddingVertical: 6.5,
   },
   headerSaveBtnText: {
     color: '#FFFFFF',
@@ -820,9 +850,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
-    borderWidth: 1,
+    paddingVertical: 11,
+    borderWidth: 1.5,
     borderStyle: 'dashed',
+    borderRadius: 14,
     gap: 8,
     marginTop: 10,
   },
@@ -834,7 +865,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.6,
     marginBottom: 8,
   },
   emptyBox: {
@@ -849,13 +880,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingVertical: 11,
     borderWidth: 1,
+    borderRadius: 14,
     marginBottom: 8,
   },
   avatarBox: {
-    width: 38,
-    height: 38,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -870,7 +903,7 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
   custName: {
-    fontSize: 14,
+    fontSize: 14.5,
     fontWeight: '700',
     marginBottom: 2,
   },
@@ -881,7 +914,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   custBalanceAmount: {
-    fontSize: 13,
+    fontSize: 13.5,
     fontWeight: '700',
   },
   custBalanceSub: {
@@ -893,8 +926,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderWidth: 1.5,
+    paddingVertical: 11,
+    borderWidth: 1,
+    borderRadius: 14,
     marginBottom: 14,
   },
   selectedCustLeft: {
@@ -903,11 +937,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   changeCustBtn: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 11,
     paddingVertical: 6,
+    borderRadius: 9999,
   },
   changeCustText: {
-    fontSize: 11,
+    fontSize: 11.5,
     fontWeight: '700',
   },
   typeToggleRow: {
@@ -921,12 +956,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
-    borderWidth: 1.5,
+    borderWidth: 1,
+    borderRadius: 14,
     gap: 6,
   },
   typeToggleLabel: {
     fontSize: 12,
     fontWeight: '800',
+    letterSpacing: 0.2,
   },
   amountRow: {
     flexDirection: 'row',
@@ -955,7 +992,8 @@ const styles = StyleSheet.create({
   quickAmtBtn: {
     flex: 1,
     height: 48,
-    borderWidth: 1.5,
+    borderWidth: 1,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 2,

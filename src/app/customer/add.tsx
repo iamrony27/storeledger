@@ -21,7 +21,7 @@ import { createCustomer, getCustomers } from '../../storage/localLedgerRepositor
 import { findDuplicateCustomer } from '../../utils/customerValidation';
 
 export default function AddCustomerScreen() {
-  const { colors, spacing, borderRadius } = useTheme();
+  const { colors, spacing, isDark } = useTheme();
   const { t } = useLanguage();
 
   const [name, setName] = useState('');
@@ -137,9 +137,9 @@ export default function AddCustomerScreen() {
             style={[
               styles.formCard,
               {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
-                borderRadius: borderRadius.lg,
+                backgroundColor: isDark ? '#131B2E' : colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+                borderRadius: 20,
               },
             ]}
           >
@@ -212,12 +212,12 @@ export default function AddCustomerScreen() {
                         backgroundColor:
                           balanceType === 'GET'
                             ? colors.youWillGet
-                            : colors.borderLight,
+                            : (isDark ? 'rgba(255,255,255,0.06)' : colors.borderLight),
                         borderColor:
                           balanceType === 'GET'
                             ? colors.youWillGet
-                            : colors.border,
-                        borderRadius: borderRadius.md,
+                            : (isDark ? 'rgba(255,255,255,0.1)' : colors.border),
+                        borderRadius: 14,
                       },
                     ]}
                   >
@@ -242,12 +242,12 @@ export default function AddCustomerScreen() {
                         backgroundColor:
                           balanceType === 'GIVE'
                             ? colors.youWillGive
-                            : colors.borderLight,
+                            : (isDark ? 'rgba(255,255,255,0.06)' : colors.borderLight),
                         borderColor:
                           balanceType === 'GIVE'
                             ? colors.youWillGive
-                            : colors.border,
-                        borderRadius: borderRadius.md,
+                            : (isDark ? 'rgba(255,255,255,0.1)' : colors.border),
+                        borderRadius: 14,
                       },
                     ]}
                   >
@@ -316,7 +316,13 @@ const styles = StyleSheet.create({
   },
   formCard: {
     borderWidth: 1,
-    padding: 16,
+    padding: 18,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 12,
+    elevation: 3,
   },
   balanceTypeContainer: {
     marginTop: 6,
@@ -335,13 +341,14 @@ const styles = StyleSheet.create({
   },
   balanceTypeBtn: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: 13,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 14,
   },
   balanceTypeText: {
-    fontSize: 12,
+    fontSize: 13,
   },
   submitContainer: {
     marginTop: 8,

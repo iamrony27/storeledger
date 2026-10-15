@@ -822,7 +822,13 @@ export const CloudBackupCard: React.FC = () => {
 const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
+    borderRadius: 18,
     marginVertical: 6,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    elevation: 1.5,
   },
   headerRow: {
     flexDirection: 'row',
@@ -838,7 +844,7 @@ const styles = StyleSheet.create({
   iconWrapper: {
     width: 38,
     height: 38,
-    borderRadius: 19,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -855,6 +861,7 @@ const styles = StyleSheet.create({
   intervalSelectorCard: {
     padding: 10,
     borderWidth: 1,
+    borderRadius: 14,
     marginBottom: 10,
   },
   intervalLabel: {
@@ -867,8 +874,9 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   intervalChip: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 12,
     paddingVertical: 6,
+    borderRadius: 9999,
   },
   intervalChipText: {
     fontSize: 11,
@@ -883,6 +891,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 10,
     borderWidth: 1,
+    borderRadius: 14,
   },
   infoTitle: {
     fontSize: 11,
@@ -904,8 +913,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   persistentFolderCard: {
-    padding: 12,
+    padding: 14,
     borderWidth: 1,
+    borderRadius: 14,
     gap: 10,
     marginTop: 6,
     marginBottom: 6,
@@ -916,9 +926,9 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   folderIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -956,7 +966,13 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 440,
     borderWidth: 1,
-    padding: 18,
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
   },
   modalHeader: {
     flexDirection: 'row',

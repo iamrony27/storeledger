@@ -113,11 +113,21 @@ export const WhatsAppShareModal: React.FC<WhatsAppShareModalProps> = ({
           style={[
             styles.modalContainer,
             {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
+              backgroundColor: isDark ? '#131B2E' : colors.surface,
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
             },
           ]}
         >
+          {/* Sheet Handle */}
+          <View style={styles.sheetHandleRow}>
+            <View
+              style={[
+                styles.sheetHandlePill,
+                { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.15)' },
+              ]}
+            />
+          </View>
+
           {/* Header */}
           <View
             style={[
@@ -129,7 +139,7 @@ export const WhatsAppShareModal: React.FC<WhatsAppShareModalProps> = ({
               <View
                 style={[
                   styles.whatsappIconBox,
-                  { backgroundColor: '#E7FCE8' },
+                  { backgroundColor: isDark ? 'rgba(37, 211, 102, 0.15)' : '#E7FCE8', borderRadius: 12 },
                 ]}
               >
                 <AppIcon
@@ -281,10 +291,11 @@ export const WhatsAppShareModal: React.FC<WhatsAppShareModalProps> = ({
                           ? isDark
                             ? '#064E3B'
                             : '#DCFCE7'
-                          : colors.surface,
+                          : (isDark ? 'rgba(255,255,255,0.06)' : colors.surface),
                         borderColor: isActive
                           ? WHATSAPP_GREEN
-                          : colors.border,
+                          : (isDark ? 'rgba(255,255,255,0.08)' : colors.border),
+                        borderRadius: 9999,
                       },
                     ]}
                   >
@@ -407,13 +418,28 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   modalContainer: {
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
     borderWidth: 1,
     borderBottomWidth: 0,
     maxHeight: '90%',
     paddingBottom: Platform.OS === 'ios' ? 24 : 16,
     overflow: 'hidden',
+    elevation: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+  },
+  sheetHandleRow: {
+    alignItems: 'center',
+    paddingTop: 8,
+    paddingBottom: 4,
+  },
+  sheetHandlePill: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
   },
   headerRow: {
     flexDirection: 'row',
@@ -430,9 +456,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   whatsappIconBox: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 42,
+    height: 42,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -461,7 +487,7 @@ const styles = StyleSheet.create({
   statCard: {
     flex: 1,
     padding: 12,
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1,
   },
   statLabel: {
@@ -501,9 +527,9 @@ const styles = StyleSheet.create({
   },
   langTabBtn: {
     flex: 1,
-    paddingVertical: 7,
-    paddingHorizontal: 4,
-    borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 6,
+    borderRadius: 9999,
     borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
@@ -545,7 +571,7 @@ const styles = StyleSheet.create({
   },
   previewScroll: {
     maxHeight: 220,
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1,
     paddingHorizontal: 14,
     paddingVertical: 10,
@@ -572,8 +598,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingVertical: 13,
+    borderRadius: 14,
     elevation: 3,
     shadowColor: '#25D366',
     shadowOffset: { width: 0, height: 2 },
@@ -591,8 +617,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    paddingVertical: 12,
-    borderRadius: 12,
+    paddingVertical: 13,
+    borderRadius: 14,
     borderWidth: 1,
   },
   shareOtherBtnText: {

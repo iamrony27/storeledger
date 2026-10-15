@@ -37,19 +37,25 @@ export const AppTextInput = React.forwardRef<TextInput, AppTextInputProps>((
   },
   ref
 ) => {
-  const { colors, borderRadius, spacing, typography } = useTheme();
+  const { colors, isDark, spacing, typography } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
 
   const borderColor = error
     ? colors.danger
     : isFocused
     ? colors.primary
-    : colors.border;
+    : isDark
+    ? 'rgba(255, 255, 255, 0.12)'
+    : 'rgba(15, 23, 42, 0.09)';
+
+  const backgroundColor = isDark
+    ? isFocused ? 'rgba(30, 41, 59, 0.95)' : 'rgba(30, 41, 59, 0.6)'
+    : isFocused ? '#FFFFFF' : '#F8FAFC';
 
   return (
     <View style={[styles.container, containerStyle]}>
       {label && (
-        <Text style={[styles.label, { color: colors.textSecondary }]}>
+        <Text style={[styles.label, { color: isFocused ? colors.primary : colors.textSecondary }]}>
           {label}
         </Text>
       )}
@@ -57,10 +63,10 @@ export const AppTextInput = React.forwardRef<TextInput, AppTextInputProps>((
         style={[
           styles.inputWrapper,
           {
-            backgroundColor: colors.inputBg,
+            backgroundColor,
             borderColor,
-            borderRadius: borderRadius.md,
-            paddingHorizontal: spacing.md,
+            borderRadius: 14,
+            paddingHorizontal: spacing.md + 2,
           },
         ]}
       >

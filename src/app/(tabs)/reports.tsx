@@ -34,7 +34,7 @@ import {
 type DateFilter = 'TODAY' | 'WEEK' | 'MONTH' | 'ALL';
 
 export default function ReportsScreen() {
-  const { colors, spacing, borderRadius } = useTheme();
+  const { colors, spacing, isDark } = useTheme();
   const { t } = useLanguage();
   const { profile } = useAuth();
   const { handleScroll } = useTabBarVisibility();
@@ -110,9 +110,8 @@ export default function ReportsScreen() {
           style={[
             styles.dateFilterContainer,
             {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-              borderRadius: borderRadius.md,
+              backgroundColor: isDark ? '#131B2E' : colors.surface,
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
             },
           ]}
         >
@@ -135,7 +134,6 @@ export default function ReportsScreen() {
                     backgroundColor: isSelected
                       ? colors.primary
                       : 'transparent',
-                    borderRadius: borderRadius.sm,
                   },
                 ]}
               >
@@ -161,9 +159,8 @@ export default function ReportsScreen() {
             style={[
               styles.metricCard,
               {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
-                borderRadius: borderRadius.lg,
+                backgroundColor: isDark ? '#131B2E' : colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
               },
             ]}
           >
@@ -198,9 +195,8 @@ export default function ReportsScreen() {
             style={[
               styles.metricCard,
               {
-                backgroundColor: colors.surface,
-                borderColor: colors.border,
-                borderRadius: borderRadius.lg,
+                backgroundColor: isDark ? '#131B2E' : colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
               },
             ]}
           >
@@ -264,9 +260,8 @@ export default function ReportsScreen() {
           style={[
             styles.breakdownCard,
             {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-              borderRadius: borderRadius.lg,
+              backgroundColor: isDark ? '#131B2E' : colors.surface,
+              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
             },
           ]}
         >
@@ -342,10 +337,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 4,
     borderWidth: 1,
+    borderRadius: 9999,
   },
   dateFilterBtn: {
     flex: 1,
     paddingVertical: 8,
+    borderRadius: 9999,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -359,7 +356,13 @@ const styles = StyleSheet.create({
   metricCard: {
     flex: 1,
     borderWidth: 1,
+    borderRadius: 18,
     padding: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
   },
   metricHeader: {
     flexDirection: 'row',
@@ -368,9 +371,9 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   metricIconBox: {
-    width: 28,
-    height: 28,
-    borderRadius: 6,
+    width: 32,
+    height: 32,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -380,12 +383,12 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   metricAmount: {
-    fontSize: 17,
-    fontWeight: '700',
+    fontSize: 18,
+    fontWeight: '800',
     marginBottom: 4,
   },
   metricFootnote: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: '500',
   },
   actionRow: {
@@ -397,7 +400,13 @@ const styles = StyleSheet.create({
   },
   breakdownCard: {
     borderWidth: 1,
+    borderRadius: 18,
     padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
   },
   sectionTitle: {
     fontSize: 14,

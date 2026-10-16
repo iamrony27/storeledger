@@ -1,13 +1,6 @@
 import React from 'react';
-import {
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  ActivityIndicator,
-  ViewStyle,
-  TextStyle,
-  View,
-} from 'react-native';
+import { ViewStyle, TextStyle, StyleSheet } from 'react-native';
+import { Button as PaperButton } from 'react-native-paper';
 import { useTheme } from '../theme/ThemeContext';
 import { AppIcon, IconFamily } from './AppIcon';
 
@@ -53,64 +46,63 @@ export const AppButton: React.FC<AppButtonProps> = ({
 }) => {
   const { colors, borderRadius, spacing, isDark } = useTheme();
 
-  const getVariantStyles = () => {
+  // Map variant to React Native Paper Button mode & colors
+  const getPaperConfig = () => {
     switch (variant) {
-      case 'flat':
-        return {
-          bg: isDark ? 'rgba(59, 130, 246, 0.16)' : 'rgba(37, 99, 235, 0.12)',
-          border: 'transparent',
-          text: colors.primary,
-        };
-      case 'light':
-        return {
-          bg: 'transparent',
-          border: 'transparent',
-          text: colors.textPrimary,
-        };
       case 'secondary':
         return {
-          bg: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.05)',
-          border: colors.border,
-          text: colors.textPrimary,
+          mode: 'contained-tonal' as const,
+          buttonColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+          textColor: colors.textPrimary,
         };
       case 'outline':
         return {
-          bg: 'transparent',
-          border: isDark ? 'rgba(255, 255, 255, 0.2)' : colors.border,
-          text: colors.textPrimary,
+          mode: 'outlined' as const,
+          buttonColor: 'transparent',
+          textColor: colors.textPrimary,
+        };
+      case 'flat':
+        return {
+          mode: 'contained-tonal' as const,
+          buttonColor: isDark ? 'rgba(59, 130, 246, 0.16)' : 'rgba(37, 99, 235, 0.12)',
+          textColor: colors.primary,
+        };
+      case 'light':
+        return {
+          mode: 'text' as const,
+          buttonColor: 'transparent',
+          textColor: colors.textPrimary,
         };
       case 'danger':
         return {
-          bg: colors.danger,
-          border: colors.danger,
-          text: '#FFFFFF',
+          mode: 'contained' as const,
+          buttonColor: colors.danger,
+          textColor: '#FFFFFF',
         };
       case 'success':
         return {
-          bg: colors.success,
-          border: colors.success,
-          text: '#FFFFFF',
+          mode: 'contained' as const,
+          buttonColor: colors.success,
+          textColor: '#FFFFFF',
         };
       case 'primary':
       default:
         return {
-          bg: colors.primary,
-          border: colors.primary,
-          text: '#FFFFFF',
+          mode: 'contained' as const,
+          buttonColor: colors.primary,
+          textColor: '#FFFFFF',
         };
     }
   };
 
-  const vStyles = getVariantStyles();
+  const { mode, buttonColor, textColor } = getPaperConfig();
 
-  const minHeight = size === 'sm' ? 34 : size === 'lg' ? 52 : 44;
+  const minHeight = size === 'sm' ? 36 : size === 'lg' ? 52 : 44;
   const paddingVertical =
-    size === 'sm' ? spacing.xs + 2 : size === 'lg' ? spacing.md + 2 : 11;
-  const paddingHorizontal =
-    size === 'sm' ? spacing.md : size === 'lg' ? spacing.xl : 16;
-  const fontSize = size === 'sm' ? 12 : size === 'lg' ? 15 : 13.5;
+    size === 'sm' ? 2 : size === 'lg' ? 6 : 4;
+  const fontSize = size === 'sm' ? 12.5 : size === 'lg' ? 15 : 13.5;
 
-  const getButtonRadius = () => {
+  const getBorderRadius = () => {
     switch (radius) {
       case 'none':
         return 0;
@@ -126,78 +118,62 @@ export const AppButton: React.FC<AppButtonProps> = ({
     }
   };
 
+  const renderIcon = iconName
+    ? ({ size: iconSize, color }: { size: number; color: string }) => (
+        <AppIcon
+          family={iconFamily}
+          name={iconName}
+          size={iconSize}
+          color={color}
+        />
+      )
+    : undefined;
+
   return (
-    <TouchableOpacity
+    <PaperButton
+      mode={mode}
       onPress={onPress}
-      disabled={disabled || loading}
-      activeOpacity={0.75}
-      accessibilityRole="button"
+      loading={loading}
+      disabled={disabled}
+      buttonColor={buttonColor}
+      textColor={textColor}
+      icon={renderIcon}
       accessibilityLabel={accessibilityLabel || title}
       accessibilityHint={accessibilityHint}
-      accessibilityState={{ disabled: disabled || loading, busy: loading }}
       style={[
-        styles.button,
         {
-          minHeight,
-          backgroundColor: disabled ? (isDark ? 'rgba(255, 255, 255, 0.06)' : colors.border) : vStyles.bg,
-          borderColor: disabled ? (isDark ? 'transparent' : colors.border) : vStyles.border,
-          borderRadius: getButtonRadius(),
-          paddingVertical,
-          paddingHorizontal,
-          opacity: disabled ? 0.5 : 1,
+          borderRadius: getBorderRadius(),
+          borderColor:
+            variant === 'outline'
+              ? isDark
+                ? 'rgba(255, 255, 255, 0.2)'
+                : colors.border
+              : undefined,
         },
         style,
       ]}
+      contentStyle={[
+        {
+          minHeight,
+          paddingVertical,
+        },
+      ]}
+      labelStyle={[
+        styles.label,
+        {
+          fontSize,
+          fontWeight: '700',
+        },
+        textStyle,
+      ]}
     >
-      {loading ? (
-        <ActivityIndicator size="small" color={vStyles.text} />
-      ) : (
-        <View style={styles.content}>
-          {iconName && (
-            <AppIcon
-              family={iconFamily}
-              name={iconName}
-              size={fontSize + 2}
-              color={vStyles.text}
-            />
-          )}
-          <Text
-            style={[
-              styles.text,
-              {
-                color: vStyles.text,
-                fontSize,
-              },
-              textStyle,
-            ]}
-            numberOfLines={1}
-            adjustsFontSizeToFit={true}
-            minimumFontScale={0.82}
-          >
-            {title}
-          </Text>
-        </View>
-      )}
-    </TouchableOpacity>
+      {title}
+    </PaperButton>
   );
 };
 
 const styles = StyleSheet.create({
-  button: {
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    maxWidth: '100%',
-  },
-  text: {
-    fontWeight: '600',
-    textAlign: 'center',
-    flexShrink: 1,
+  label: {
+    letterSpacing: 0.2,
   },
 });

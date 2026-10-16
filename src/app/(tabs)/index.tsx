@@ -14,6 +14,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { Chip as PaperChip, FAB as PaperFAB } from 'react-native-paper';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { AppIcon } from '../../components/AppIcon';
@@ -430,12 +431,12 @@ export default function CustomersScreen() {
                 const isActive = activeFilter === f.key;
                 const count = filterCounts[f.key];
                 return (
-                  <TouchableOpacity
+                  <PaperChip
                     key={f.key}
+                    selected={isActive}
+                    showSelectedOverlay
+                    mode={isActive ? 'flat' : 'outlined'}
                     onPress={() => setActiveFilter(f.key)}
-                    activeOpacity={0.75}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Filter by ${f.label}`}
                     style={[
                       styles.filterChip,
                       {
@@ -449,40 +450,16 @@ export default function CustomersScreen() {
                       },
                       isActive && styles.filterChipActiveShadow,
                     ]}
+                    textStyle={[
+                      styles.filterChipText,
+                      {
+                        color: isActive ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary),
+                        fontWeight: isActive ? '700' : '600',
+                      },
+                    ]}
                   >
-                    <Text
-                      style={[
-                        styles.filterChipText,
-                        {
-                          color: isActive ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary),
-                          fontWeight: isActive ? '700' : '600',
-                        },
-                      ]}
-                    >
-                      {f.label}
-                    </Text>
-                    <View
-                      style={[
-                        styles.filterChipBadge,
-                        {
-                          backgroundColor: isActive
-                            ? 'rgba(255, 255, 255, 0.24)'
-                            : (isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)'),
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.filterChipBadgeText,
-                          {
-                            color: isActive ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary),
-                          },
-                        ]}
-                      >
-                        {count}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
+                    {`${f.label} • ${count}`}
+                  </PaperChip>
                 );
               })}
             </ScrollView>
@@ -576,23 +553,20 @@ export default function CustomersScreen() {
       />
 
       {/* Material 3 Expressive Extended FAB - Add Customer */}
-      <TouchableOpacity
+      <PaperFAB
+        icon="account-plus"
+        label={t.dashboard.addCustomer}
         onPress={() => router.push('/customer/add' as any)}
-        activeOpacity={0.85}
-        accessibilityRole="button"
         accessibilityLabel={t.dashboard.addCustomer}
+        mode="elevated"
         style={[
           styles.fabButton,
           {
             backgroundColor: isDark ? '#2563EB' : colors.primary,
-            shadowColor: isDark ? '#2563EB' : '#1D4ED8',
-            borderColor: isDark ? 'rgba(96, 165, 250, 0.4)' : 'rgba(255, 255, 255, 0.25)',
           },
         ]}
-      >
-        <AppIcon name="user-plus" size={18} color="#FFFFFF" />
-        <Text style={styles.fabText}>{t.dashboard.addCustomer}</Text>
-      </TouchableOpacity>
+        color="#FFFFFF"
+      />
 
       {/* Modern Long-Height Collapsible Executive Title Bar with Integrated Search (Color Hunt: #EF6905) */}
       <CollapsibleExecutiveTopBar

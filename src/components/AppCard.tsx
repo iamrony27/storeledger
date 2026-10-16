@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
+import { ViewStyle, StyleSheet } from 'react-native';
+import { Card as PaperCard } from 'react-native-paper';
 import { useTheme } from '../theme/ThemeContext';
 
 interface AppCardProps {
@@ -7,6 +8,7 @@ interface AppCardProps {
   style?: ViewStyle;
   elevated?: boolean;
   variant?: 'elevated' | 'bordered' | 'flat';
+  onPress?: () => void;
 }
 
 export const AppCard: React.FC<AppCardProps> = ({
@@ -14,6 +16,7 @@ export const AppCard: React.FC<AppCardProps> = ({
   style,
   elevated = false,
   variant,
+  onPress,
 }) => {
   const { colors, isDark, spacing } = useTheme();
 
@@ -21,42 +24,60 @@ export const AppCard: React.FC<AppCardProps> = ({
   const isBordered = variant === 'bordered';
   const isFlat = variant === 'flat';
 
+  const mode = isElevated ? 'elevated' : isBordered ? 'outlined' : 'contained';
+
+  const backgroundColor = isFlat
+    ? isDark
+      ? 'rgba(255, 255, 255, 0.04)'
+      : 'rgba(15, 23, 42, 0.03)'
+    : isElevated
+    ? isDark
+      ? '#131B2E'
+      : colors.surfaceElevated
+    : isDark
+    ? '#131B2E'
+    : colors.surface;
+
   const borderColor = isBordered
-    ? (isDark ? 'rgba(255, 255, 255, 0.14)' : 'rgba(15, 23, 42, 0.12)')
-    : (isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)');
+    ? isDark
+      ? 'rgba(255, 255, 255, 0.14)'
+      : 'rgba(15, 23, 42, 0.12)'
+    : isDark
+    ? 'rgba(255, 255, 255, 0.08)'
+    : 'rgba(15, 23, 42, 0.06)';
 
   return (
-    <View
+    <PaperCard
+      mode={mode as any}
+      elevation={isElevated ? 2 : 0}
+      onPress={onPress}
       style={[
         styles.card,
         {
-          backgroundColor: isFlat
-            ? (isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(15, 23, 42, 0.03)')
-            : isElevated
-            ? colors.surfaceElevated
-            : colors.surface,
+          backgroundColor,
           borderColor,
-          padding: spacing.md + 2,
+          borderRadius: 20,
         },
-        isElevated && styles.shadow,
         style,
+      ]}
+      contentStyle={[
+        styles.content,
+        {
+          padding: spacing.md,
+        },
       ]}
     >
       {children}
-    </View>
+    </PaperCard>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
     borderWidth: 1,
-    borderRadius: 18,
+    overflow: 'hidden',
   },
-  shadow: {
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    elevation: 3,
+  content: {
+    padding: 0,
   },
 });

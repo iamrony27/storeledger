@@ -9,6 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { RadioButton } from 'react-native-paper';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { useAuth } from '../../auth/AuthContext';
@@ -549,21 +550,12 @@ export default function SettingsScreen() {
                   </Text>
                 </View>
 
-                <View
-                  style={[
-                    styles.radioCircle,
-                    {
-                      borderColor: isSelected ? colors.primary : colors.border,
-                      backgroundColor: isSelected
-                        ? colors.primary
-                        : 'transparent',
-                    },
-                  ]}
-                >
-                  {isSelected && (
-                    <AppIcon name="check" size={12} color="#FFFFFF" />
-                  )}
-                </View>
+                <RadioButton
+                  value={item.key}
+                  status={isSelected ? 'checked' : 'unchecked'}
+                  onPress={() => setThemeMode(item.key as any)}
+                  color={colors.primary}
+                />
               </TouchableOpacity>
             );
           })}

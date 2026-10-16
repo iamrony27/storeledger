@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import { SegmentedButtons } from 'react-native-paper';
 import { useTheme } from '../../theme/ThemeContext';
 import { useAuth } from '../../auth/AuthContext';
 import { AppIcon } from '../../components/AppIcon';
@@ -184,10 +185,10 @@ export default function LoginScreen() {
               style={[
                 styles.logoBadge,
                 {
-                  backgroundColor: isDark ? 'rgba(239, 105, 5, 0.15)' : colors.primaryLight,
+                  backgroundColor: colors.primaryLight,
                   borderRadius: 20,
                   borderWidth: 1,
-                  borderColor: isDark ? 'rgba(239, 105, 5, 0.3)' : 'transparent',
+                  borderColor: isDark ? 'rgba(59, 130, 246, 0.4)' : 'rgba(37, 99, 235, 0.2)',
                 },
               ]}
             >
@@ -242,66 +243,19 @@ export default function LoginScreen() {
             <AppIcon name="settings" size={16} color={isConfigured ? colors.primary : colors.warning} />
           </TouchableOpacity>
 
-          {/* Mode Switcher */}
-          <View
-            style={[
-              styles.tabRow,
-              {
-                backgroundColor: isDark ? '#131B2E' : colors.surface,
-                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
-                borderRadius: 9999,
-              },
-            ]}
-          >
-            <TouchableOpacity
-              onPress={() => {
-                setMode('signin');
+          {/* Mode Switcher via Paper SegmentedButtons */}
+          <View style={{ marginVertical: 12 }}>
+            <SegmentedButtons
+              value={mode}
+              onValueChange={(val) => {
+                setMode(val as 'signin' | 'signup');
                 setErrorMessage(null);
               }}
-              style={[
-                styles.tabButton,
-                mode === 'signin' && {
-                  backgroundColor: colors.primary,
-                  borderRadius: 9999,
-                },
+              buttons={[
+                { value: 'signin', label: 'Sign In' },
+                { value: 'signup', label: 'Register Business' },
               ]}
-            >
-              <Text
-                style={[
-                  styles.tabButtonText,
-                  {
-                    color: mode === 'signin' ? '#FFFFFF' : colors.textSecondary,
-                  },
-                ]}
-              >
-                Sign In
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => {
-                setMode('signup');
-                setErrorMessage(null);
-              }}
-              style={[
-                styles.tabButton,
-                mode === 'signup' && {
-                  backgroundColor: colors.primary,
-                  borderRadius: 9999,
-                },
-              ]}
-            >
-              <Text
-                style={[
-                  styles.tabButtonText,
-                  {
-                    color: mode === 'signup' ? '#FFFFFF' : colors.textSecondary,
-                  },
-                ]}
-              >
-                Register Business
-              </Text>
-            </TouchableOpacity>
+            />
           </View>
 
           {/* Error / Success Messages */}

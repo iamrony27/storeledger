@@ -8,6 +8,7 @@ import {
   Alert,
 } from 'react-native';
 import { router } from 'expo-router';
+import { SegmentedButtons, ProgressBar } from 'react-native-paper';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { useAuth } from '../../auth/AuthContext';
@@ -167,57 +168,18 @@ export default function ReportsScreen() {
         onScroll={handleScroll}
         scrollEventThrottle={16}
       >
-        {/* Time Horizon Segmented Pill Selector */}
-        <View
-          style={[
-            styles.dateFilterContainer,
-            {
-              backgroundColor: isDark ? '#131B2E' : colors.surface,
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
-            },
+        {/* Time Horizon Segmented Buttons */}
+        <SegmentedButtons
+          value={dateFilter}
+          onValueChange={(val) => setDateFilter(val as DateFilter)}
+          buttons={[
+            { value: 'TODAY', label: 'Today' },
+            { value: 'WEEK', label: 'This Week' },
+            { value: 'MONTH', label: 'This Month' },
+            { value: 'ALL', label: 'All Time' },
           ]}
-        >
-          {(
-            [
-              { key: 'TODAY', label: 'Today' },
-              { key: 'WEEK', label: 'This Week' },
-              { key: 'MONTH', label: 'This Month' },
-              { key: 'ALL', label: 'All Time' },
-            ] as const
-          ).map((item) => {
-            const isSelected = dateFilter === item.key;
-            return (
-              <TouchableOpacity
-                key={item.key}
-                onPress={() => setDateFilter(item.key)}
-                activeOpacity={0.75}
-                accessibilityRole="button"
-                accessibilityLabel={`Filter by ${item.label}`}
-                style={[
-                  styles.dateFilterBtn,
-                  {
-                    backgroundColor: isSelected
-                      ? (isDark ? '#2563EB' : colors.primary)
-                      : 'transparent',
-                  },
-                  isSelected && styles.filterActiveGlow,
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.dateFilterText,
-                    {
-                      color: isSelected ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary),
-                      fontWeight: isSelected ? '700' : '600',
-                    },
-                  ]}
-                >
-                  {item.label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
+          style={{ marginVertical: 8 }}
+        />
 
         {/* Executive Cash Flow Matrix (3 High-Impact Cards) */}
         <View style={styles.cashFlowGrid}>
@@ -385,58 +347,16 @@ export default function ReportsScreen() {
               </Text>
             </View>
 
-            <View style={styles.rankingToggleGroup}>
-              <TouchableOpacity
-                onPress={() => setRankingTab('DEBTORS')}
-                style={[
-                  styles.rankingToggleBtn,
-                  rankingTab === 'DEBTORS' && {
-                    backgroundColor: isDark ? 'rgba(248, 113, 113, 0.2)' : '#FEE2E2',
-                    borderColor: isDark ? '#F87171' : '#FCA5A5',
-                  },
+            <View style={{ width: 230 }}>
+              <SegmentedButtons
+                density="small"
+                value={rankingTab}
+                onValueChange={(val) => setRankingTab(val as RankingTab)}
+                buttons={[
+                  { value: 'DEBTORS', label: 'Receivables' },
+                  { value: 'CREDITORS', label: 'Payables' },
                 ]}
-              >
-                <Text
-                  style={[
-                    styles.rankingToggleText,
-                    {
-                      color:
-                        rankingTab === 'DEBTORS'
-                          ? (isDark ? '#F87171' : '#DC2626')
-                          : (isDark ? '#94A3B8' : colors.textSecondary),
-                      fontWeight: rankingTab === 'DEBTORS' ? '700' : '500',
-                    },
-                  ]}
-                >
-                  Receivables
-                </Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => setRankingTab('CREDITORS')}
-                style={[
-                  styles.rankingToggleBtn,
-                  rankingTab === 'CREDITORS' && {
-                    backgroundColor: isDark ? 'rgba(16, 185, 129, 0.2)' : '#D1FAE5',
-                    borderColor: isDark ? '#34D399' : '#6EE7B7',
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.rankingToggleText,
-                    {
-                      color:
-                        rankingTab === 'CREDITORS'
-                          ? (isDark ? '#34D399' : '#047857')
-                          : (isDark ? '#94A3B8' : colors.textSecondary),
-                      fontWeight: rankingTab === 'CREDITORS' ? '700' : '500',
-                    },
-                  ]}
-                >
-                  Payables
-                </Text>
-              </TouchableOpacity>
+              />
             </View>
           </View>
 
@@ -489,20 +409,16 @@ export default function ReportsScreen() {
                       {cust.phone || 'No phone'}
                     </Text>
 
-                    {/* Visual Volume Bar */}
-                    <View style={styles.volumeBarTrack}>
-                      <View
-                        style={[
-                          styles.volumeBarFill,
-                          {
-                            width: `${Math.round(progressRatio * 100)}%`,
-                            backgroundColor: isDue
-                              ? (isDark ? '#F87171' : '#EF4444')
-                              : (isDark ? '#34D399' : '#10B981'),
-                          },
-                        ]}
-                      />
-                    </View>
+                    {/* Visual Volume Bar via Paper's ProgressBar */}
+                    <ProgressBar
+                      progress={progressRatio}
+                      color={
+                        isDue
+                          ? (isDark ? '#F87171' : '#EF4444')
+                          : (isDark ? '#34D399' : '#10B981')
+                      }
+                      style={{ height: 5, borderRadius: 3, marginTop: 4, width: 140 }}
+                    />
                   </View>
                 </View>
 

@@ -10,6 +10,7 @@ import {
   Modal,
 } from 'react-native';
 import { router } from 'expo-router';
+import { SegmentedButtons } from 'react-native-paper';
 import { useTheme } from '../theme/ThemeContext';
 import { AppIcon } from '../components/AppIcon';
 import { AppTopBar } from '../components/AppTopBar';
@@ -357,41 +358,18 @@ export default function ImportScreen() {
           )}
         </View>
 
-        {/* Filter Pills */}
-        <View style={styles.filterPillsRow}>
-          {(['ALL', 'DUE', 'SETTLED'] as const).map((filter) => {
-            const isSelected = selectedFilter === filter;
-            const label =
-              filter === 'ALL'
-                ? 'All (66)'
-                : filter === 'DUE'
-                ? 'Dues Only (39)'
-                : 'Settled (27)';
-            return (
-              <TouchableOpacity
-                key={filter}
-                style={[
-                  styles.filterPill,
-                  {
-                    backgroundColor: isSelected ? colors.primary : (isDark ? '#131B2E' : colors.surface),
-                    borderColor: isSelected ? colors.primary : (isDark ? 'rgba(255,255,255,0.08)' : colors.border),
-                    borderRadius: borderRadius.full,
-                  },
-                ]}
-                onPress={() => setSelectedFilter(filter)}
-                activeOpacity={0.7}
-              >
-                <Text
-                  style={[
-                    styles.filterPillText,
-                    { color: isSelected ? '#FFFFFF' : colors.textSecondary },
-                  ]}
-                >
-                  {label}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
+        {/* Filter Pills via Paper SegmentedButtons */}
+        <View style={{ marginVertical: 12 }}>
+          <SegmentedButtons
+            density="small"
+            value={selectedFilter}
+            onValueChange={(val) => setSelectedFilter(val as 'ALL' | 'DUE' | 'SETTLED')}
+            buttons={[
+              { value: 'ALL', label: 'All (66)' },
+              { value: 'DUE', label: 'Dues (39)' },
+              { value: 'SETTLED', label: 'Settled (27)' },
+            ]}
+          />
         </View>
 
         {/* Customer List Cards */}

@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, useLocalSearchParams } from 'expo-router';
+import { SegmentedButtons, Chip as PaperChip } from 'react-native-paper';
 import { useTheme } from '../../theme/ThemeContext';
 import { useAuth } from '../../auth/AuthContext';
 import { AppIcon } from '../../components/AppIcon';
@@ -412,76 +413,16 @@ export default function TransactionsScreen() {
 
             {/* Sort Mode & Direction Controls (Date Wise vs Entry Wise) */}
             <View style={styles.sortModeRow}>
-              <View
-                style={[
-                  styles.modeSegmentContainer,
-                  {
-                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.06)' : colors.borderLight,
-                    borderRadius: borderRadius.full,
-                  },
-                ]}
-              >
-                <TouchableOpacity
-                  onPress={() => setSortMode('DATE')}
-                  activeOpacity={0.75}
-                  style={[
-                    styles.modeSegmentBtn,
-                    sortMode === 'DATE' && {
-                      backgroundColor: colors.primary,
-                      borderRadius: borderRadius.full,
-                    },
+              <View style={{ flex: 1, marginRight: 8 }}>
+                <SegmentedButtons
+                  density="small"
+                  value={sortMode}
+                  onValueChange={(val) => setSortMode(val as TransactionSortMode)}
+                  buttons={[
+                    { value: 'DATE', label: 'Date Wise', icon: 'calendar' },
+                    { value: 'ENTRY', label: 'Entry Wise', icon: 'clock' },
                   ]}
-                  accessibilityRole="button"
-                  accessibilityLabel="Sort Date Wise"
-                >
-                  <AppIcon
-                    name="calendar"
-                    size={12}
-                    color={sortMode === 'DATE' ? '#FFFFFF' : colors.textSecondary}
-                  />
-                  <Text
-                    style={[
-                      styles.modeSegmentText,
-                      {
-                        color: sortMode === 'DATE' ? '#FFFFFF' : colors.textSecondary,
-                        fontWeight: sortMode === 'DATE' ? '700' : '500',
-                      },
-                    ]}
-                  >
-                    Date Wise
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  onPress={() => setSortMode('ENTRY')}
-                  activeOpacity={0.75}
-                  style={[
-                    styles.modeSegmentBtn,
-                    sortMode === 'ENTRY' && {
-                      backgroundColor: colors.primary,
-                      borderRadius: borderRadius.full,
-                    },
-                  ]}
-                  accessibilityRole="button"
-                  accessibilityLabel="Sort Entry Wise"
-                >
-                  <AppIcon
-                    name="clock"
-                    size={12}
-                    color={sortMode === 'ENTRY' ? '#FFFFFF' : colors.textSecondary}
-                  />
-                  <Text
-                    style={[
-                      styles.modeSegmentText,
-                      {
-                        color: sortMode === 'ENTRY' ? '#FFFFFF' : colors.textSecondary,
-                        fontWeight: sortMode === 'ENTRY' ? '700' : '500',
-                      },
-                    ]}
-                  >
-                    Entry Wise
-                  </Text>
-                </TouchableOpacity>
+                />
               </View>
 
               <TouchableOpacity
@@ -523,8 +464,11 @@ export default function TransactionsScreen() {
               ].map((f) => {
                 const isActive = dateFilter === f.key;
                 return (
-                  <TouchableOpacity
+                  <PaperChip
                     key={f.key}
+                    selected={isActive}
+                    showSelectedOverlay
+                    mode={isActive ? 'flat' : 'outlined'}
                     onPress={() => {
                       if (f.key === 'CUSTOM') {
                         setCustomRangeModalVisible(true);
@@ -543,16 +487,13 @@ export default function TransactionsScreen() {
                         borderRadius: borderRadius.full,
                       },
                     ]}
+                    textStyle={[
+                      styles.filterChipText,
+                      { color: isActive ? '#FFFFFF' : (isDark ? '#F8FAFC' : colors.textPrimary) },
+                    ]}
                   >
-                    <Text
-                      style={[
-                        styles.filterChipText,
-                        { color: isActive ? '#FFFFFF' : (isDark ? '#F8FAFC' : colors.textPrimary) },
-                      ]}
-                    >
-                      {f.label}
-                    </Text>
-                  </TouchableOpacity>
+                    {f.label}
+                  </PaperChip>
                 );
               })}
             </ScrollView>
@@ -591,42 +532,17 @@ export default function TransactionsScreen() {
             )}
 
             {/* Transaction Type Segment Filter (All | You Gave | You Got) */}
-            <View style={styles.typeFilterRow}>
-              {[
-                { key: 'ALL', label: 'All Types' },
-                { key: 'GAVE', label: 'You Gave', color: colors.danger },
-                { key: 'GOT', label: 'You Got', color: colors.success },
-              ].map((tf) => {
-                const isActive = typeFilter === tf.key;
-                return (
-                  <TouchableOpacity
-                    key={tf.key}
-                    onPress={() => setTypeFilter(tf.key as TypeFilterPreset)}
-                    activeOpacity={0.75}
-                    style={[
-                      styles.typeFilterBtn,
-                      {
-                        backgroundColor: isActive
-                          ? tf.color || colors.primary
-                          : (isDark ? '#131B2E' : colors.surface),
-                        borderColor: isActive
-                          ? tf.color || colors.primary
-                          : (isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border),
-                        borderRadius: borderRadius.full,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.typeFilterText,
-                        { color: isActive ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary) },
-                      ]}
-                    >
-                      {tf.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
+            <View style={{ marginVertical: 8 }}>
+              <SegmentedButtons
+                density="small"
+                value={typeFilter}
+                onValueChange={(val) => setTypeFilter(val as TypeFilterPreset)}
+                buttons={[
+                  { value: 'ALL', label: 'All Types' },
+                  { value: 'GAVE', label: 'You Gave' },
+                  { value: 'GOT', label: 'You Got' },
+                ]}
+              />
             </View>
 
             {/* 3 Metric Summary KPI Cards */}

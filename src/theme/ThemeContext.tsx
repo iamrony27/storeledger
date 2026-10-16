@@ -1,8 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { PaperProvider } from 'react-native-paper';
 import { ColorTheme, lightColors, darkColors } from './colors';
 import { spacing, borderRadius, typography } from './spacing';
+import { paperLightTheme, paperDarkTheme, ExtendedMD3Theme } from './paperTheme';
 
 type ThemeMode = 'system' | 'light' | 'dark';
 
@@ -12,6 +14,7 @@ interface ThemeContextType {
   mode: ThemeMode;
   isDark: boolean;
   colors: ColorTheme;
+  paperTheme: ExtendedMD3Theme;
   spacing: typeof spacing;
   borderRadius: typeof borderRadius;
   typography: typeof typography;
@@ -40,6 +43,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     mode === 'system' ? systemColorScheme === 'dark' : mode === 'dark';
 
   const colors = isDark ? darkColors : lightColors;
+  const paperTheme = isDark ? paperDarkTheme : paperLightTheme;
 
   const toggleTheme = () => {
     const nextMode: ThemeMode = isDark ? 'light' : 'dark';
@@ -53,20 +57,23 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   return (
-    <ThemeContext.Provider
-      value={{
-        mode,
-        isDark,
-        colors,
-        spacing,
-        borderRadius,
-        typography,
-        setThemeMode,
-        toggleTheme,
-      }}
-    >
-      {children}
-    </ThemeContext.Provider>
+    <PaperProvider theme={paperTheme}>
+      <ThemeContext.Provider
+        value={{
+          mode,
+          isDark,
+          colors,
+          paperTheme,
+          spacing,
+          borderRadius,
+          typography,
+          setThemeMode,
+          toggleTheme,
+        }}
+      >
+        {children}
+      </ThemeContext.Provider>
+    </PaperProvider>
   );
 };
 

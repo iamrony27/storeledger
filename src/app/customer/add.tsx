@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
+import { SegmentedButtons } from 'react-native-paper';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { AppTopBar } from '../../components/AppTopBar';
@@ -197,73 +198,28 @@ export default function AddCustomerScreen() {
                 <Text
                   style={[
                     styles.balanceTypeLabel,
-                    { color: colors.textSecondary },
+                    { color: colors.textSecondary, marginBottom: 8 },
                   ]}
                 >
                   {t.addCustomer.balanceTypeLabel}
                 </Text>
 
-                <View style={styles.balanceTypeRow}>
-                  <TouchableOpacity
-                    onPress={() => setBalanceType('GET')}
-                    style={[
-                      styles.balanceTypeBtn,
-                      {
-                        backgroundColor:
-                          balanceType === 'GET'
-                            ? colors.youWillGet
-                            : (isDark ? 'rgba(255,255,255,0.06)' : colors.borderLight),
-                        borderColor:
-                          balanceType === 'GET'
-                            ? colors.youWillGet
-                            : (isDark ? 'rgba(255,255,255,0.1)' : colors.border),
-                        borderRadius: 14,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.balanceTypeText,
-                        {
-                          color: balanceType === 'GET' ? '#FFFFFF' : colors.textPrimary,
-                          fontWeight: balanceType === 'GET' ? '700' : '500',
-                        },
-                      ]}
-                    >
-                      {t.dashboard.filterGet} (Receivable)
-                    </Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    onPress={() => setBalanceType('GIVE')}
-                    style={[
-                      styles.balanceTypeBtn,
-                      {
-                        backgroundColor:
-                          balanceType === 'GIVE'
-                            ? colors.youWillGive
-                            : (isDark ? 'rgba(255,255,255,0.06)' : colors.borderLight),
-                        borderColor:
-                          balanceType === 'GIVE'
-                            ? colors.youWillGive
-                            : (isDark ? 'rgba(255,255,255,0.1)' : colors.border),
-                        borderRadius: 14,
-                      },
-                    ]}
-                  >
-                    <Text
-                      style={[
-                        styles.balanceTypeText,
-                        {
-                          color: balanceType === 'GIVE' ? '#FFFFFF' : colors.textPrimary,
-                          fontWeight: balanceType === 'GIVE' ? '700' : '500',
-                        },
-                      ]}
-                    >
-                      {t.dashboard.filterGive} (Advance)
-                    </Text>
-                  </TouchableOpacity>
-                </View>
+                <SegmentedButtons
+                  value={balanceType}
+                  onValueChange={(val) => setBalanceType(val as 'GET' | 'GIVE')}
+                  buttons={[
+                    {
+                      value: 'GET',
+                      label: `${t.dashboard.filterGet} (Receivable)`,
+                      style: balanceType === 'GET' ? { backgroundColor: colors.youWillGetBg } : undefined,
+                    },
+                    {
+                      value: 'GIVE',
+                      label: `${t.dashboard.filterGive} (Advance)`,
+                      style: balanceType === 'GIVE' ? { backgroundColor: colors.youWillGiveBg } : undefined,
+                    },
+                  ]}
+                />
               </View>
             )}
           </View>

@@ -13,8 +13,8 @@ import { AppIcon } from './AppIcon';
 import { SyncIndicator } from './SyncIndicator';
 import { useTabBarVisibility } from '../context/TabBarVisibilityContext';
 import { formatINR } from '../types/customer';
-import { COLOR_HUNT_PALETTE } from '../theme/colors';
 import { useTheme } from '../theme/ThemeContext';
+import { COLOR_HUNT_PALETTE } from '../theme/colors';
 
 export interface CollapsibleExecutiveTopBarProps {
   appName?: string;
@@ -51,7 +51,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
 }) => {
   const insets = useSafeAreaInsets();
   const { topBarCollapseAnim, expandTopBar } = useTabBarVisibility();
-  const { isDark } = useTheme();
+  const { colors, isDark } = useTheme();
 
   // Metrics
   const hasSearchBar = onSearchQueryChange !== undefined || searchQuery !== undefined;
@@ -77,7 +77,6 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
   }, [diffClampedScrollY, topBarCollapseAnim, CARDS_COLLAPSE_DISTANCE]);
 
   // Active continuous driver:
-  // Directly maps scroll deltas via diffClamp on native UI thread at 60/120Hz
   const animValue =
     diffClampedScrollY ||
     topBarCollapseAnim.interpolate({
@@ -119,9 +118,9 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
 
   const handleOpenTodayTransactions = () => {
     router.push({
-      pathname: '/(tabs)/transactions',
+      pathname: '/(tabs)/transactions' as any,
       params: { filter: 'TODAY' },
-    } as any);
+    });
   };
 
   const handleOpenAllTransactions = () => {
@@ -134,9 +133,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
     <View pointerEvents="box-none" style={styles.outerWrapper}>
       {/* 
         1. DRAWER PANEL (Rendered behind Fixed Top Bar):
-        Physically slides up under the top bar like a drawer closing,
-        and slides down when scrolling up. Both open and closed states
-        feature the requested rounded bottom corners!
+        Physically slides up under the top bar like a drawer closing
       */}
       <Animated.View
         style={[
@@ -145,34 +142,58 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
             height: TOTAL_BAR_HEIGHT,
             paddingTop: FIXED_BAR_HEIGHT,
             transform: [{ translateY: drawerTranslateY }],
+            backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
+            borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#E2E8F0',
+            shadowColor: isDark ? '#000000' : '#0F172A',
           },
         ]}
       >
         <View style={styles.drawerInner}>
-          {/* Dual Hero Cards: Due (Crimson) & Paid (Forest Olive Green) */}
+          {/* Dual Hero Cards: Due (Coral) & Paid (Emerald) */}
           <View style={styles.cardsRow}>
             {/* Card 1: Till Today's Due (Receivable) */}
             <TouchableOpacity
               activeOpacity={0.88}
               onPress={handleOpenTodayTransactions}
-              style={styles.dueCard}
+              style={[
+                styles.dueCard,
+                {
+                  backgroundColor: isDark ? '#1C161D' : '#FEF2F2',
+                  borderColor: isDark ? 'rgba(248, 113, 113, 0.35)' : '#FCA5A5',
+                },
+              ]}
               accessibilityRole="button"
               accessibilityLabel={`Till Today's Due: ${formatINR(youWillGetPaise)}. Tap to view today's transactions`}
             >
               <View style={styles.cardHeader}>
-                <View style={styles.cardIconCircle}>
+                <View
+                  style={[
+                    styles.cardIconCircle,
+                    { backgroundColor: isDark ? 'rgba(248, 113, 113, 0.2)' : '#FEE2E2' },
+                  ]}
+                >
                   <AppIcon
                     family="feather"
                     name="arrow-down-left"
                     size={13}
-                    color={COLOR_HUNT_PALETTE.creamYellow}
+                    color={isDark ? '#F87171' : '#DC2626'}
                   />
                 </View>
-                <Text style={styles.cardTitle}>TILL TODAY&apos;S DUE</Text>
+                <Text
+                  style={[
+                    styles.cardTitle,
+                    { color: isDark ? '#F87171' : '#DC2626' },
+                  ]}
+                >
+                  TILL TODAY&apos;S DUE
+                </Text>
               </View>
 
               <Text
-                style={styles.cardAmount}
+                style={[
+                  styles.cardAmount,
+                  { color: isDark ? '#F87171' : '#DC2626' },
+                ]}
                 numberOfLines={1}
                 adjustsFontSizeToFit={true}
                 minimumFontScale={0.8}
@@ -181,11 +202,35 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
               </Text>
 
               <View style={styles.cardFooterRow}>
-                <Text style={styles.cardSublabel}>You&apos;ll Get</Text>
+                <Text
+                  style={[
+                    styles.cardSublabel,
+                    { color: isDark ? '#94A3B8' : '#64748B' },
+                  ]}
+                >
+                  You&apos;ll Get
+                </Text>
                 {todayGavePaise > 0 ? (
-                  <Text style={styles.cardTodayBadge}>+{formatINR(todayGavePaise)} today</Text>
+                  <Text
+                    style={[
+                      styles.cardTodayBadge,
+                      {
+                        color: isDark ? '#F87171' : '#DC2626',
+                        backgroundColor: isDark ? 'rgba(248, 113, 113, 0.16)' : '#FEE2E2',
+                      },
+                    ]}
+                  >
+                    +{formatINR(todayGavePaise)} today
+                  </Text>
                 ) : (
-                  <Text style={styles.cardTodayBadgeMuted}>Active dues</Text>
+                  <Text
+                    style={[
+                      styles.cardTodayBadgeMuted,
+                      { color: isDark ? '#64748B' : '#94A3B8' },
+                    ]}
+                  >
+                    Active dues
+                  </Text>
                 )}
               </View>
             </TouchableOpacity>
@@ -194,24 +239,45 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
             <TouchableOpacity
               activeOpacity={0.88}
               onPress={handleOpenAllTransactions}
-              style={styles.paidCard}
+              style={[
+                styles.paidCard,
+                {
+                  backgroundColor: isDark ? '#11221B' : '#ECFDF5',
+                  borderColor: isDark ? 'rgba(16, 185, 129, 0.35)' : '#6EE7B7',
+                },
+              ]}
               accessibilityRole="button"
               accessibilityLabel={`Total Paid: ${formatINR(totalGotPaise)}. Tap to view history`}
             >
               <View style={styles.cardHeader}>
-                <View style={[styles.cardIconCircle, { backgroundColor: 'rgba(241, 229, 161, 0.2)' }]}>
+                <View
+                  style={[
+                    styles.cardIconCircle,
+                    { backgroundColor: isDark ? 'rgba(16, 185, 129, 0.2)' : '#D1FAE5' },
+                  ]}
+                >
                   <AppIcon
                     family="feather"
                     name="arrow-up-right"
                     size={13}
-                    color={COLOR_HUNT_PALETTE.creamYellow}
+                    color={isDark ? '#34D399' : '#047857'}
                   />
                 </View>
-                <Text style={styles.cardTitle}>TOTAL PAID</Text>
+                <Text
+                  style={[
+                    styles.cardTitle,
+                    { color: isDark ? '#34D399' : '#047857' },
+                  ]}
+                >
+                  TOTAL PAID
+                </Text>
               </View>
 
               <Text
-                style={styles.cardAmount}
+                style={[
+                  styles.cardAmount,
+                  { color: isDark ? '#34D399' : '#047857' },
+                ]}
                 numberOfLines={1}
                 adjustsFontSizeToFit={true}
                 minimumFontScale={0.8}
@@ -220,25 +286,49 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
               </Text>
 
               <View style={styles.cardFooterRow}>
-                <Text style={styles.cardSublabel}>Received</Text>
+                <Text
+                  style={[
+                    styles.cardSublabel,
+                    { color: isDark ? '#94A3B8' : '#64748B' },
+                  ]}
+                >
+                  Received
+                </Text>
                 {todayGotPaise > 0 ? (
-                  <Text style={styles.cardTodayBadge}>+{formatINR(todayGotPaise)} today</Text>
+                  <Text
+                    style={[
+                      styles.cardTodayBadge,
+                      {
+                        color: isDark ? '#34D399' : '#047857',
+                        backgroundColor: isDark ? 'rgba(16, 185, 129, 0.16)' : '#D1FAE5',
+                      },
+                    ]}
+                  >
+                    +{formatINR(todayGotPaise)} today
+                  </Text>
                 ) : (
-                  <Text style={styles.cardTodayBadgeMuted}>All collections</Text>
+                  <Text
+                    style={[
+                      styles.cardTodayBadgeMuted,
+                      { color: isDark ? '#64748B' : '#94A3B8' },
+                    ]}
+                  >
+                    All collections
+                  </Text>
                 )}
               </View>
             </TouchableOpacity>
           </View>
 
-          {/* Integrated Search Bar: IN THE SAME BAR DIRECTLY UNDER HERO CARDS */}
+          {/* Integrated Search Bar */}
           {hasSearchBar && (
             <View style={styles.searchBarRow}>
               <View
                 style={[
                   styles.searchInputContainer,
-                  isDark && {
-                    backgroundColor: '#1E293B',
-                    borderColor: 'rgba(241, 229, 161, 0.45)',
+                  {
+                    backgroundColor: isDark ? '#131B2E' : '#F8FAFC',
+                    borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#E2E8F0',
                   },
                 ]}
               >
@@ -246,18 +336,18 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   family="feather"
                   name="search"
                   size={16}
-                  color={isDark ? COLOR_HUNT_PALETTE.creamYellow : COLOR_HUNT_PALETTE.crimsonRed}
+                  color={isDark ? '#60A5FA' : colors.primary}
                 />
                 <TextInput
                   style={[
                     styles.searchInput,
-                    isDark && { color: '#F8FAFC' },
+                    { color: isDark ? '#F8FAFC' : '#0F172A' },
                   ]}
                   value={searchQuery}
                   onChangeText={onSearchQueryChange}
                   placeholder={searchPlaceholder}
                   placeholderTextColor={
-                    isDark ? 'rgba(241, 229, 161, 0.65)' : 'rgba(100, 116, 139, 0.75)'
+                    isDark ? 'rgba(148, 163, 184, 0.7)' : 'rgba(100, 116, 139, 0.75)'
                   }
                   returnKeyType="search"
                   autoCorrect={false}
@@ -273,7 +363,12 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                     accessibilityLabel="Clear search text"
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   >
-                    <AppIcon family="feather" name="x" size={14} color={isDark ? COLOR_HUNT_PALETTE.creamYellow : '#64748B'} />
+                    <AppIcon
+                      family="feather"
+                      name="x"
+                      size={14}
+                      color={isDark ? '#94A3B8' : '#64748B'}
+                    />
                   </TouchableOpacity>
                 )}
               </View>
@@ -282,11 +377,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
         </View>
       </Animated.View>
 
-      {/* 
-        2. FIXED TOP BAR (Rendered on top of Drawer Panel with elevation: 10, zIndex: 20):
-        Remains pinned at the top status bar. Displays full branding when drawer is open,
-        and seamlessly cross-fades into the compact summary pill when drawer is closed.
-      */}
+      {/* 2. FIXED PERSISTENT TOP BAR */}
       <Animated.View
         accessibilityRole="header"
         style={[
@@ -294,6 +385,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
           {
             height: FIXED_BAR_HEIGHT,
             paddingTop: safeTopPadding,
+            backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
           },
         ]}
       >
@@ -317,25 +409,60 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
               accessibilityRole="button"
               accessibilityLabel={`${appName} ${subtitle}`}
             >
-              <View style={styles.appIconSquircle}>
+              <View
+                style={[
+                  styles.appIconSquircle,
+                  {
+                    backgroundColor: isDark ? 'rgba(37, 99, 235, 0.2)' : '#EFF6FF',
+                    borderColor: isDark ? 'rgba(96, 165, 250, 0.35)' : '#BFDBFE',
+                  },
+                ]}
+              >
                 <AppIcon
                   family="material"
                   name="book-open-page-variant"
                   size={18}
-                  color={COLOR_HUNT_PALETTE.creamYellow}
+                  color={isDark ? '#60A5FA' : '#2563EB'}
                 />
               </View>
               <View style={styles.brandTextGroup}>
                 <View style={styles.brandTitleRow}>
-                  <Text style={styles.brandTitle} numberOfLines={1}>
+                  <Text
+                    style={[
+                      styles.brandTitle,
+                      { color: isDark ? '#F8FAFC' : '#0F172A' },
+                    ]}
+                    numberOfLines={1}
+                  >
                     {appName}
                   </Text>
-                  <View style={styles.liveBadge}>
+                  <View
+                    style={[
+                      styles.liveBadge,
+                      {
+                        backgroundColor: isDark ? 'rgba(34, 197, 94, 0.18)' : 'rgba(34, 197, 94, 0.12)',
+                        borderColor: isDark ? 'rgba(74, 222, 128, 0.35)' : 'rgba(34, 197, 94, 0.25)',
+                      },
+                    ]}
+                  >
                     <View style={styles.livePulseDot} />
-                    <Text style={styles.liveBadgeText}>LIVE</Text>
+                    <Text
+                      style={[
+                        styles.liveBadgeText,
+                        { color: isDark ? '#4ADE80' : '#16A34A' },
+                      ]}
+                    >
+                      LIVE
+                    </Text>
                   </View>
                 </View>
-                <Text style={styles.brandSubtitle} numberOfLines={1}>
+                <Text
+                  style={[
+                    styles.brandSubtitle,
+                    { color: isDark ? '#94A3B8' : '#64748B' },
+                  ]}
+                  numberOfLines={1}
+                >
                   {subtitle}
                 </Text>
               </View>
@@ -343,21 +470,36 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
 
             {/* Right: Date, Sync Status */}
             <View style={styles.rightControls}>
-              <View style={styles.datePill}>
+              <View
+                style={[
+                  styles.datePill,
+                  {
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#F1F5F9',
+                    borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#E2E8F0',
+                  },
+                ]}
+              >
                 <AppIcon
                   family="feather"
                   name="calendar"
                   size={12}
-                  color={COLOR_HUNT_PALETTE.creamYellow}
+                  color={isDark ? '#94A3B8' : '#64748B'}
                 />
-                <Text style={styles.datePillText}>{todayFormattedDate}</Text>
+                <Text
+                  style={[
+                    styles.datePillText,
+                    { color: isDark ? '#94A3B8' : '#64748B' },
+                  ]}
+                >
+                  {todayFormattedDate}
+                </Text>
               </View>
 
               {showSync && <SyncIndicator compact={true} />}
             </View>
           </Animated.View>
 
-          {/* 2B. Collapsed Compact Header Row (Dedicated zero-collision flex row) */}
+          {/* 2B. Collapsed Compact Header Row */}
           <Animated.View
             pointerEvents={isCollapsed ? 'auto' : 'none'}
             style={[
@@ -376,29 +518,60 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
               accessibilityRole="button"
               accessibilityLabel={`${appName}, tap to expand`}
             >
-              <View style={styles.collapsedIconSquircle}>
+              <View
+                style={[
+                  styles.collapsedIconSquircle,
+                  {
+                    backgroundColor: isDark ? 'rgba(37, 99, 235, 0.2)' : '#EFF6FF',
+                    borderColor: isDark ? 'rgba(96, 165, 250, 0.35)' : '#BFDBFE',
+                  },
+                ]}
+              >
                 <AppIcon
                   family="material"
                   name="book-open-page-variant"
                   size={14}
-                  color={COLOR_HUNT_PALETTE.creamYellow}
+                  color={isDark ? '#60A5FA' : '#2563EB'}
                 />
               </View>
-              <Text style={styles.collapsedBrandTitle}>GWD</Text>
+              <Text
+                style={[
+                  styles.collapsedBrandTitle,
+                  { color: isDark ? '#F8FAFC' : '#0F172A' },
+                ]}
+              >
+                GWD
+              </Text>
             </TouchableOpacity>
 
-            {/* Center: Non-overlapping Due + Paid Summary Pill */}
+            {/* Center: Summary Pill */}
             <TouchableOpacity
               activeOpacity={0.85}
               onPress={handleExpandPress}
-              style={styles.collapsedSummaryPill}
+              style={[
+                styles.collapsedSummaryPill,
+                {
+                  backgroundColor: isDark ? '#131B2E' : '#F1F5F9',
+                  borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#E2E8F0',
+                },
+              ]}
               accessibilityRole="button"
               accessibilityLabel={`Due: ${formatINR(youWillGetPaise)}, Paid: ${formatINR(totalGotPaise)}. Tap to expand`}
             >
               <View style={styles.microChip}>
-                <Text style={styles.microChipLabel}>Due: </Text>
                 <Text
-                  style={styles.microChipValue}
+                  style={[
+                    styles.microChipLabel,
+                    { color: isDark ? '#F87171' : '#DC2626' },
+                  ]}
+                >
+                  Due:{' '}
+                </Text>
+                <Text
+                  style={[
+                    styles.microChipValue,
+                    { color: isDark ? '#F87171' : '#DC2626' },
+                  ]}
                   numberOfLines={1}
                   adjustsFontSizeToFit={true}
                 >
@@ -406,12 +579,29 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 </Text>
               </View>
 
-              <Text style={styles.microDivider}>•</Text>
+              <Text
+                style={[
+                  styles.microDivider,
+                  { color: isDark ? 'rgba(255, 255, 255, 0.25)' : '#CBD5E1' },
+                ]}
+              >
+                •
+              </Text>
 
               <View style={styles.microChip}>
-                <Text style={styles.microChipLabel}>Paid: </Text>
                 <Text
-                  style={styles.microChipValue}
+                  style={[
+                    styles.microChipLabel,
+                    { color: isDark ? '#34D399' : '#047857' },
+                  ]}
+                >
+                  Paid:{' '}
+                </Text>
+                <Text
+                  style={[
+                    styles.microChipValue,
+                    { color: isDark ? '#34D399' : '#047857' },
+                  ]}
                   numberOfLines={1}
                   adjustsFontSizeToFit={true}
                 >
@@ -422,14 +612,29 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
 
             {/* Right: Date & Cloud Sync Status */}
             <View style={styles.collapsedRightControls}>
-              <View style={styles.collapsedDatePill}>
+              <View
+                style={[
+                  styles.collapsedDatePill,
+                  {
+                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#F1F5F9',
+                    borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#E2E8F0',
+                  },
+                ]}
+              >
                 <AppIcon
                   family="feather"
                   name="calendar"
                   size={11}
-                  color={COLOR_HUNT_PALETTE.creamYellow}
+                  color={isDark ? '#94A3B8' : '#64748B'}
                 />
-                <Text style={styles.collapsedDateText}>{todayFormattedDate}</Text>
+                <Text
+                  style={[
+                    styles.collapsedDateText,
+                    { color: isDark ? '#94A3B8' : '#64748B' },
+                  ]}
+                >
+                  {todayFormattedDate}
+                </Text>
               </View>
 
               {showSync && <SyncIndicator compact={true} />}
@@ -437,7 +642,6 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
           </Animated.View>
         </View>
       </Animated.View>
-
     </View>
   );
 };
@@ -450,8 +654,6 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 100,
   },
-
-  // 1. Drawer Panel (The sliding hero cards drawer)
   drawerPanel: {
     position: 'absolute',
     top: 0,
@@ -459,11 +661,10 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 10,
     elevation: 6,
-    backgroundColor: COLOR_HUNT_PALETTE.headerBg, // #EF6905 (Flame Orange)
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
+    borderBottomLeftRadius: 22,
+    borderBottomRightRadius: 22,
+    borderBottomWidth: 1.5,
     overflow: 'hidden',
-    shadowColor: COLOR_HUNT_PALETTE.crimsonRed,
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.32,
     shadowRadius: 10,
@@ -473,22 +674,19 @@ const styles = StyleSheet.create({
     paddingTop: 4,
     paddingBottom: 10,
   },
-
-  // 2. Fixed Top Bar (Pinned status bar & branding)
   fixedTopBar: {
     position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     zIndex: 20,
-    elevation: 0, // NO elevation shadow in the middle of top bar on Android
-    shadowOpacity: 0, // NO shadow in the middle of top bar on iOS
+    elevation: 0,
+    shadowOpacity: 0,
     shadowRadius: 0,
     shadowOffset: { width: 0, height: 0 },
     shadowColor: 'transparent',
     borderWidth: 0,
     borderBottomWidth: 0,
-    backgroundColor: COLOR_HUNT_PALETTE.headerBg, // #EF6905 (Flame Orange)
     paddingHorizontal: 12,
   },
   fixedContent: {
@@ -496,8 +694,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
   },
-
-  // Header Rows
   expandedHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -511,8 +707,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
   },
-
-  // Branding Elements
   brandingGroup: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -523,12 +717,10 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   appIconSquircle: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    backgroundColor: COLOR_HUNT_PALETTE.crimsonRed, // #8B2626
+    width: 36,
+    height: 36,
+    borderRadius: 11,
     borderWidth: 1.2,
-    borderColor: 'rgba(241, 229, 161, 0.45)', // #F1E5A1
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -540,25 +732,21 @@ const styles = StyleSheet.create({
   brandTitle: {
     fontSize: 16,
     fontWeight: '800',
-    color: '#FFFFFF',
-    letterSpacing: 0.2,
+    letterSpacing: -0.2,
   },
   brandSubtitle: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: COLOR_HUNT_PALETTE.creamYellow, // #F1E5A1
+    fontSize: 10.5,
+    fontWeight: '500',
     marginTop: 1,
   },
   liveBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,
-    backgroundColor: 'rgba(139, 38, 38, 0.65)',
     paddingHorizontal: 5,
     paddingVertical: 1.5,
     borderRadius: 6,
     borderWidth: 0.8,
-    borderColor: 'rgba(241, 229, 161, 0.3)',
   },
   livePulseDot: {
     width: 4.5,
@@ -569,11 +757,8 @@ const styles = StyleSheet.create({
   liveBadgeText: {
     fontSize: 8.5,
     fontWeight: '800',
-    color: '#FFFFFF',
     letterSpacing: 0.4,
   },
-
-  // Collapsed Branding & Summary Pill
   collapsedBranding: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -581,19 +766,16 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
   collapsedIconSquircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 8,
-    backgroundColor: COLOR_HUNT_PALETTE.crimsonRed, // #8B2626
+    width: 30,
+    height: 30,
+    borderRadius: 9,
     borderWidth: 1.2,
-    borderColor: 'rgba(241, 229, 161, 0.45)', // #F1E5A1
     alignItems: 'center',
     justifyContent: 'center',
   },
   collapsedBrandTitle: {
-    fontSize: 13,
+    fontSize: 13.5,
     fontWeight: '800',
-    color: '#FFFFFF',
     letterSpacing: 0.3,
   },
   collapsedSummaryPill: {
@@ -601,14 +783,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 5,
-    backgroundColor: COLOR_HUNT_PALETTE.crimsonRed, // #8B2626 (Deep crimson)
+    gap: 6,
     marginHorizontal: 6,
     paddingHorizontal: 8,
-    paddingVertical: 4.5,
+    paddingVertical: 5,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: 'rgba(241, 229, 161, 0.45)',
   },
   microChip: {
     flexDirection: 'row',
@@ -617,53 +797,33 @@ const styles = StyleSheet.create({
   microChipLabel: {
     fontSize: 10,
     fontWeight: '700',
-    color: COLOR_HUNT_PALETTE.creamYellow,
   },
   microChipValue: {
     fontSize: 10.5,
     fontWeight: '800',
-    color: '#FFFFFF',
   },
   microDivider: {
     fontSize: 9,
-    color: 'rgba(241, 229, 161, 0.6)',
   },
-
-  // Top Controls (Right)
   rightControls: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 6,
     flexShrink: 0,
   },
   datePill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 3,
-    backgroundColor: 'rgba(139, 38, 38, 0.45)',
-    paddingHorizontal: 7,
+    gap: 4,
+    paddingHorizontal: 8,
     paddingVertical: 4.5,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'rgba(241, 229, 161, 0.35)',
   },
   datePillText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: COLOR_HUNT_PALETTE.creamYellow,
+    fontSize: 10.5,
+    fontWeight: '600',
   },
-  themeToggleBtn: {
-    width: 30,
-    height: 30,
-    borderRadius: 9,
-    backgroundColor: 'rgba(139, 38, 38, 0.45)',
-    borderWidth: 1,
-    borderColor: 'rgba(241, 229, 161, 0.35)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // Collapsed Right Controls
   collapsedRightControls: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -674,20 +834,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 3,
-    backgroundColor: 'rgba(139, 38, 38, 0.45)',
     paddingHorizontal: 6,
     paddingVertical: 4,
     borderRadius: 9,
     borderWidth: 1,
-    borderColor: 'rgba(241, 229, 161, 0.35)',
   },
   collapsedDateText: {
     fontSize: 9.5,
-    fontWeight: '700',
-    color: COLOR_HUNT_PALETTE.creamYellow,
+    fontWeight: '600',
   },
-
-  // Drawer Hero Cards
   cardsRow: {
     flexDirection: 'row',
     gap: 8,
@@ -696,77 +851,63 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 84,
     justifyContent: 'space-between',
-    backgroundColor: COLOR_HUNT_PALETTE.crimsonRed, // #8B2626
-    borderRadius: 14,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
+    borderRadius: 16,
+    paddingHorizontal: 11,
+    paddingVertical: 8,
     borderWidth: 1.2,
-    borderColor: 'rgba(241, 229, 161, 0.35)',
   },
   paidCard: {
     flex: 1,
     height: 84,
     justifyContent: 'space-between',
-    backgroundColor: COLOR_HUNT_PALETTE.forestGreen, // #486C2F
-    borderRadius: 14,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
+    borderRadius: 16,
+    paddingHorizontal: 11,
+    paddingVertical: 8,
     borderWidth: 1.2,
-    borderColor: 'rgba(241, 229, 161, 0.35)',
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    marginBottom: 3,
+    marginBottom: 2,
   },
   cardIconCircle: {
-    width: 19,
-    height: 19,
-    borderRadius: 6,
-    backgroundColor: 'rgba(241, 229, 161, 0.18)',
+    width: 20,
+    height: 20,
+    borderRadius: 7,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cardTitle: {
     fontSize: 9.5,
     fontWeight: '800',
-    color: COLOR_HUNT_PALETTE.creamYellow,
     letterSpacing: 0.4,
   },
   cardAmount: {
-    fontSize: 18,
+    fontSize: 18.5,
     fontWeight: '800',
-    color: '#FFFFFF',
-    marginVertical: 2,
+    marginVertical: 1,
   },
   cardFooterRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 2,
   },
   cardSublabel: {
     fontSize: 10,
     fontWeight: '600',
-    color: COLOR_HUNT_PALETTE.creamYellow,
   },
   cardTodayBadge: {
     fontSize: 9.5,
     fontWeight: '700',
-    color: '#FFFFFF',
-    backgroundColor: 'rgba(0,0,0,0.22)',
-    paddingHorizontal: 4,
-    paddingVertical: 1,
-    borderRadius: 4,
+    paddingHorizontal: 5,
+    paddingVertical: 1.5,
+    borderRadius: 5,
   },
   cardTodayBadgeMuted: {
     fontSize: 9.5,
     fontWeight: '600',
-    color: 'rgba(241, 229, 161, 0.75)',
   },
-
-  // Integrated Search Bar inside the same bar
   searchBarRow: {
     marginTop: 8,
   },
@@ -774,10 +915,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     height: 42,
-    borderRadius: 21,
-    backgroundColor: '#FFFFFF',
+    borderRadius: 14,
     borderWidth: 1.2,
-    borderColor: 'rgba(241, 229, 161, 0.5)',
     paddingHorizontal: 12,
     gap: 8,
     shadowColor: '#000',
@@ -791,7 +930,6 @@ const styles = StyleSheet.create({
     height: '100%',
     fontSize: 13,
     fontWeight: '500',
-    color: '#0F172A',
     padding: 0,
   },
   clearBtn: {

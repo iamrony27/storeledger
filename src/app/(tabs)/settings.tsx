@@ -857,13 +857,13 @@ const styles = StyleSheet.create({
   },
   sectionCard: {
     borderWidth: 1,
-    borderRadius: 18,
+    borderRadius: 20,
     padding: 16,
     shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 1.5,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
   },
   cardHeaderRow: {
     flexDirection: 'row',
@@ -896,7 +896,7 @@ const styles = StyleSheet.create({
   profileAvatar: {
     width: 48,
     height: 48,
-    borderRadius: 24,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },

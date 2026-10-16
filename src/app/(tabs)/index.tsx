@@ -311,6 +311,107 @@ export default function CustomersScreen() {
         ]}
         ListHeaderComponent={
           <View style={styles.headerContent}>
+            {/* Executive Financial Command Hero Card */}
+            <View
+              style={[
+                styles.dashboardHeroCard,
+                {
+                  backgroundColor: isDark ? '#131B2E' : (colors.surfaceElevated || colors.surface),
+                  borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.07)',
+                },
+              ]}
+            >
+              <View style={styles.heroTopRow}>
+                <View>
+                  <Text style={[styles.heroSubtitle, { color: isDark ? '#94A3B8' : colors.textSecondary }]}>
+                    TOTAL NET LEDGER POSITION
+                  </Text>
+                  <Text
+                    style={[
+                      styles.heroBalanceText,
+                      {
+                        color:
+                          summary.netBalancePaise >= 0
+                            ? (isDark ? '#F87171' : '#DC2626')
+                            : (isDark ? '#34D399' : '#047857'),
+                      },
+                    ]}
+                  >
+                    {formatINR(summary.netBalancePaise)}
+                  </Text>
+                </View>
+
+                <View
+                  style={[
+                    styles.heroBadge,
+                    {
+                      backgroundColor:
+                        summary.netBalancePaise >= 0
+                          ? (isDark ? 'rgba(248, 113, 113, 0.16)' : '#FEF2F2')
+                          : (isDark ? 'rgba(16, 185, 129, 0.16)' : '#ECFDF5'),
+                      borderColor:
+                        summary.netBalancePaise >= 0
+                          ? (isDark ? 'rgba(248, 113, 113, 0.35)' : '#FCA5A5')
+                          : (isDark ? 'rgba(16, 185, 129, 0.35)' : '#6EE7B7'),
+                    },
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.heroBadgeText,
+                      {
+                        color:
+                          summary.netBalancePaise >= 0
+                            ? (isDark ? '#F87171' : '#DC2626')
+                            : (isDark ? '#34D399' : '#047857'),
+                      },
+                    ]}
+                  >
+                    {summary.netBalancePaise >= 0 ? "TOTAL DUE" : "SURPLUS"}
+                  </Text>
+                </View>
+              </View>
+
+              {/* Quick Split Pills: Today's Movement */}
+              <View style={styles.heroSplitRow}>
+                <View
+                  style={[
+                    styles.heroMiniPill,
+                    {
+                      backgroundColor: isDark ? 'rgba(248, 113, 113, 0.1)' : '#FEF2F2',
+                      borderColor: isDark ? 'rgba(248, 113, 113, 0.25)' : '#FECACA',
+                    },
+                  ]}
+                >
+                  <AppIcon name="arrow-up-right" size={13} color={isDark ? '#F87171' : '#DC2626'} />
+                  <Text style={[styles.heroMiniPillLabel, { color: isDark ? '#94A3B8' : '#64748B' }]}>
+                    Today Gave:
+                  </Text>
+                  <Text style={[styles.heroMiniPillValue, { color: isDark ? '#F87171' : '#DC2626' }]}>
+                    {formatINR(todaySummary.gavePaise)}
+                  </Text>
+                </View>
+
+                <View
+                  style={[
+                    styles.heroMiniPill,
+                    {
+                      backgroundColor: isDark ? 'rgba(16, 185, 129, 0.1)' : '#ECFDF5',
+                      borderColor: isDark ? 'rgba(16, 185, 129, 0.25)' : '#A7F3D0',
+                    },
+                  ]}
+                >
+                  <AppIcon name="arrow-down-left" size={13} color={isDark ? '#34D399' : '#047857'} />
+                  <Text style={[styles.heroMiniPillLabel, { color: isDark ? '#94A3B8' : '#64748B' }]}>
+                    Today Got:
+                  </Text>
+                  <Text style={[styles.heroMiniPillValue, { color: isDark ? '#34D399' : '#047857' }]}>
+                    {formatINR(todaySummary.gotPaise)}
+                  </Text>
+                </View>
+              </View>
+            </View>
+
             {/* Filter Chips with Live Badges */}
             <ScrollView
               horizontal
@@ -587,6 +688,68 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingHorizontal: 16,
     marginBottom: 6,
+  },
+  dashboardHeroCard: {
+    borderRadius: 20,
+    borderWidth: 1.2,
+    padding: 16,
+    marginBottom: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 3,
+  },
+  heroTopRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  heroSubtitle: {
+    fontSize: 10.5,
+    fontWeight: '700',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+  },
+  heroBalanceText: {
+    fontSize: 26,
+    fontWeight: '900',
+    letterSpacing: -0.6,
+    marginTop: 2,
+  },
+  heroBadge: {
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  heroBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.4,
+  },
+  heroSplitRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  heroMiniPill: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  heroMiniPillLabel: {
+    fontSize: 10.5,
+    fontWeight: '600',
+  },
+  heroMiniPillValue: {
+    fontSize: 11.5,
+    fontWeight: '800',
   },
   summaryCard: {
     borderWidth: 1,

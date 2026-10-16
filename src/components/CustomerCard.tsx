@@ -124,11 +124,25 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
       style={[
         styles.cardContainer,
         {
-          borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+          borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.07)',
           backgroundColor: isDark ? '#131B2E' : colors.surface,
         },
       ]}
     >
+      {/* M3 Tonal Status Indicator Line */}
+      <View
+        style={[
+          styles.statusIndicatorLine,
+          {
+            backgroundColor: hasDue
+              ? (isDark ? '#F87171' : '#EF4444')
+              : hasAdvance
+              ? (isDark ? '#10B981' : '#059669')
+              : (isDark ? '#64748B' : '#CBD5E1'),
+          },
+        ]}
+      />
+
       {/* Left: Avatar + Name + Last Transaction Time (Opens customer ledger) */}
       <TouchableOpacity
         activeOpacity={0.7}
@@ -276,42 +290,53 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    minHeight: 68,
+    minHeight: 70,
     marginHorizontal: 12,
     marginVertical: 4.5,
-    borderRadius: 16,
+    borderRadius: 20,
     borderWidth: 1,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.04,
     shadowRadius: 8,
-    elevation: 1.5,
+    elevation: 2,
     overflow: 'hidden',
+    position: 'relative',
+  },
+  statusIndicatorLine: {
+    position: 'absolute',
+    left: 0,
+    top: 15,
+    bottom: 15,
+    width: 3.5,
+    borderTopRightRadius: 3,
+    borderBottomRightRadius: 3,
+    zIndex: 2,
   },
   leftCol: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    paddingLeft: 12,
+    paddingLeft: 14,
     paddingRight: 8,
     paddingVertical: 10,
     gap: 12,
   },
   avatarSquircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 46,
+    height: 46,
+    borderRadius: 15,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
   },
   avatarImage: {
-    width: 44,
-    height: 44,
-    borderRadius: 14,
+    width: 46,
+    height: 46,
+    borderRadius: 15,
   },
   avatarText: {
-    fontSize: 15,
+    fontSize: 15.5,
     fontWeight: '800',
     letterSpacing: -0.2,
   },
@@ -320,9 +345,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   customerName: {
-    fontSize: 15.5,
+    fontSize: 16,
     fontWeight: '700',
-    letterSpacing: -0.2,
+    letterSpacing: -0.25,
   },
   metaRow: {
     flexDirection: 'row',

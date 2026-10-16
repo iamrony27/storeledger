@@ -232,6 +232,25 @@ export default function CustomersScreen() {
     return rankAndSortCustomers(matched, searchQuery, activeSort, getCustomerRecency);
   }, [customers, searchQuery, activeFilter, activeSort, getCustomerRecency]);
 
+  // Live count per filter status for Material 3 filter badges
+  const filterCounts = useMemo(() => {
+    let get = 0;
+    let give = 0;
+    let settled = 0;
+    for (const c of customers) {
+      const type = getBalanceType(c.currentBalancePaise);
+      if (type === 'GET') get++;
+      else if (type === 'GIVE') give++;
+      else settled++;
+    }
+    return {
+      ALL: customers.length,
+      GET: get,
+      GIVE: give,
+      SETTLED: settled,
+    };
+  }, [customers]);
+
   const handleCustomerLongPress = (cust: Customer) => {
     Alert.alert(
       cust.name,
@@ -287,12 +306,12 @@ export default function CustomersScreen() {
           styles.listContainer,
           {
             paddingTop: totalTopBarHeight + 8,
-            paddingBottom: 120,
+            paddingBottom: 170,
           },
         ]}
         ListHeaderComponent={
           <View style={styles.headerContent}>
-            {/* Filter Chips */}
+            {/* Filter Chips with Live Badges */}
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -308,6 +327,7 @@ export default function CustomersScreen() {
                 ] as const
               ).map((f) => {
                 const isActive = activeFilter === f.key;
+                const count = filterCounts[f.key];
                 return (
                   <TouchableOpacity
                     key={f.key}
@@ -319,12 +339,12 @@ export default function CustomersScreen() {
                       styles.filterChip,
                       {
                         backgroundColor: isActive
-                          ? colors.primary
+                          ? (isDark ? '#2563EB' : colors.primary)
                           : (isDark ? '#131B2E' : (colors.surfaceElevated || colors.surface)),
                         borderColor: isActive
-                          ? colors.primary
+                          ? (isDark ? '#3B82F6' : colors.primary)
                           : (isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border),
-                        borderRadius: borderRadius.full,
+                        borderRadius: 20,
                       },
                       isActive && styles.filterChipActiveShadow,
                     ]}
@@ -340,6 +360,27 @@ export default function CustomersScreen() {
                     >
                       {f.label}
                     </Text>
+                    <View
+                      style={[
+                        styles.filterChipBadge,
+                        {
+                          backgroundColor: isActive
+                            ? 'rgba(255, 255, 255, 0.24)'
+                            : (isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)'),
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.filterChipBadgeText,
+                          {
+                            color: isActive ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary),
+                          },
+                        ]}
+                      >
+                        {count}
+                      </Text>
+                    </View>
                   </TouchableOpacity>
                 );
               })}
@@ -432,6 +473,25 @@ export default function CustomersScreen() {
           />
         }
       />
+
+      {/* Material 3 Expressive Extended FAB - Add Customer */}
+      <TouchableOpacity
+        onPress={() => router.push('/customer/add' as any)}
+        activeOpacity={0.85}
+        accessibilityRole="button"
+        accessibilityLabel={t.dashboard.addCustomer}
+        style={[
+          styles.fabButton,
+          {
+            backgroundColor: isDark ? '#2563EB' : colors.primary,
+            shadowColor: isDark ? '#2563EB' : '#1D4ED8',
+            borderColor: isDark ? 'rgba(96, 165, 250, 0.4)' : 'rgba(255, 255, 255, 0.25)',
+          },
+        ]}
+      >
+        <AppIcon name="user-plus" size={18} color="#FFFFFF" />
+        <Text style={styles.fabText}>{t.dashboard.addCustomer}</Text>
+      </TouchableOpacity>
 
       {/* Modern Long-Height Collapsible Executive Title Bar with Integrated Search (Color Hunt: #EF6905) */}
       <CollapsibleExecutiveTopBar
@@ -578,19 +638,58 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   filterChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     borderWidth: 1,
-    paddingHorizontal: 14,
+    paddingHorizontal: 13,
     paddingVertical: 7,
   },
   filterChipText: {
-    fontSize: 12,
+    fontSize: 12.5,
+    letterSpacing: -0.1,
+  },
+  filterChipBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 1.5,
+    borderRadius: 10,
+    minWidth: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  filterChipBadgeText: {
+    fontSize: 10.5,
+    fontWeight: '700',
   },
   filterChipActiveShadow: {
     shadowColor: '#2563EB',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  fabButton: {
+    position: 'absolute',
+    bottom: 96,
+    right: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 22,
+    borderWidth: 1.2,
+    elevation: 8,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    zIndex: 90,
+  },
+  fabText: {
+    color: '#FFFFFF',
+    fontSize: 13.5,
+    fontWeight: '700',
+    letterSpacing: 0.1,
   },
   sortBar: {
     flexDirection: 'row',

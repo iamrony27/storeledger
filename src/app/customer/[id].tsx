@@ -557,7 +557,7 @@ export default function CustomerDetailScreen() {
             {
               backgroundColor: colors.surface,
               borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
-              borderRadius: 20,
+              borderRadius: 22,
             },
           ]}
         >
@@ -606,7 +606,7 @@ export default function CustomerDetailScreen() {
               {
                 backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(15, 23, 42, 0.03)',
                 borderColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(15, 23, 42, 0.06)',
-                borderRadius: 14,
+                borderRadius: 16,
                 padding: spacing.sm + 2,
                 marginVertical: spacing.sm,
               },
@@ -682,7 +682,7 @@ export default function CustomerDetailScreen() {
               {
                 backgroundColor: isDark ? 'rgba(255, 255, 255, 0.04)' : 'rgba(15, 23, 42, 0.03)',
                 borderColor: isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(15, 23, 42, 0.06)',
-                borderRadius: 14,
+                borderRadius: 16,
                 padding: spacing.sm + 2,
                 marginVertical: spacing.xs,
               },
@@ -1286,10 +1286,10 @@ export default function CustomerDetailScreen() {
           activeOpacity={0.78}
           style={[
             styles.actionButtonSplit,
-            { backgroundColor: colors.danger, borderRadius: 16 },
+            { backgroundColor: colors.danger, borderRadius: 18 },
           ]}
         >
-          <AppIcon name="arrow-up-right" size={17} color="#FFFFFF" />
+          <AppIcon name="arrow-up-right" size={18} color="#FFFFFF" />
           <Text style={styles.actionBtnLabel}>YOU GAVE</Text>
         </TouchableOpacity>
 
@@ -1298,10 +1298,10 @@ export default function CustomerDetailScreen() {
           activeOpacity={0.78}
           style={[
             styles.actionButtonSplit,
-            { backgroundColor: colors.success, borderRadius: 16 },
+            { backgroundColor: colors.success, borderRadius: 18 },
           ]}
         >
-          <AppIcon name="arrow-down-left" size={17} color="#FFFFFF" />
+          <AppIcon name="arrow-down-left" size={18} color="#FFFFFF" />
           <Text style={styles.actionBtnLabel}>YOU GOT</Text>
         </TouchableOpacity>
       </View>
@@ -1930,11 +1930,11 @@ const styles = StyleSheet.create({
   },
   balanceCard: {
     borderWidth: 1,
-    borderRadius: 20,
+    borderRadius: 22,
     padding: 18,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.08,
     shadowRadius: 12,
     elevation: 3,
   },
@@ -2089,19 +2089,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 14,
-    borderRadius: 16,
+    borderRadius: 18,
     gap: 8,
     shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.22,
+    shadowRadius: 6,
+    elevation: 4,
   },
   actionBtnLabel: {
     color: '#FFFFFF',
-    fontSize: 12.5,
+    fontSize: 13.5,
     fontWeight: '800',
-    letterSpacing: 0.5,
+    letterSpacing: 0.4,
   },
   backBtn: {
     paddingHorizontal: 20,

@@ -54,8 +54,12 @@ const AnimatedTabItem: React.FC<TabItemProps> = ({
           styles.iconPill,
           isFocused && {
             backgroundColor: isDark
-              ? 'rgba(96, 165, 250, 0.18)'
-              : 'rgba(56, 189, 248, 0.16)',
+              ? 'rgba(96, 165, 250, 0.22)'
+              : 'rgba(56, 189, 248, 0.18)',
+            borderColor: isDark
+              ? 'rgba(96, 165, 250, 0.35)'
+              : 'rgba(56, 189, 248, 0.3)',
+            borderWidth: 1,
           },
           { transform: [{ scale: scaleAnim }] },
         ]}
@@ -273,8 +277,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '94%',
     maxWidth: 420,
-    height: 64,
-    borderRadius: 32,
+    height: 66,
+    borderRadius: 33,
     borderWidth: 1.2,
     paddingHorizontal: 4,
     elevation: 18,
@@ -294,15 +298,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   iconPill: {
-    width: 44,
-    height: 26,
-    borderRadius: 13,
+    width: 50,
+    height: 28,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 2,
   },
   tabItemLabel: {
-    fontSize: 10,
+    fontSize: 10.5,
     marginTop: 1,
     letterSpacing: 0,
     textAlign: 'center',
@@ -310,23 +314,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 1,
   },
   heroButtonWrapper: {
-    top: -14,
-    width: 52,
-    height: 52,
+    top: -16,
+    width: 54,
+    height: 54,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 10,
   },
   heroButtonCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    borderWidth: 3,
+    width: 52,
+    height: 52,
+    borderRadius: 18,
+    borderWidth: 2.5,
     alignItems: 'center',
     justifyContent: 'center',
-    elevation: 12,
+    elevation: 14,
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.5,
-    shadowRadius: 10,
+    shadowOpacity: 0.55,
+    shadowRadius: 12,
   },
 });

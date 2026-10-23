@@ -163,8 +163,24 @@ export const ConnectSupabaseModal: React.FC<ConnectSupabaseModalProps> = ({
       if (!connTest.success) {
         setTestResult(connTest);
         Alert.alert(
-          'Connection Failed',
-          `Could not reach your Supabase endpoint:\n${connTest.error}\n\nPlease check your URL and Key before saving.`
+          'Connection Notice',
+          `Could not reach your Supabase endpoint:\n\n${connTest.error}\n\nWould you like to save this configuration anyway? Offline-first sync will activate whenever the connection is restored.`,
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Save Anyway',
+              onPress: async () => {
+                await saveCustomSupabaseConfig(url, key);
+                setIsCurrentlyConnected(true);
+                onConnectionChanged?.(true);
+                Alert.alert(
+                  'Configuration Saved',
+                  'Your Supabase connection details are saved. Store Ledger will sync when your project is online.'
+                );
+                onClose();
+              },
+            },
+          ]
         );
         return;
       }
@@ -400,8 +416,8 @@ export const ConnectSupabaseModal: React.FC<ConnectSupabaseModalProps> = ({
 
                 <View style={{ marginTop: 12 }}>
                   <AppTextInput
-                    label="Publishable Key (or Legacy Anon Key)"
-                    placeholder="sbp_... or eyJhbGciOi..."
+                    label="Anon Public Key (or Publishable Key)"
+                    placeholder="eyJhbGciOi... or sb_publishable_..."
                     value={key}
                     onChangeText={handleKeyChange}
                     autoCapitalize="none"
@@ -410,7 +426,7 @@ export const ConnectSupabaseModal: React.FC<ConnectSupabaseModalProps> = ({
                     secureTextEntry={false}
                   />
                   <Text style={[styles.inputHint, { color: colors.textSecondary }]}>
-                    Supabase Dashboard → Project Settings → API → API Keys (anon public)
+                    Supabase Dashboard → Project Settings → API → Project API Keys (anon public)
                   </Text>
                 </View>
               </View>

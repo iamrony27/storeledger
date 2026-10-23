@@ -197,8 +197,20 @@ export default function SetupWizardScreen() {
       if (!connTest.success) {
         setTestResult(connTest);
         Alert.alert(
-          'Connection Test Failed',
-          `Could not reach your Supabase endpoint:\n${connTest.error}\n\nPlease check your URL and Key before continuing.`
+          'Connection Notice',
+          `Could not reach your Supabase endpoint:\n\n${connTest.error}\n\nWould you like to save this configuration anyway? Store Ledger will run offline and sync as soon as your project is online.`,
+          [
+            { text: 'Cancel', style: 'cancel' },
+            {
+              text: 'Save Anyway',
+              onPress: async () => {
+                await saveCustomSupabaseConfig(url, key);
+                await setOnboardingCompleted(true);
+                await reloadConfig();
+                router.replace('/(tabs)');
+              },
+            },
+          ]
         );
         return;
       }
@@ -831,8 +843,8 @@ export default function SetupWizardScreen() {
           />
 
           <AppTextInput
-            label="Publishable Key or Anon Key"
-            placeholder="sbp_... or eyJhbGciOiJIUzI1NiIsInR5cCI6..."
+            label="Anon Public Key (or Publishable Key)"
+            placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6... or sb_publishable_..."
             value={key}
             onChangeText={(t) => {
               setKey(t);

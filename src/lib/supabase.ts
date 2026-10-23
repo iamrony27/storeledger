@@ -1,7 +1,7 @@
 import 'react-native-url-polyfill/auto';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { validateSupabaseConfig, validateSupabaseCredentials } from './supabaseConfig';
+import { normalizeSupabaseUrl, validateSupabaseConfig, validateSupabaseCredentials } from './supabaseConfig';
 
 // Database Row Types
 export interface ProfileRow {
@@ -103,7 +103,7 @@ export function getCurrentSupabaseConfig(): { url: string; anonKey: string } {
 }
 
 export async function saveCustomSupabaseConfig(url: string, anonKey: string): Promise<boolean> {
-  const cleanUrl = url.trim();
+  const cleanUrl = normalizeSupabaseUrl(url);
   const cleanKey = anonKey.trim();
   const isValid = validateSupabaseConfig(cleanUrl, cleanKey);
   if (!isValid) return false;
@@ -163,7 +163,7 @@ export async function testSupabaseConnection(
     return { success: false, error: validation.error };
   }
 
-  const cleanUrl = url.trim().replace(/\/+$/, '');
+  const cleanUrl = normalizeSupabaseUrl(url);
   const cleanKey = key.trim();
   const startTime = Date.now();
 
@@ -171,29 +171,71 @@ export async function testSupabaseConnection(
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 9000);
 
-    const res = await fetch(`${cleanUrl}/rest/v1/`, {
-      method: 'GET',
-      headers: {
-        apikey: cleanKey,
-        Authorization: `Bearer ${cleanKey}`,
-      },
-      signal: controller.signal,
-    });
-    clearTimeout(timer);
+    let res: Response;
+    try {
+      res = await fetch(`${cleanUrl}/rest/v1/`, {
+        method: 'GET',
+        headers: {
+          apikey: cleanKey,
+          Authorization: `Bearer ${cleanKey}`,
+        },
+        signal: controller.signal,
+      });
+    } catch (fetchErr: any) {
+      // Fallback: test auth health endpoint before failing on network error
+      try {
+        const authProbe = await fetch(`${cleanUrl}/auth/v1/health`, {
+          method: 'GET',
+          headers: { apikey: cleanKey },
+          signal: controller.signal,
+        });
+        clearTimeout(timer);
+        if (authProbe.ok || authProbe.status === 200) {
+          return { success: true, latencyMs: Date.now() - startTime, statusCode: authProbe.status };
+        }
+      } catch {}
+      throw fetchErr;
+    }
 
+    clearTimeout(timer);
     const latencyMs = Date.now() - startTime;
 
     if (res.ok || res.status === 200 || res.status === 204) {
       return { success: true, latencyMs, statusCode: res.status };
     }
 
+    // If /rest/v1/ was not 200/204 but also not 401, check /auth/v1/health fallback
+    if (res.status !== 401) {
+      try {
+        const authFallback = await fetch(`${cleanUrl}/auth/v1/health`, {
+          method: 'GET',
+          headers: { apikey: cleanKey },
+        });
+        if (authFallback.ok || authFallback.status === 200) {
+          return { success: true, latencyMs: Date.now() - startTime, statusCode: authFallback.status };
+        }
+        if (authFallback.status === 503) {
+          return {
+            success: false,
+            latencyMs,
+            statusCode: 503,
+            error:
+              'Project Paused (503): Your free-tier Supabase project is currently paused. Please log in to your Supabase dashboard and click "Restore project" to unpause it.',
+          };
+        }
+      } catch {}
+    }
+
     if (res.status === 401) {
+      const isSbp = cleanKey.startsWith('sbp_');
+      const hint = isSbp
+        ? 'You entered an "sbp_..." token, which is a Personal Access Token for the Supabase CLI, not your Project API Key! In your Supabase Dashboard, go to Project Settings → API → Project API Keys, and copy the "anon public" key (starts with "eyJhbGciOi...").'
+        : 'The Supabase API key is invalid or has expired. Make sure you copy the "anon public" key from Project Settings → API in your Supabase dashboard.';
       return {
         success: false,
         latencyMs,
         statusCode: 401,
-        error:
-          'Unauthorized: The Supabase API key is invalid or has expired. Verify your Publishable (sbp_...) or Public Anon Key in Project Settings → API.',
+        error: `Unauthorized (401): ${hint}`,
       };
     }
 
@@ -203,7 +245,17 @@ export async function testSupabaseConnection(
         latencyMs,
         statusCode: 404,
         error:
-          'Project Not Found: The Supabase project URL could not be resolved. Please verify the URL.',
+          'Project Not Found (404): The Supabase project URL could not be resolved. Please make sure your Project URL has the format https://<project-id>.supabase.co',
+      };
+    }
+
+    if (res.status === 503) {
+      return {
+        success: false,
+        latencyMs,
+        statusCode: 503,
+        error:
+          'Project Paused (503): Your Supabase project appears to be paused in the free tier. Please log in to your Supabase dashboard and click "Restore project" to unpause it.',
       };
     }
 
@@ -225,7 +277,7 @@ export async function testSupabaseConnection(
     return {
       success: false,
       latencyMs,
-      error: `Cannot reach Supabase (${err?.message || 'Network request failed'}). Check your internet connection and URL.`,
+      error: `Cannot reach Supabase (${err?.message || 'Network request failed'}). Check your device internet connection and project URL.`,
     };
   }
 }

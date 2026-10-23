@@ -7,6 +7,37 @@ export interface SupabaseValidationResult {
   valid: boolean;
   error?: string;
   keyType?: 'publishable' | 'legacy_anon';
+  normalizedUrl?: string;
+}
+
+/**
+ * Normalizes user-entered Supabase project URLs:
+ * - Auto-converts dashboard browser URLs (https://supabase.com/dashboard/project/<ref>) into https://<ref>.supabase.co
+ * - Auto-prepends https:// if protocol is omitted
+ * - Strips trailing slashes and API subpaths (/rest/v1 or /auth/v1)
+ */
+export function normalizeSupabaseUrl(rawUrl?: string): string {
+  if (!rawUrl) return '';
+  let clean = rawUrl.trim();
+
+  // If user pasted dashboard browser URL: https://supabase.com/dashboard/project/<project_ref>
+  // or https://app.supabase.com/project/<project_ref>
+  const dashboardMatch = clean.match(
+    /(?:supabase\.com\/dashboard\/project|app\.supabase\.com\/project)\/([a-zA-Z0-9_-]+)/i
+  );
+  if (dashboardMatch && dashboardMatch[1]) {
+    return `https://${dashboardMatch[1]}.supabase.co`;
+  }
+
+  // Prepend https:// if protocol is omitted (e.g. xyz.supabase.co)
+  if (!clean.startsWith('http://') && !clean.startsWith('https://')) {
+    clean = `https://${clean}`;
+  }
+
+  // Strip trailing slashes and API subpaths like /rest/v1 or /auth/v1
+  clean = clean.replace(/\/+(?:rest\/v1|auth\/v1)?\/?$/i, '').replace(/\/+$/, '');
+
+  return clean;
 }
 
 /**
@@ -59,10 +90,10 @@ export function validateSupabaseCredentials(url?: string, key?: string): Supabas
     return { valid: false, error: 'Supabase Project URL is required.' };
   }
   if (!key || !key.trim()) {
-    return { valid: false, error: 'Supabase Publishable or Anon Key is required.' };
+    return { valid: false, error: 'Supabase Anon or Publishable Key is required.' };
   }
 
-  const cleanUrl = url.trim();
+  const cleanUrl = normalizeSupabaseUrl(url);
   const cleanKey = key.trim();
 
   if (cleanUrl.includes('your-project-id') || cleanUrl.includes('placeholder')) {
@@ -84,7 +115,7 @@ export function validateSupabaseCredentials(url?: string, key?: string): Supabas
     return {
       valid: false,
       error:
-        'Security Warning: You entered a Service-Role key! Service-role keys bypass all security rules and grant full administrative database access. Mobile apps must NEVER use service-role keys. Please copy your Publishable Key (sbp_...) or Public Anon Key (anon public) from Supabase Dashboard → Project Settings → API.',
+        'Security Warning: You entered a Service-Role key! Service-role keys bypass all security rules and grant full administrative database access. Mobile apps must NEVER use service-role keys. Please copy your Public Anon Key (anon public) from Supabase Dashboard → Project Settings → API.',
     };
   }
 
@@ -105,7 +136,7 @@ export function validateSupabaseCredentials(url?: string, key?: string): Supabas
       ? 'publishable'
       : 'legacy_anon';
 
-  return { valid: true, keyType };
+  return { valid: true, keyType, normalizedUrl: cleanUrl };
 }
 
 /**

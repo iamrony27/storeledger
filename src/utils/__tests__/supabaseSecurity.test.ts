@@ -1,6 +1,7 @@
 import {
   validateSupabaseConfig,
   validateSupabaseCredentials,
+  normalizeSupabaseUrl,
   isServiceRoleKey,
 } from '../../lib/supabaseConfig';
 import {
@@ -102,6 +103,34 @@ const validAnonResult = validateSupabaseCredentials(
 );
 assertEquals(validAnonResult.valid, true, 'Valid HTTPS URL and legacy anon JWT must be valid');
 assertEquals(validAnonResult.keyType, 'legacy_anon', 'keyType must be legacy_anon');
+
+// URL Normalization tests
+assertEquals(
+  normalizeSupabaseUrl('xyzcompany.supabase.co'),
+  'https://xyzcompany.supabase.co',
+  'Must auto-prepend https://'
+);
+assertEquals(
+  normalizeSupabaseUrl('https://supabase.com/dashboard/project/mhywovxqupkjztwrbpyd'),
+  'https://mhywovxqupkjztwrbpyd.supabase.co',
+  'Must convert browser dashboard URL to API URL'
+);
+assertEquals(
+  normalizeSupabaseUrl('https://xyzcompany.supabase.co/rest/v1/'),
+  'https://xyzcompany.supabase.co',
+  'Must strip trailing API subpath and slash'
+);
+
+const autoFixedDashboardResult = validateSupabaseCredentials(
+  'https://supabase.com/dashboard/project/mhywovxqupkjztwrbpyd',
+  anonJwt
+);
+assertEquals(autoFixedDashboardResult.valid, true, 'Dashboard URL must be normalized and accepted');
+assertEquals(
+  autoFixedDashboardResult.normalizedUrl,
+  'https://mhywovxqupkjztwrbpyd.supabase.co',
+  'Normalized URL must match project domain'
+);
 
 // Backward compatibility check
 assertEquals(validateSupabaseConfig('', ''), false, 'Backward compatible validator on empty input');

@@ -845,13 +845,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   tappedColLabel: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '700',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
     marginBottom: 2,
   },
   tappedColAmount: {
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: '800',
+    letterSpacing: -0.6,
   },
   tappedColDivider: {
     width: 1,
@@ -908,8 +911,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   debtorAmount: {
-    fontSize: 12,
+    fontSize: 12.5,
     fontWeight: '800',
+    letterSpacing: -0.4,
     marginLeft: 8,
   },
   debtorBarTrack: {
@@ -944,12 +948,15 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   summaryCardTitle: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '700',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
   },
   summaryCardAmount: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '800',
+    letterSpacing: -0.6,
     marginBottom: 2,
   },
   summaryCardNote: {

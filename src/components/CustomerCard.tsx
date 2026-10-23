@@ -5,6 +5,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Image,
+  ImageStyle,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { useLanguage } from '../i18n/LanguageContext';
@@ -155,7 +156,7 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
       >
         {/* Squircle Avatar with HeroUI smooth geometry */}
         {customer.avatarUrl ? (
-          <Image source={{ uri: customer.avatarUrl }} style={styles.avatarImage} />
+          <Image source={{ uri: customer.avatarUrl }} style={styles.avatarImage as ImageStyle} />
         ) : (
           <View
             style={[
@@ -290,14 +291,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    minHeight: 70,
+    minHeight: 68,
     marginHorizontal: 12,
-    marginVertical: 4.5,
-    borderRadius: 20,
+    marginVertical: 4,
+    borderRadius: 18,
     borderWidth: 1,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
+    shadowOpacity: 0.05,
     shadowRadius: 8,
     elevation: 2,
     overflow: 'hidden',
@@ -306,11 +307,11 @@ const styles = StyleSheet.create({
   statusIndicatorLine: {
     position: 'absolute',
     left: 0,
-    top: 15,
-    bottom: 15,
+    top: 14,
+    bottom: 14,
     width: 3.5,
-    borderTopRightRadius: 3,
-    borderBottomRightRadius: 3,
+    borderTopRightRadius: 4,
+    borderBottomRightRadius: 4,
     zIndex: 2,
   },
   leftCol: {
@@ -323,21 +324,21 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   avatarSquircle: {
-    width: 46,
-    height: 46,
-    borderRadius: 15,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
   },
   avatarImage: {
-    width: 46,
-    height: 46,
-    borderRadius: 15,
+    width: 44,
+    height: 44,
+    borderRadius: 14,
   },
   avatarText: {
-    fontSize: 15.5,
-    fontWeight: '800',
+    fontSize: 15,
+    fontWeight: '700',
     letterSpacing: -0.2,
   },
   nameBlock: {
@@ -345,19 +346,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   customerName: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 15.5,
+    fontWeight: '600',
     letterSpacing: -0.25,
   },
   metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    marginTop: 3,
+    gap: 4.5,
+    marginTop: 2.5,
   },
   timeText: {
-    fontSize: 12,
-    fontWeight: '400',
+    fontSize: 11.5,
+    fontWeight: '500',
+    letterSpacing: 0.1,
   },
   rightCol: {
     minWidth: 105,
@@ -370,12 +372,12 @@ const styles = StyleSheet.create({
   amountTouchArea: {
     alignItems: 'flex-end',
     justifyContent: 'center',
-    paddingVertical: 2,
+    paddingVertical: 1,
   },
   amountText: {
-    fontSize: 16.5,
+    fontSize: 16,
     fontWeight: '700',
-    letterSpacing: -0.3,
+    letterSpacing: -0.6,
   },
   amountDueDark: {
     color: '#F87171', // Luminous coral for dark mode
@@ -396,8 +398,7 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
   remindPill: {
-    marginTop: 4,
-    backgroundColor: 'rgba(34, 197, 94, 0.12)',
+    marginTop: 3.5,
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 9999,
@@ -408,33 +409,33 @@ const styles = StyleSheet.create({
     gap: 3.5,
   },
   remindText: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '700',
-    color: '#16A34A',
-    letterSpacing: 0.2,
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
   },
   advancePill: {
-    marginTop: 4,
-    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    marginTop: 3.5,
     paddingHorizontal: 7,
     paddingVertical: 2.5,
     borderRadius: 9999,
   },
   advanceLabel: {
-    fontSize: 10.5,
+    fontSize: 10,
     fontWeight: '700',
-    color: '#059669',
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
   },
   settledPill: {
-    marginTop: 4,
-    backgroundColor: 'rgba(148, 163, 184, 0.12)',
+    marginTop: 3.5,
     paddingHorizontal: 7,
     paddingVertical: 2.5,
     borderRadius: 9999,
   },
   settledLabel: {
-    fontSize: 10.5,
+    fontSize: 10,
     fontWeight: '600',
-    color: '#64748B',
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
   },
 });

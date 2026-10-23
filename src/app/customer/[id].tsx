@@ -1945,15 +1945,15 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   balanceCardLabel: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: 10.5,
+    fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
   balanceCardAmount: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '800',
-    letterSpacing: -0.5,
+    letterSpacing: -1.0,
     marginBottom: 8,
   },
   customerKpiContainer: {
@@ -1973,17 +1973,20 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   customerKpiLabel: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '600',
-    letterSpacing: -0.1,
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
   },
   customerKpiValue: {
-    fontSize: 13,
+    fontSize: 13.5,
     fontWeight: '700',
+    letterSpacing: -0.4,
   },
   netHighlight: {
-    fontSize: 14,
+    fontSize: 14.5,
     fontWeight: '800',
+    letterSpacing: -0.5,
   },
   kpiVerticalDivider: {
     width: 1,
@@ -2009,14 +2012,15 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   historyTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
   historyCount: {
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '500',
+    letterSpacing: 0.1,
   },
   noTxCard: {
     borderWidth: 1,
@@ -2056,9 +2060,11 @@ const styles = StyleSheet.create({
   txDescription: {
     fontSize: 13,
     fontWeight: '600',
+    letterSpacing: -0.1,
   },
   txDate: {
     fontSize: 11,
+    letterSpacing: 0.1,
     marginTop: 2,
   },
   txRightCol: {
@@ -2066,8 +2072,9 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   txAmount: {
-    fontSize: 14,
+    fontSize: 14.5,
     fontWeight: '700',
+    letterSpacing: -0.5,
   },
   voidBtn: {
     paddingVertical: 2,
@@ -2075,6 +2082,7 @@ const styles = StyleSheet.create({
   voidText: {
     fontSize: 10,
     fontWeight: '600',
+    letterSpacing: 0.2,
   },
   bottomActionBar: {
     flexDirection: 'row',
@@ -2101,7 +2109,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 13.5,
     fontWeight: '800',
-    letterSpacing: 0.4,
+    letterSpacing: 0.6,
   },
   backBtn: {
     paddingHorizontal: 20,

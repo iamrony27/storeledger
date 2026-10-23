@@ -1318,17 +1318,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   kpiTitle: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
+    letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
   kpiAmount: {
-    fontSize: 16,
+    fontSize: 16.5,
     fontWeight: '800',
-    letterSpacing: -0.3,
+    letterSpacing: -0.6,
   },
   kpiSub: {
     fontSize: 10,
+    letterSpacing: 0.1,
     marginTop: 2,
   },
   summaryMetaBar: {
@@ -1342,6 +1344,7 @@ const styles = StyleSheet.create({
   },
   metaBarText: {
     fontSize: 11,
+    letterSpacing: 0.1,
   },
   emptyCard: {
     alignItems: 'center',
@@ -1353,6 +1356,7 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 16,
     fontWeight: '700',
+    letterSpacing: -0.2,
     marginTop: 10,
   },
   emptyDesc: {
@@ -1388,21 +1392,25 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 13,
     fontWeight: '700',
+    letterSpacing: -0.2,
   },
   txCustName: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontSize: 14.5,
+    fontWeight: '600',
+    letterSpacing: -0.2,
     marginBottom: 2,
   },
   txTimeText: {
     fontSize: 11,
+    letterSpacing: 0.1,
   },
   txAmountCol: {
     alignItems: 'flex-end',
   },
   txAmountText: {
-    fontSize: 15,
-    fontWeight: '800',
+    fontSize: 15.5,
+    fontWeight: '700',
+    letterSpacing: -0.6,
   },
   txBadgeBox: {
     paddingHorizontal: 6,
@@ -1412,7 +1420,7 @@ const styles = StyleSheet.create({
   txBadgeText: {
     fontSize: 9,
     fontWeight: '800',
-    letterSpacing: 0.3,
+    letterSpacing: 0.5,
   },
   txMetaDetailsRow: {
     flexDirection: 'row',

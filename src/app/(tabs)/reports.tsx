@@ -498,7 +498,7 @@ const styles = StyleSheet.create({
   },
   cashCard: {
     flex: 1,
-    borderWidth: 1.2,
+    borderWidth: 1,
     borderRadius: 20,
     padding: 14,
     shadowColor: '#000',
@@ -521,19 +521,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   cashCardLabel: {
-    fontSize: 11,
-    fontWeight: '800',
-    letterSpacing: 0.5,
+    fontSize: 10,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
   },
   cashCardAmount: {
-    fontSize: 20,
+    fontSize: 21,
     fontWeight: '800',
-    letterSpacing: -0.3,
+    letterSpacing: -0.8,
     marginVertical: 2,
   },
   cashCardSubtitle: {
     fontSize: 10.5,
     fontWeight: '500',
+    letterSpacing: 0.1,
     marginTop: 2,
   },
   netBannerCard: {
@@ -554,20 +556,21 @@ const styles = StyleSheet.create({
     paddingRight: 10,
   },
   netBannerTitle: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '700',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
   netBannerAmount: {
-    fontSize: 22,
+    fontSize: 23,
     fontWeight: '800',
-    letterSpacing: -0.4,
+    letterSpacing: -0.8,
     marginVertical: 2,
   },
   netBannerSub: {
     fontSize: 11,
     fontWeight: '500',
+    letterSpacing: 0.1,
     marginTop: 1,
   },
   recoveryMeterBox: {

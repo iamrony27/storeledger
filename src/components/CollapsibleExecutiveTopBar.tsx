@@ -854,7 +854,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingHorizontal: 11,
     paddingVertical: 8,
-    borderWidth: 1.2,
+    borderWidth: 1,
   },
   paidCard: {
     flex: 1,
@@ -863,7 +863,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     paddingHorizontal: 11,
     paddingVertical: 8,
-    borderWidth: 1.2,
+    borderWidth: 1,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -881,11 +881,12 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 9.5,
     fontWeight: '800',
-    letterSpacing: 0.4,
+    letterSpacing: 0.6,
   },
   cardAmount: {
     fontSize: 18.5,
     fontWeight: '800',
+    letterSpacing: -0.6,
     marginVertical: 1,
   },
   cardFooterRow: {
@@ -895,18 +896,21 @@ const styles = StyleSheet.create({
   },
   cardSublabel: {
     fontSize: 10,
-    fontWeight: '600',
+    fontWeight: '500',
+    letterSpacing: 0.1,
   },
   cardTodayBadge: {
     fontSize: 9.5,
     fontWeight: '700',
+    letterSpacing: 0.2,
     paddingHorizontal: 5,
     paddingVertical: 1.5,
     borderRadius: 5,
   },
   cardTodayBadgeMuted: {
     fontSize: 9.5,
-    fontWeight: '600',
+    fontWeight: '500',
+    letterSpacing: 0.1,
   },
   searchBarRow: {
     marginTop: 8,
@@ -916,12 +920,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 42,
     borderRadius: 14,
-    borderWidth: 1.2,
+    borderWidth: 1,
     paddingHorizontal: 12,
     gap: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.06,
     shadowRadius: 4,
     elevation: 2,
   },
@@ -930,6 +934,7 @@ const styles = StyleSheet.create({
     height: '100%',
     fontSize: 13,
     fontWeight: '500',
+    letterSpacing: -0.1,
     padding: 0,
   },
   clearBtn: {

@@ -1,7 +1,7 @@
 import 'react-native-url-polyfill/auto';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { validateSupabaseConfig } from './supabaseConfig';
+import { validateSupabaseConfig, validateSupabaseCredentials } from './supabaseConfig';
 
 // Database Row Types
 export interface ProfileRow {
@@ -128,6 +128,172 @@ export async function clearCustomSupabaseConfig(): Promise<void> {
   );
 }
 
+/**
+ * Disconnects from custom Supabase, terminates session, resets client, and preserves local & remote records.
+ */
+export async function disconnectCustomSupabase(): Promise<void> {
+  try {
+    if (supabase && typeof supabase.auth?.signOut === 'function') {
+      await supabase.auth.signOut();
+    }
+  } catch {}
+
+  runtimeUrl = '';
+  runtimeAnonKey = '';
+  await AsyncStorage.removeItem(STORAGE_KEY_CONFIG);
+  recreateSupabaseClient('https://placeholder.supabase.co', 'placeholder-anon-key');
+}
+
+export interface ConnectionTestResult {
+  success: boolean;
+  latencyMs?: number;
+  error?: string;
+  statusCode?: number;
+}
+
+/**
+ * Tests connection to a remote Supabase project endpoint without requiring database passwords.
+ */
+export async function testSupabaseConnection(
+  url: string,
+  key: string
+): Promise<ConnectionTestResult> {
+  const validation = validateSupabaseCredentials(url, key);
+  if (!validation.valid) {
+    return { success: false, error: validation.error };
+  }
+
+  const cleanUrl = url.trim().replace(/\/+$/, '');
+  const cleanKey = key.trim();
+  const startTime = Date.now();
+
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 9000);
+
+    const res = await fetch(`${cleanUrl}/rest/v1/`, {
+      method: 'GET',
+      headers: {
+        apikey: cleanKey,
+        Authorization: `Bearer ${cleanKey}`,
+      },
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+
+    const latencyMs = Date.now() - startTime;
+
+    if (res.ok || res.status === 200 || res.status === 204) {
+      return { success: true, latencyMs, statusCode: res.status };
+    }
+
+    if (res.status === 401) {
+      return {
+        success: false,
+        latencyMs,
+        statusCode: 401,
+        error:
+          'Unauthorized: The Supabase API key is invalid or has expired. Verify your Publishable (sbp_...) or Public Anon Key in Project Settings → API.',
+      };
+    }
+
+    if (res.status === 404) {
+      return {
+        success: false,
+        latencyMs,
+        statusCode: 404,
+        error:
+          'Project Not Found: The Supabase project URL could not be resolved. Please verify the URL.',
+      };
+    }
+
+    return {
+      success: false,
+      latencyMs,
+      statusCode: res.status,
+      error: `Supabase returned HTTP ${res.status}: ${res.statusText || 'Unexpected response'}`,
+    };
+  } catch (err: any) {
+    const latencyMs = Date.now() - startTime;
+    if (err?.name === 'AbortError') {
+      return {
+        success: false,
+        latencyMs,
+        error: 'Connection timed out after 9 seconds. Please check your internet connection and Supabase URL.',
+      };
+    }
+    return {
+      success: false,
+      latencyMs,
+      error: `Cannot reach Supabase (${err?.message || 'Network request failed'}). Check your internet connection and URL.`,
+    };
+  }
+}
+
+export interface SchemaVerificationResult {
+  isInstalled: boolean;
+  missingTables: string[];
+  details: string;
+}
+
+/**
+ * Checks if the required database schema (tables, RLS) is installed on the remote Supabase project.
+ */
+export async function verifySupabaseSchema(
+  url?: string,
+  key?: string
+): Promise<SchemaVerificationResult> {
+  const activeUrl = url?.trim() || runtimeUrl;
+  const activeKey = key?.trim() || runtimeAnonKey;
+
+  const validation = validateSupabaseCredentials(activeUrl, activeKey);
+  if (!validation.valid) {
+    return {
+      isInstalled: false,
+      missingTables: ['profiles', 'customers', 'ledger_transactions', 'ledger_backups'],
+      details: validation.error || 'Invalid Supabase credentials.',
+    };
+  }
+
+  const client = createNewClient(activeUrl, activeKey);
+  const requiredTables = ['profiles', 'customers', 'ledger_transactions', 'ledger_backups'];
+  const missingTables: string[] = [];
+
+  for (const tableName of requiredTables) {
+    try {
+      const { error } = await client.from(tableName).select('id').limit(1);
+      if (error) {
+        const isMissing =
+          error.code === 'PGRST205' ||
+          error.code === '42P01' ||
+          error.message?.includes('Could not find the table') ||
+          error.message?.includes('relation') ||
+          (error.details && String(error.details).includes('does not exist'));
+
+        if (isMissing) {
+          missingTables.push(tableName);
+        }
+      }
+    } catch {
+      missingTables.push(tableName);
+    }
+  }
+
+  if (missingTables.length > 0) {
+    return {
+      isInstalled: false,
+      missingTables,
+      details: `Database tables missing: ${missingTables.join(', ')}. Please run the Store Ledger SQL Setup Script in your Supabase SQL Editor.`,
+    };
+  }
+
+  return {
+    isInstalled: true,
+    missingTables: [],
+    details: 'All required database tables and security policies are installed & verified.',
+  };
+}
+
 function recreateSupabaseClient(url: string, key: string) {
   const activeUrl = url && url.startsWith('https://') ? url : 'https://placeholder.supabase.co';
   const activeKey = key && key.length >= 20 ? key : 'placeholder-anon-key';
@@ -139,4 +305,5 @@ const initialUrl = isSupabaseConfigured() ? runtimeUrl : 'https://placeholder.su
 const initialKey = isSupabaseConfigured() ? runtimeAnonKey : 'placeholder-anon-key';
 
 export let supabase: SupabaseClient = createNewClient(initialUrl, initialKey);
+
 

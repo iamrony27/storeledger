@@ -21,6 +21,7 @@ import { AppIcon } from '../../components/AppIcon';
 import { CollapsibleExecutiveTopBar } from '../../components/CollapsibleExecutiveTopBar';
 import { CustomerCard } from '../../components/CustomerCard';
 import { EmptyState } from '../../components/EmptyState';
+import { ConnectSupabaseModal } from '../../components/ConnectSupabaseModal';
 import { useTabBarVisibility } from '../../context/TabBarVisibilityContext';
 import { syncEngine } from '../../sync/syncEngine';
 import {
@@ -61,6 +62,7 @@ export default function CustomersScreen() {
   const [activeFilter, setActiveFilter] = useState<FilterType>('ALL');
   const [activeSort, setActiveSort] = useState<SortType>('RECENT');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [connectModalVisible, setConnectModalVisible] = useState(false);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -477,6 +479,8 @@ export default function CustomersScreen() {
                 ? undefined
                 : () => router.push('/customer/add' as any)
             }
+            secondaryActionTitle={searchQuery ? undefined : 'Connect Your Supabase (Cloud Sync)'}
+            onSecondaryAction={searchQuery ? undefined : () => setConnectModalVisible(true)}
           />
         }
         refreshControl={
@@ -506,6 +510,13 @@ export default function CustomersScreen() {
         onSearchQueryChange={setSearchQuery}
         searchPlaceholder={t.dashboard.searchPlaceholder}
         onPressExpand={() => flatListRef.current?.scrollToOffset({ offset: 0, animated: true })}
+      />
+
+      {/* Connect Supabase Modal */}
+      <ConnectSupabaseModal
+        visible={connectModalVisible}
+        onClose={() => setConnectModalVisible(false)}
+        onConnectionChanged={() => handleRefresh()}
       />
     </View>
   );

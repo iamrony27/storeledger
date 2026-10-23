@@ -27,6 +27,7 @@ import {
 } from '../../lib/supabase';
 import { CloudBackupCard } from '../../components/CloudBackupCard';
 import { CloudUsageCard } from '../../components/CloudUsageCard';
+import { ConnectSupabaseModal } from '../../components/ConnectSupabaseModal';
 import { useTabBarVisibility } from '../../context/TabBarVisibilityContext';
 import { useQuickAmounts, DEFAULT_QUICK_AMOUNTS } from '../../storage/quickAmountSettings';
 
@@ -57,9 +58,6 @@ export default function SettingsScreen() {
 
   // Supabase Cloud Config Modal State
   const [sbModalVisible, setSbModalVisible] = useState(false);
-  const [sbUrl, setSbUrl] = useState('');
-  const [sbKey, setSbKey] = useState('');
-  const [savingSb, setSavingSb] = useState(false);
 
   // Quick Amount Buttons State
   const { quickAmounts, saveQuickAmounts } = useQuickAmounts();
@@ -105,58 +103,6 @@ export default function SettingsScreen() {
     await saveQuickAmounts([...DEFAULT_QUICK_AMOUNTS]);
     setQuickAmountsModalVisible(false);
     Alert.alert('Reset Done', `Quick amounts reset to default ${currencyConfig.symbol}50, ${currencyConfig.symbol}100, and ${currencyConfig.symbol}200.`);
-  };
-
-  const handleOpenSbModal = () => {
-    const current = getCurrentSupabaseConfig();
-    setSbUrl(current.url);
-    setSbKey(current.anonKey);
-    setSbModalVisible(true);
-  };
-
-  const handleSaveSbConfig = async () => {
-    if (!sbUrl.trim() || !sbKey.trim()) {
-      Alert.alert('Required', 'Please enter both Supabase Project URL and Anon Public Key.');
-      return;
-    }
-    setSavingSb(true);
-    try {
-      const success = await saveCustomSupabaseConfig(sbUrl, sbKey);
-      if (!success) {
-        Alert.alert(
-          'Invalid Configuration',
-          'Please verify that the URL starts with https:// and the Anon Key is valid.'
-        );
-        return;
-      }
-      await reloadConfig();
-      setSbModalVisible(false);
-      Alert.alert('Supabase Connected', 'Supabase credentials saved and initialized successfully!');
-    } catch (err: any) {
-      Alert.alert('Configuration Error', err?.message || 'Failed to apply credentials.');
-    } finally {
-      setSavingSb(false);
-    }
-  };
-
-  const handleResetSbConfig = async () => {
-    Alert.alert(
-      'Reset Credentials',
-      'Are you sure you want to clear saved Supabase credentials and revert to default .env?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Reset',
-          style: 'destructive',
-          onPress: async () => {
-            await clearCustomSupabaseConfig();
-            await reloadConfig();
-            setSbModalVisible(false);
-            Alert.alert('Credentials Cleared', 'Reverted to default configuration.');
-          },
-        },
-      ]
-    );
   };
 
   const handleOpenEditModal = () => {
@@ -350,10 +296,10 @@ export default function SettingsScreen() {
               />
 
               <AppButton
-                title="Configure Supabase API Key & URL"
+                title="Connect Your Supabase"
                 variant="outline"
-                onPress={handleOpenSbModal}
-                iconName="key"
+                onPress={() => setSbModalVisible(true)}
+                iconName="cloud"
                 style={{ marginTop: 8 }}
               />
             </View>
@@ -361,10 +307,10 @@ export default function SettingsScreen() {
 
           {user && (
             <AppButton
-              title="View / Edit Supabase API Key"
+              title="Manage Supabase Connection"
               variant="outline"
-              onPress={handleOpenSbModal}
-              iconName="key"
+              onPress={() => setSbModalVisible(true)}
+              iconName="cloud"
               style={{ marginTop: 8 }}
             />
           )}
@@ -714,74 +660,12 @@ export default function SettingsScreen() {
         </View>
       </Modal>
 
-      {/* Supabase API Key & Cloud Config Modal */}
-      <Modal
+      {/* Connect Your Supabase Modal */}
+      <ConnectSupabaseModal
         visible={sbModalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setSbModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View
-            style={[
-              styles.modalCard,
-              {
-                backgroundColor: colors.surface,
-                borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : colors.border,
-                borderRadius: borderRadius.lg,
-              },
-            ]}
-          >
-            <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
-                Supabase API Key & Cloud URL
-              </Text>
-              <TouchableOpacity onPress={() => setSbModalVisible(false)}>
-                <AppIcon name="x" size={20} color={colors.textSecondary} />
-              </TouchableOpacity>
-            </View>
-
-            <Text style={{ fontSize: 12, color: colors.textSecondary, lineHeight: 18 }}>
-              Enter your project URL and Anon key from supabase.com (Project Settings → API). Data will sync directly to your Postgres database.
-            </Text>
-
-            <View style={styles.modalForm}>
-              <AppTextInput
-                label="Supabase Project URL"
-                placeholder="https://xyzcompany.supabase.co"
-                value={sbUrl}
-                onChangeText={setSbUrl}
-                autoCapitalize="none"
-                iconName="globe"
-              />
-
-              <AppTextInput
-                label="Supabase Anon Public Key"
-                placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                value={sbKey}
-                onChangeText={setSbKey}
-                autoCapitalize="none"
-                iconName="key"
-              />
-            </View>
-
-            <View style={styles.modalActions}>
-              <AppButton
-                title="Reset"
-                variant="outline"
-                onPress={handleResetSbConfig}
-                style={styles.modalBtn}
-              />
-              <AppButton
-                title="Save & Connect"
-                onPress={handleSaveSbConfig}
-                loading={savingSb}
-                style={styles.modalBtn}
-              />
-            </View>
-          </View>
-        </View>
-      </Modal>
+        onClose={() => setSbModalVisible(false)}
+        onConnectionChanged={() => reloadConfig()}
+      />
 
       {/* Customize Quick Amounts Modal */}
       <Modal

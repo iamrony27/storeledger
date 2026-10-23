@@ -11,6 +11,8 @@ interface EmptyStateProps {
   description: string;
   actionTitle?: string;
   onAction?: () => void;
+  secondaryActionTitle?: string;
+  onSecondaryAction?: () => void;
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
@@ -20,6 +22,8 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   description,
   actionTitle,
   onAction,
+  secondaryActionTitle,
+  onSecondaryAction,
 }) => {
   const { colors, spacing, isDark } = useTheme();
 
@@ -53,6 +57,17 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
             onPress={onAction}
             iconName="plus"
             size="md"
+          />
+        </View>
+      )}
+      {secondaryActionTitle && onSecondaryAction && (
+        <View style={{ marginTop: 8 }}>
+          <AppButton
+            title={secondaryActionTitle}
+            variant="light"
+            onPress={onSecondaryAction}
+            iconName="cloud"
+            size="sm"
           />
         </View>
       )}

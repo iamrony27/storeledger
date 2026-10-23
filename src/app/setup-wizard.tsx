@@ -227,9 +227,15 @@ export default function SetupWizardScreen() {
       await reloadConfig();
 
       Alert.alert(
-        'Setup Complete! 🎉',
-        'Store Ledger is now connected to your personal Supabase cloud database! Real-time cloud sync is enabled.',
+        'Supabase Connected! 🎉',
+        'Your Supabase project has been connected successfully!\n\nIMPORTANT NEXT STEP FOR CLOUD SYNC:\n1. Register or sign in with your business account.\n2. Confirm your email in your inbox (or turn off email confirmation in Supabase).\n3. Once logged in, your ledger transactions will automatically sync in real time.',
         [
+          {
+            text: 'Sign In / Register Now',
+            onPress: () => {
+              router.replace('/auth/login' as any);
+            },
+          },
           {
             text: 'Open Store Ledger',
             onPress: () => {
@@ -977,8 +983,31 @@ export default function SetupWizardScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* Business Account Sync Callout */}
+          <View
+            style={[
+              styles.calloutCard,
+              {
+                backgroundColor: isDark ? 'rgba(56, 189, 248, 0.08)' : '#F0F9FF',
+                borderColor: isDark ? 'rgba(56, 189, 248, 0.25)' : '#BAE6FD',
+                borderRadius: borderRadius.md,
+                marginTop: 16,
+              },
+            ]}
+          >
+            <View style={styles.calloutHeader}>
+              <AppIcon name="info" size={16} color={colors.primary} />
+              <Text style={[styles.calloutTitle, { color: colors.primary }]}>
+                Important for Cloud Sync
+              </Text>
+            </View>
+            <Text style={[styles.calloutText, { color: colors.textPrimary }]}>
+              Connecting your Supabase project establishes the database bridge. For security (Row Level Security), you will need to register your business account and confirm your email link before cloud sync activates.
+            </Text>
+          </View>
+
           {/* Main Action: Connect & Finish */}
-          <View style={{ marginTop: 16 }}>
+          <View style={{ marginTop: 14 }}>
             <AppButton
               title="Connect & Complete Setup"
               onPress={handleConnectAndFinish}

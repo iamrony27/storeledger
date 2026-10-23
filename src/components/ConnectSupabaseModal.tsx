@@ -11,7 +11,9 @@ import {
   Share,
   ActivityIndicator,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useTheme } from '../theme/ThemeContext';
+import { useAuth } from '../auth/AuthContext';
 import { AppIcon } from './AppIcon';
 import { AppTextInput } from './AppTextInput';
 import { AppButton } from './AppButton';
@@ -40,6 +42,8 @@ export const ConnectSupabaseModal: React.FC<ConnectSupabaseModalProps> = ({
   onConnectionChanged,
 }) => {
   const { colors, borderRadius, isDark } = useTheme();
+  const router = useRouter();
+  const { user } = useAuth();
 
   const [url, setUrl] = useState('');
   const [key, setKey] = useState('');
@@ -194,10 +198,22 @@ export const ConnectSupabaseModal: React.FC<ConnectSupabaseModalProps> = ({
       setIsCurrentlyConnected(true);
       onConnectionChanged?.(true);
       Alert.alert(
-        'Supabase Connected',
-        'Your Supabase project has been connected successfully! Real-time cloud sync is now enabled.'
+        'Supabase Connected! 🎉',
+        'Your Supabase project has been connected successfully!\n\nIMPORTANT NEXT STEP FOR CLOUD SYNC:\n1. Register or sign in with your business account.\n2. Confirm your email in your inbox (if required by Supabase).\n3. Once logged in, your ledger transactions will sync automatically in real time.',
+        [
+          {
+            text: 'Sign In / Register Now',
+            onPress: () => {
+              onClose();
+              router.push('/auth/login');
+            },
+          },
+          {
+            text: 'Done',
+            onPress: onClose,
+          },
+        ]
       );
-      onClose();
     } catch (err: any) {
       Alert.alert('Error', err?.message || 'Failed to connect Supabase.');
     } finally {
@@ -361,23 +377,27 @@ export const ConnectSupabaseModal: React.FC<ConnectSupabaseModalProps> = ({
                         : isDark
                         ? 'rgba(255, 255, 255, 0.05)'
                         : colors.borderLight,
-                      borderColor: isCurrentlyConnected ? colors.success : colors.border,
+                      borderColor: isCurrentlyConnected ? (user ? colors.success : colors.warning) : colors.border,
                     },
                   ]}
                 >
                   <View
                     style={[
                       styles.statusDot,
-                      { backgroundColor: isCurrentlyConnected ? colors.success : colors.textSecondary },
+                      { backgroundColor: isCurrentlyConnected ? (user ? colors.success : colors.warning) : colors.textSecondary },
                     ]}
                   />
                   <Text
                     style={[
                       styles.statusPillText,
-                      { color: isCurrentlyConnected ? colors.success : colors.textSecondary },
+                      { color: isCurrentlyConnected ? (user ? colors.success : colors.warning) : colors.textSecondary },
                     ]}
                   >
-                    {isCurrentlyConnected ? 'Cloud Sync Enabled' : 'Offline Mode (Not Connected)'}
+                    {isCurrentlyConnected
+                      ? user
+                        ? `Cloud Sync Active (${user.email})`
+                        : 'Connected • Login Needed for Sync'
+                      : 'Offline Mode (Not Connected)'}
                   </Text>
                 </View>
 
@@ -398,6 +418,42 @@ export const ConnectSupabaseModal: React.FC<ConnectSupabaseModalProps> = ({
                   <Text style={[styles.guideTriggerText, { color: colors.primary }]}>Setup Guide</Text>
                 </TouchableOpacity>
               </View>
+
+              {/* If Supabase is connected but user is not signed in yet, show auth action card */}
+              {isCurrentlyConnected && !user && (
+                <View
+                  style={[
+                    styles.authRequiredCard,
+                    {
+                      backgroundColor: isDark ? 'rgba(245, 158, 11, 0.08)' : '#FFFBEB',
+                      borderColor: isDark ? 'rgba(245, 158, 11, 0.25)' : '#FDE68A',
+                      borderRadius: borderRadius.md,
+                    },
+                  ]}
+                >
+                  <View style={styles.authRequiredHeader}>
+                    <AppIcon name="lock" size={16} color={colors.warning} />
+                    <Text style={[styles.authRequiredTitle, { color: colors.warning }]}>
+                      Sign In Required to Activate Cloud Sync
+                    </Text>
+                  </View>
+                  <Text style={[styles.authRequiredBody, { color: colors.textSecondary }]}>
+                    Your Supabase project is connected! To begin backing up and syncing transactions across devices, you must register your business and confirm your email link.
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      onClose();
+                      router.push('/auth/login');
+                    }}
+                    style={[styles.authActionBtn, { backgroundColor: colors.primary, borderRadius: borderRadius.sm }]}
+                    accessibilityRole="button"
+                    accessibilityLabel="Sign in or register business account"
+                  >
+                    <AppIcon name="user" size={14} color="#FFFFFF" />
+                    <Text style={styles.authActionBtnText}>Sign In / Register Business Account →</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
 
               {/* Input Form */}
               <View style={styles.formSection}>
@@ -686,15 +742,6 @@ export const ConnectSupabaseModal: React.FC<ConnectSupabaseModalProps> = ({
                 </Text>
               </View>
 
-              <View style={styles.guideStepRow}>
-                <View style={[styles.stepNum, { backgroundColor: colors.primary }]}>
-                  <Text style={styles.stepNumText}>4</Text>
-                </View>
-                <Text style={[styles.guideStepText, { color: colors.textPrimary }]}>
-                  Go to <Text style={{ fontWeight: '700' }}>Project Settings → API</Text> to copy your Project URL and Publishable or Anon Key.
-                </Text>
-              </View>
-
               <View
                 style={[
                   styles.sqlPreviewBox,
@@ -716,12 +763,72 @@ export const ConnectSupabaseModal: React.FC<ConnectSupabaseModalProps> = ({
                 </Text>
               </View>
 
-              <View style={{ marginTop: 14 }}>
+              <View style={{ marginTop: 10, marginBottom: 16 }}>
                 <AppButton
                   title={copiedSql ? '✓ Script Shared / Copied' : 'Copy All-in-One SQL Script'}
                   onPress={handleCopySqlScript}
                   iconName="copy"
                 />
+              </View>
+
+              <View style={styles.guideStepRow}>
+                <View style={[styles.stepNum, { backgroundColor: colors.primary }]}>
+                  <Text style={styles.stepNumText}>4</Text>
+                </View>
+                <Text style={[styles.guideStepText, { color: colors.textPrimary }]}>
+                  Go to <Text style={{ fontWeight: '700' }}>Project Settings → API</Text> to copy your Project URL and Publishable or Anon Key.
+                </Text>
+              </View>
+
+              <View style={styles.guideStepRow}>
+                <View style={[styles.stepNum, { backgroundColor: colors.primary }]}>
+                  <Text style={styles.stepNumText}>5</Text>
+                </View>
+                <Text style={[styles.guideStepText, { color: colors.textPrimary }]}>
+                  Paste your URL & Key into Store Ledger and tap <Text style={{ fontWeight: '700' }}>&quot;Connect & Save&quot;</Text>.
+                </Text>
+              </View>
+
+              <View style={styles.guideStepRow}>
+                <View style={[styles.stepNum, { backgroundColor: colors.primary }]}>
+                  <Text style={styles.stepNumText}>6</Text>
+                </View>
+                <Text style={[styles.guideStepText, { color: colors.textPrimary }]}>
+                  Register your business account in Store Ledger (<Text style={{ fontWeight: '700' }}>Settings → Cloud Sync / Sign In</Text>).
+                </Text>
+              </View>
+
+              <View style={styles.guideStepRow}>
+                <View style={[styles.stepNum, { backgroundColor: colors.primary }]}>
+                  <Text style={styles.stepNumText}>7</Text>
+                </View>
+                <Text style={[styles.guideStepText, { color: colors.textPrimary }]}>
+                  <Text style={{ fontWeight: '700' }}>Confirm email & log in:</Text> Open your email inbox, click the verification link from Supabase, then log in to Store Ledger. Cloud sync will immediately activate and back up your transactions!
+                </Text>
+              </View>
+
+              {/* Pro-Tip Box */}
+              <View
+                style={[
+                  styles.tipBox,
+                  {
+                    backgroundColor: isDark ? 'rgba(56, 189, 248, 0.08)' : '#F0F9FF',
+                    borderColor: isDark ? 'rgba(56, 189, 248, 0.25)' : '#BAE6FD',
+                    borderRadius: borderRadius.md,
+                    marginTop: 12,
+                    marginBottom: 20,
+                  },
+                ]}
+              >
+                <View style={styles.tipBoxHeader}>
+                  <AppIcon name="zap" size={15} color={colors.primary} />
+                  <Text style={[styles.tipBoxTitle, { color: colors.primary }]}>
+                    Pro-Tip: Skip Email Confirmation
+                  </Text>
+                </View>
+                <Text style={[styles.tipBoxText, { color: colors.textSecondary }]}>
+                  Want instant sign in without waiting for an email? In your Supabase Dashboard, go to <Text style={{ fontWeight: '700' }}>Authentication → Providers → Email</Text> and toggle <Text style={{ fontWeight: '700' }}>OFF &quot;Confirm email&quot;</Text>. You can then log in right away!
+                </Text>
               </View>
             </ScrollView>
           </View>
@@ -960,5 +1067,59 @@ const styles = StyleSheet.create({
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
     fontSize: 11,
     lineHeight: 15,
+  },
+  authRequiredCard: {
+    marginHorizontal: 20,
+    marginTop: 4,
+    marginBottom: 16,
+    padding: 14,
+    borderWidth: 1,
+  },
+  authRequiredHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 6,
+  },
+  authRequiredTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    flex: 1,
+  },
+  authRequiredBody: {
+    fontSize: 12,
+    lineHeight: 17,
+    marginBottom: 10,
+  },
+  authActionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 9,
+    paddingHorizontal: 12,
+    gap: 6,
+  },
+  authActionBtnText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  tipBox: {
+    padding: 12,
+    borderWidth: 1,
+  },
+  tipBoxHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
+  tipBoxTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  tipBoxText: {
+    fontSize: 12,
+    lineHeight: 17,
   },
 });

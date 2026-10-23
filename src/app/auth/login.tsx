@@ -72,7 +72,13 @@ export default function LoginScreen() {
       if (mode === 'signin') {
         const res = await signInWithEmail(email, password);
         if (res.error) {
-          setErrorMessage(res.error);
+          if (res.error.toLowerCase().includes('email not confirmed')) {
+            setErrorMessage(
+              'Email not confirmed yet! Please check your email inbox (and spam folder) for the verification link sent by Supabase. Once confirmed, sign in here to activate real-time sync.\n\nTip: You can also disable "Confirm email" in Supabase Dashboard → Authentication → Providers → Email.'
+            );
+          } else {
+            setErrorMessage(res.error);
+          }
         } else {
           router.replace('/(tabs)');
         }
@@ -85,14 +91,18 @@ export default function LoginScreen() {
           phone
         );
         if (res.error) {
-          setErrorMessage(res.error);
+          if (res.error.toLowerCase().includes('already registered')) {
+            setErrorMessage('This email is already registered. Please switch to Sign In above.');
+          } else {
+            setErrorMessage(res.error);
+          }
         } else {
           setSuccessMessage(
-            'Account created successfully! If email confirmation is required, please check your inbox.'
+            'Business account registered! ✉️\n\nPlease check your email inbox and click the verification link to confirm your account. Once confirmed, sign in above to activate real-time cloud sync.'
           );
           setTimeout(() => {
-            router.replace('/(tabs)');
-          }, 1500);
+            setMode('signin');
+          }, 3500);
         }
       }
     } finally {

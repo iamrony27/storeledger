@@ -55,11 +55,11 @@ const AnimatedTabItem: React.FC<TabItemProps> = ({
           styles.iconPill,
           isFocused && {
             backgroundColor: isDark
-              ? 'rgba(96, 165, 250, 0.22)'
-              : 'rgba(56, 189, 248, 0.18)',
+              ? 'rgba(77, 182, 167, 0.18)'
+              : 'rgba(27, 99, 88, 0.14)',
             borderColor: isDark
-              ? 'rgba(96, 165, 250, 0.35)'
-              : 'rgba(56, 189, 248, 0.3)',
+              ? 'rgba(77, 182, 167, 0.35)'
+              : 'rgba(27, 99, 88, 0.25)',
             borderWidth: 1,
           },
           { transform: [{ scale: scaleAnim }] },
@@ -273,7 +273,7 @@ function ModernDockTabBar({
                       },
                     ]}
                   >
-                    <AppIcon name="plus" size={26} color="#FFFFFF" />
+                    <AppIcon name="plus" size={26} color={colors.textInverse} />
                   </View>
                 </TouchableOpacity>
               );

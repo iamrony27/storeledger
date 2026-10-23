@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Platform, Alert, View, Image } from 'react-native';
+import { Platform, Alert, View, Image, StatusBar as RNStatusBar } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -33,16 +33,22 @@ if (Platform.OS === 'web' && typeof window !== 'undefined') {
 }
 
 function RootLayoutContent() {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
 
   useEffect(() => {
     // Perform sync after app start
     syncEngine.syncNow();
   }, []);
 
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      RNStatusBar.setBackgroundColor(colors.surface, true);
+    }
+  }, [colors.surface]);
+
   return (
     <>
-      <StatusBar style="light" />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
       <Stack
         screenOptions={{
           headerShown: false,

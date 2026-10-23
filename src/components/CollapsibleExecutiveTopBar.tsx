@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   Animated,
   TextInput,
+  Platform,
+  StatusBar,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -55,7 +57,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
 
   // Metrics
   const hasSearchBar = onSearchQueryChange !== undefined || searchQuery !== undefined;
-  const safeTopPadding = Math.max(insets.top, 14);
+  const statusBarHeight = Platform.OS === 'android' ? (StatusBar.currentHeight || 24) : insets.top;
+  const safeTopPadding = Math.max(insets.top, statusBarHeight, 18);
   const FIXED_BAR_HEIGHT = safeTopPadding + 52;
   const CARDS_COLLAPSE_DISTANCE = 96;
   const DRAWER_HEIGHT = hasSearchBar ? 148 : 98;

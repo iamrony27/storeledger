@@ -291,7 +291,7 @@ export default function CustomersScreen() {
 
   return (
     <View style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      <StatusBar style="light" />
+      <StatusBar style={isDark ? 'light' : 'dark'} />
 
       {/* Main Content (Smooth 120Hz native driver scroll tracking, Adaptive 2-Column Grid on Tablet/Web) */}
       <Animated.FlatList
@@ -313,112 +313,11 @@ export default function CustomersScreen() {
           styles.listContainer,
           {
             paddingTop: totalTopBarHeight + 8,
-            paddingBottom: 170,
+            paddingBottom: 200,
           },
         ]}
         ListHeaderComponent={
           <View style={styles.headerContent}>
-            {/* Executive Financial Command Hero Card */}
-            <View
-              style={[
-                styles.dashboardHeroCard,
-                {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                },
-              ]}
-            >
-              <View style={styles.heroTopRow}>
-                <View>
-                  <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>
-                    TOTAL NET LEDGER POSITION
-                  </Text>
-                  <Text
-                    style={[
-                      styles.heroBalanceText,
-                      {
-                        color:
-                          summary.netBalancePaise >= 0
-                            ? colors.youWillGet
-                            : colors.youWillGive,
-                      },
-                    ]}
-                  >
-                    {formatINR(summary.netBalancePaise)}
-                  </Text>
-                </View>
-
-                <View
-                  style={[
-                    styles.heroBadge,
-                    {
-                      backgroundColor:
-                        summary.netBalancePaise >= 0
-                          ? (isDark ? 'rgba(224, 122, 95, 0.16)' : '#FDF1ED')
-                          : (isDark ? 'rgba(78, 170, 132, 0.16)' : '#EDF6F2'),
-                      borderColor:
-                        summary.netBalancePaise >= 0
-                          ? (isDark ? 'rgba(224, 122, 95, 0.35)' : '#F5C6BA')
-                          : (isDark ? 'rgba(78, 170, 132, 0.35)' : '#BBE3D1'),
-                    },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.heroBadgeText,
-                      {
-                        color:
-                          summary.netBalancePaise >= 0
-                            ? colors.youWillGet
-                            : colors.youWillGive,
-                      },
-                    ]}
-                  >
-                    {summary.netBalancePaise >= 0 ? "TOTAL DUE" : "SURPLUS"}
-                  </Text>
-                </View>
-              </View>
-
-              {/* Quick Split Pills: Today's Movement */}
-              <View style={styles.heroSplitRow}>
-                <View
-                  style={[
-                    styles.heroMiniPill,
-                    {
-                      backgroundColor: isDark ? 'rgba(224, 122, 95, 0.12)' : '#FDF1ED',
-                      borderColor: isDark ? 'rgba(224, 122, 95, 0.25)' : '#F5C6BA',
-                    },
-                  ]}
-                >
-                  <AppIcon name="arrow-up-right" size={13} color={colors.youWillGet} />
-                  <Text style={[styles.heroMiniPillLabel, { color: colors.textSecondary }]}>
-                    Today Gave:
-                  </Text>
-                  <Text style={[styles.heroMiniPillValue, { color: colors.youWillGet }]}>
-                    {formatINR(todaySummary.gavePaise)}
-                  </Text>
-                </View>
-
-                <View
-                  style={[
-                    styles.heroMiniPill,
-                    {
-                      backgroundColor: isDark ? 'rgba(78, 170, 132, 0.12)' : '#EDF6F2',
-                      borderColor: isDark ? 'rgba(78, 170, 132, 0.25)' : '#BBE3D1',
-                    },
-                  ]}
-                >
-                  <AppIcon name="arrow-down-left" size={13} color={colors.youWillGive} />
-                  <Text style={[styles.heroMiniPillLabel, { color: colors.textSecondary }]}>
-                    Today Got:
-                  </Text>
-                  <Text style={[styles.heroMiniPillValue, { color: colors.youWillGive }]}>
-                    {formatINR(todaySummary.gotPaise)}
-                  </Text>
-                </View>
-              </View>
-            </View>
-
             {/* Filter Chips with Live Badges */}
             <ScrollView
               horizontal

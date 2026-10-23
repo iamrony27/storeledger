@@ -144,8 +144,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
             height: TOTAL_BAR_HEIGHT,
             paddingTop: FIXED_BAR_HEIGHT,
             transform: [{ translateY: drawerTranslateY }],
-            backgroundColor: colors.background,
-            borderBottomColor: colors.headerBorder || colors.border,
+            backgroundColor: colors.headerBg,
+            borderBottomColor: colors.headerBorder,
             shadowColor: '#000000',
           },
         ]}
@@ -160,8 +160,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
               style={[
                 styles.dueCard,
                 {
-                  backgroundColor: isDark ? 'rgba(224, 122, 95, 0.12)' : '#FDF1ED',
-                  borderColor: isDark ? 'rgba(224, 122, 95, 0.3)' : '#F5C6BA',
+                  backgroundColor: isDark ? colors.surface : '#FFFFFF',
+                  borderColor: isDark ? colors.border : 'rgba(255, 255, 255, 0.75)',
                 },
               ]}
               accessibilityRole="button"
@@ -244,8 +244,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
               style={[
                 styles.paidCard,
                 {
-                  backgroundColor: isDark ? 'rgba(78, 170, 132, 0.12)' : '#EDF6F2',
-                  borderColor: isDark ? 'rgba(78, 170, 132, 0.3)' : '#BBE3D1',
+                  backgroundColor: isDark ? colors.surface : '#FFFFFF',
+                  borderColor: isDark ? colors.border : 'rgba(255, 255, 255, 0.75)',
                 },
               ]}
               accessibilityRole="button"
@@ -329,8 +329,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 style={[
                   styles.searchInputContainer,
                   {
-                    backgroundColor: colors.surface,
-                    borderColor: colors.border,
+                    backgroundColor: isDark ? colors.surface : '#FFFFFF',
+                    borderColor: isDark ? colors.border : 'rgba(255, 255, 255, 0.75)',
                   },
                 ]}
               >
@@ -338,17 +338,17 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   family="feather"
                   name="search"
                   size={16}
-                  color={colors.primary}
+                  color={isDark ? colors.primary : colors.secondary}
                 />
                 <TextInput
                   style={[
                     styles.searchInput,
-                    { color: colors.textPrimary },
+                    { color: isDark ? colors.textPrimary : '#161B18' },
                   ]}
                   value={searchQuery}
                   onChangeText={onSearchQueryChange}
                   placeholder={searchPlaceholder}
-                  placeholderTextColor={colors.textMuted}
+                  placeholderTextColor={isDark ? colors.textMuted : '#78756C'}
                   returnKeyType="search"
                   autoCorrect={false}
                   autoCapitalize="none"

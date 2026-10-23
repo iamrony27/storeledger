@@ -104,7 +104,7 @@ export function getCurrentSupabaseConfig(): { url: string; anonKey: string } {
 
 export async function saveCustomSupabaseConfig(url: string, anonKey: string): Promise<boolean> {
   const cleanUrl = normalizeSupabaseUrl(url);
-  const cleanKey = anonKey.trim();
+  const cleanKey = anonKey.trim().replace(/^Bearer\s+/i, '').replace(/^["']|["']$/g, '');
   const isValid = validateSupabaseConfig(cleanUrl, cleanKey);
   if (!isValid) return false;
 
@@ -164,21 +164,28 @@ export async function testSupabaseConnection(
   }
 
   const cleanUrl = normalizeSupabaseUrl(url);
-  const cleanKey = key.trim();
+  const cleanKey = key.trim().replace(/^Bearer\s+/i, '').replace(/^["']|["']$/g, '');
   const startTime = Date.now();
 
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 9000);
 
+    const isJwt = cleanKey.split('.').length === 3;
+    const reqHeaders: Record<string, string> = {
+      apikey: cleanKey,
+    };
+    // ONLY send Authorization: Bearer if the key is actually a 3-part JWT!
+    // Passing opaque publishable keys (sb_publishable_...) as Bearer causes 401 CompactDecodeError.
+    if (isJwt) {
+      reqHeaders['Authorization'] = `Bearer ${cleanKey}`;
+    }
+
     let res: Response;
     try {
       res = await fetch(`${cleanUrl}/rest/v1/`, {
         method: 'GET',
-        headers: {
-          apikey: cleanKey,
-          Authorization: `Bearer ${cleanKey}`,
-        },
+        headers: reqHeaders,
         signal: controller.signal,
       });
     } catch (fetchErr: any) {
@@ -203,6 +210,19 @@ export async function testSupabaseConnection(
     if (res.ok || res.status === 200 || res.status === 204) {
       return { success: true, latencyMs, statusCode: res.status };
     }
+
+    // Secondary probe: test via official client query
+    try {
+      const probeClient = createNewClient(cleanUrl, cleanKey);
+      const probeRes = await probeClient.from('customers').select('id').limit(1);
+      // If error is PGRST205 or 42P01 (table not found), the API key is 100% authenticated by Kong!
+      if (!probeRes.error || probeRes.error.code === 'PGRST205' || probeRes.error.code === '42P01') {
+        return { success: true, latencyMs: Date.now() - startTime, statusCode: 200 };
+      }
+      if (probeRes.status === 200) {
+        return { success: true, latencyMs: Date.now() - startTime, statusCode: 200 };
+      }
+    } catch {}
 
     // If /rest/v1/ was not 200/204 but also not 401, check /auth/v1/health fallback
     if (res.status !== 401) {
@@ -230,7 +250,7 @@ export async function testSupabaseConnection(
       const isSbp = cleanKey.startsWith('sbp_');
       const hint = isSbp
         ? 'You entered an "sbp_..." token, which is a Personal Access Token for the Supabase CLI, not your Project API Key! In your Supabase Dashboard, go to Project Settings → API → Project API Keys, and copy the "anon public" key (starts with "eyJhbGciOi...").'
-        : 'The Supabase API key is invalid or has expired. Make sure you copy the "anon public" key from Project Settings → API in your Supabase dashboard.';
+        : 'The Supabase API key is invalid or does not belong to this project URL. Make sure you copy the "anon public" key from Project Settings → API in your Supabase dashboard for this exact project.';
       return {
         success: false,
         latencyMs,

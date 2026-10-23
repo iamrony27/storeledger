@@ -51,9 +51,9 @@ export const AppButton: React.FC<AppButtonProps> = ({
     switch (variant) {
       case 'secondary':
         return {
-          mode: 'contained-tonal' as const,
-          buttonColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
-          textColor: colors.textPrimary,
+          mode: 'contained' as const,
+          buttonColor: colors.secondary,
+          textColor: '#FFFFFF',
         };
       case 'outline':
         return {

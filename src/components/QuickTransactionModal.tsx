@@ -184,6 +184,23 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
     return rankAndSortCustomers(matched, searchQuery, 'RECENT', getRecency);
   }, [customers, searchQuery, latestTxByCustomer]);
 
+  // Top 5 most recent customers for 1-tap quick pick
+  const recentCustomers = useMemo(() => {
+    return [...customers]
+      .sort((a, b) => {
+        const timeA = Math.max(
+          latestTxByCustomer.get(a.id) || 0,
+          a.updatedAt ? new Date(a.updatedAt).getTime() : 0
+        );
+        const timeB = Math.max(
+          latestTxByCustomer.get(b.id) || 0,
+          b.updatedAt ? new Date(b.updatedAt).getTime() : 0
+        );
+        return timeB - timeA;
+      })
+      .slice(0, 5);
+  }, [customers, latestTxByCustomer]);
+
   const getInitials = (name: string): string => {
     if (!name) return '?';
     const trimmed = name.trim();
@@ -396,6 +413,86 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                   onClear={() => setSearchQuery('')}
                   autoFocus={false}
                 />
+
+                {/* 1-Tap Recent Customers Horizontal Quick Pick */}
+                {recentCustomers.length > 0 && !searchQuery && (
+                  <View style={{ marginTop: 10, marginBottom: 4 }}>
+                    <Text
+                      style={[
+                        styles.recentSectionTitle,
+                        { color: colors.textSecondary },
+                      ]}
+                    >
+                      RECENT ACCOUNTS (1-TAP PICK)
+                    </Text>
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={{ gap: 8, paddingVertical: 4 }}
+                    >
+                      {recentCustomers.map((cust) => (
+                        <TouchableOpacity
+                          key={`recent-${cust.id}`}
+                          onPress={() => handleSelectCustomer(cust)}
+                          style={[
+                            styles.recentCustomerChip,
+                            {
+                              backgroundColor: isDark
+                                ? 'rgba(78, 170, 132, 0.12)'
+                                : colors.surfaceElevated,
+                              borderColor: isDark
+                                ? 'rgba(78, 170, 132, 0.3)'
+                                : colors.border,
+                            },
+                          ]}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Select ${cust.name}`}
+                        >
+                          <View
+                            style={[
+                              styles.recentAvatar,
+                              {
+                                backgroundColor: colors.secondary,
+                              },
+                            ]}
+                          >
+                            <Text style={styles.recentAvatarText}>
+                              {getInitials(cust.name)}
+                            </Text>
+                          </View>
+                          <View style={{ maxWidth: 110 }}>
+                            <Text
+                              style={[styles.recentCustName, { color: colors.textPrimary }]}
+                              numberOfLines={1}
+                            >
+                              {cust.name}
+                            </Text>
+                            <Text
+                              style={[
+                                styles.recentCustDue,
+                                {
+                                  color:
+                                    cust.currentBalancePaise > 0
+                                      ? colors.youWillGet
+                                      : cust.currentBalancePaise < 0
+                                      ? colors.secondary
+                                      : colors.textMuted,
+                                },
+                              ]}
+                              numberOfLines={1}
+                            >
+                              {cust.currentBalancePaise > 0
+                                ? `Due ${formatINR(cust.currentBalancePaise)}`
+                                : cust.currentBalancePaise < 0
+                                ? `Adv ${formatINR(Math.abs(cust.currentBalancePaise))}`
+                                : 'Settled'}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  </View>
+                )}
 
                 {/* Shortcut to Add New Customer */}
                 <TouchableOpacity
@@ -1014,5 +1111,41 @@ const styles = StyleSheet.create({
   },
   quickAmtBtnText: {
     fontSize: 13,
+  },
+  recentSectionTitle: {
+    fontSize: 10.5,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+    marginBottom: 6,
+  },
+  recentCustomerChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  recentAvatar: {
+    width: 26,
+    height: 26,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  recentAvatarText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '800',
+  },
+  recentCustName: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  recentCustDue: {
+    fontSize: 10,
+    fontWeight: '600',
   },
 });

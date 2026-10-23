@@ -11,6 +11,9 @@ export interface ColorTheme {
   primary: string;
   primaryLight: string;
   primaryDark: string;
+  secondary: string; // The vibrant Forest Green from the transaction button
+  secondaryLight: string;
+  secondaryDark: string;
   background: string;
   surface: string;
   surfaceElevated: string;
@@ -49,11 +52,14 @@ export const lightColors: ColorTheme = {
   primary: '#1B6358', // Deep editorial forest teal
   primaryLight: '#E6F2F0',
   primaryDark: '#12443C',
-  background: '#F5F2EB', // Warm natural parchment / linen
-  surface: '#FFFFFF', // Crisp paper white
-  surfaceElevated: '#EAE5DC', // Warm stone container
-  border: '#DDD8CE',
-  borderLight: '#E8E3D8',
+  secondary: '#2E7D52', // Grounded vibrant forest green (from action button)
+  secondaryLight: '#E8F5E9',
+  secondaryDark: '#1B5E20',
+  background: '#EFEBE1', // Warm natural parchment / linen (zero harsh white)
+  surface: '#FBF8F1', // Soothing warm ivory parchment (replaces stark #FFFFFF)
+  surfaceElevated: '#E8E2D6', // Warm stone container
+  border: '#DCD4C5',
+  borderLight: '#E8E1D3',
   textPrimary: '#161B18', // Deep forest ink
   textSecondary: '#5C5950', // Warm charcoal taupe
   textMuted: '#8C887C', // Soft olive stone
@@ -61,35 +67,38 @@ export const lightColors: ColorTheme = {
   // Financial Semantics (Quiet Ledger: calm terracotta & forest sage)
   youWillGet: '#BA482C', // Terracotta clay (Receivable / Udhaar)
   youWillGetBg: '#FDF1ED',
-  youWillGive: '#266C52', // Deep calm sage (Payable / Jama)
-  youWillGiveBg: '#EDF6F2',
+  youWillGive: '#2E7D52', // Grounded forest green (from action button)
+  youWillGiveBg: '#E8F5E9',
   settled: '#6E6A5E',
-  settledBg: '#F0EBE0',
+  settledBg: '#EFEAE0',
   // Alerts
   danger: '#BA482C',
   dangerBg: '#FDF1ED',
-  success: '#266C52',
-  successBg: '#EDF6F2',
+  success: '#2E7D52',
+  successBg: '#E8F5E9',
   warning: '#A67727', // Warm antique gold
   warningBg: '#FDF8EC',
-  badgeBg: '#EAE5DC',
-  inputBg: '#FFFFFF',
+  badgeBg: '#E8E2D6',
+  inputBg: '#FBF8F1', // Gentle ivory input (no harsh white glare)
   // Modern Navbar & Header Border
   tabBarBg: '#141A17', // Deep forest ink capsule
   tabBarBorder: 'rgba(255, 255, 255, 0.12)',
-  tabBarActive: '#4DB6A7', // Luminous editorial teal
+  tabBarActive: '#2E7D52', // Secondary green highlight
   tabBarInactive: '#A39F93', // Warm linen taupe
-  headerBorder: '#E2E8F0',
-  headerAccent: 'rgba(27, 99, 88, 0.25)',
+  headerBorder: '#DCD4C5',
+  headerAccent: 'rgba(46, 125, 82, 0.25)',
 };
 
 export const darkColors: ColorTheme = {
   primary: '#4DB6A7', // Luminous editorial teal
   primaryLight: 'rgba(77, 182, 167, 0.15)',
   primaryDark: '#266E63',
-  background: '#0B0E0D', // Deep forest obsidian charcoal
-  surface: '#141A17', // Quiet dark slate card
-  surfaceElevated: '#1A221E', // Raised stone container
+  secondary: '#4EAA84', // Luminous forest sage green (from action button)
+  secondaryLight: 'rgba(78, 170, 132, 0.18)',
+  secondaryDark: '#2A6650',
+  background: '#0B0F0D', // Deep forest obsidian charcoal
+  surface: '#131A16', // Quiet dark slate card (soothing matte finish)
+  surfaceElevated: '#1A231E', // Raised stone container
   border: '#232B26',
   borderLight: '#19211D',
   textPrimary: '#EDE8DF', // Warm linen ivory
@@ -110,13 +119,13 @@ export const darkColors: ColorTheme = {
   successBg: 'rgba(78, 170, 132, 0.15)',
   warning: '#D4A359', // Antique bronze / amber
   warningBg: 'rgba(212, 163, 89, 0.15)',
-  badgeBg: '#1A221E',
-  inputBg: '#141A17',
+  badgeBg: '#1A231E',
+  inputBg: '#131A16',
   // Modern Navbar & Header Border
   tabBarBg: '#0E1310', // Deep forest charcoal capsule
   tabBarBorder: 'rgba(237, 232, 223, 0.1)',
-  tabBarActive: '#4DB6A7', // Calm luminous teal
+  tabBarActive: '#4EAA84', // Secondary green highlight
   tabBarInactive: '#8E8A7E', // Soft warm taupe
   headerBorder: '#334155',
-  headerAccent: 'rgba(77, 182, 167, 0.4)',
+  headerAccent: 'rgba(78, 170, 132, 0.35)',
 };

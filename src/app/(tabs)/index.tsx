@@ -13,9 +13,9 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Chip as PaperChip, FAB as PaperFAB } from 'react-native-paper';
+import { router } from 'expo-router';
+import { Chip as PaperChip } from 'react-native-paper';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { AppIcon } from '../../components/AppIcon';
@@ -457,22 +457,6 @@ export default function CustomersScreen() {
             progressViewOffset={totalTopBarHeight}
           />
         }
-      />
-
-      {/* Material 3 Expressive Extended FAB - Add Customer */}
-      <PaperFAB
-        icon="account-plus"
-        label={t.dashboard.addCustomer}
-        onPress={() => router.push('/customer/add' as any)}
-        accessibilityLabel={t.dashboard.addCustomer}
-        mode="elevated"
-        style={[
-          styles.fabButton,
-          {
-            backgroundColor: colors.primary,
-          },
-        ]}
-        color={colors.textInverse}
       />
 
       {/* Modern Long-Height Collapsible Executive Title Bar with Integrated Search (Color Hunt: #EF6905) */}

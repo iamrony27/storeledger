@@ -14,24 +14,24 @@ export const paperLightTheme: ExtendedMD3Theme = {
     onPrimary: '#FFFFFF',
     primaryContainer: '#E6F2F0',
     onPrimaryContainer: '#0F3831',
-    secondary: '#8A6F4E', // Antique bronze
+    secondary: '#2E7D52', // Grounded vibrant forest green (from action button)
     onSecondary: '#FFFFFF',
-    secondaryContainer: '#F5ECE1',
-    onSecondaryContainer: '#3C2E1D',
-    tertiary: '#266C52', // Forest sage
+    secondaryContainer: '#E8F5E9',
+    onSecondaryContainer: '#1B5E20',
+    tertiary: '#8A6F4E', // Antique bronze
     onTertiary: '#FFFFFF',
-    tertiaryContainer: '#EDF6F2',
-    onTertiaryContainer: '#133D2D',
-    background: '#F5F2EB', // Warm parchment
+    tertiaryContainer: '#F5ECE1',
+    onTertiaryContainer: '#3C2E1D',
+    background: '#EFEBE1', // Warm parchment canvas (zero harsh white)
     onBackground: '#161B18',
-    surface: '#FFFFFF',
+    surface: '#FBF8F1', // Soothing warm ivory parchment (replaces stark white)
     onSurface: '#161B18',
-    surfaceVariant: '#EAE5DC',
+    surfaceVariant: '#E8E2D6',
     onSurfaceVariant: '#5C5950',
     surfaceDisabled: 'rgba(22, 27, 24, 0.12)',
     onSurfaceDisabled: 'rgba(22, 27, 24, 0.38)',
-    outline: '#DDD8CE',
-    outlineVariant: '#E8E3D8',
+    outline: '#DCD4C5',
+    outlineVariant: '#E8E1D3',
     error: '#BA482C', // Terracotta
     onError: '#FFFFFF',
     errorContainer: '#FDF1ED',
@@ -39,11 +39,11 @@ export const paperLightTheme: ExtendedMD3Theme = {
     elevation: {
       ...MD3LightTheme.colors.elevation,
       level0: 'transparent',
-      level1: '#FFFFFF',
-      level2: '#F8F6F1',
-      level3: '#EFEBE2',
-      level4: '#E6E0D5',
-      level5: '#DDD6C9',
+      level1: '#FBF8F1',
+      level2: '#F4EFE6',
+      level3: '#EBE5D9',
+      level4: '#E2DBCE',
+      level5: '#D8D1C3',
     },
   },
   customColors: lightColors,
@@ -58,14 +58,14 @@ export const paperDarkTheme: ExtendedMD3Theme = {
     onPrimary: '#0B0E0D',
     primaryContainer: '#1A2E2A',
     onPrimaryContainer: '#9EE1D7',
-    secondary: '#D4A359', // Antique bronze
-    onSecondary: '#2E200B',
-    secondaryContainer: '#453216',
-    onSecondaryContainer: '#F5D8A3',
-    tertiary: '#4EAA84', // Forest sage
-    onTertiary: '#0C261C',
-    tertiaryContainer: '#1C3B2E',
-    onTertiaryContainer: '#A5E2C8',
+    secondary: '#4EAA84', // Luminous forest sage green (from action button)
+    onSecondary: '#0B0E0D',
+    secondaryContainer: 'rgba(78, 170, 132, 0.18)',
+    onSecondaryContainer: '#C6EFE1',
+    tertiary: '#D4A359', // Antique bronze
+    onTertiary: '#2E200B',
+    tertiaryContainer: '#453216',
+    onTertiaryContainer: '#F5D8A3',
     background: '#0B0E0D', // Deep forest obsidian charcoal
     onBackground: '#EDE8DF',
     surface: '#141A17', // Quiet slate

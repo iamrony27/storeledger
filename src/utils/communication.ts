@@ -1,5 +1,6 @@
 import { Linking, Alert, Platform } from 'react-native';
 import { SupportedLanguage } from '../i18n/translations';
+import { SupportedCurrency } from './ledgerMath';
 import {
   cleanPhoneNumber,
   getLocalizedReminderText,
@@ -57,6 +58,7 @@ export async function openWhatsAppReminder(options: {
   businessPhone?: string | null;
   lastPayment?: LastPaymentInfo | null;
   language?: SupportedLanguage;
+  currencyCode?: SupportedCurrency;
 }): Promise<boolean> {
   const clean = cleanPhoneNumber(options.phoneNumber);
   if (!clean) {
@@ -71,6 +73,7 @@ export async function openWhatsAppReminder(options: {
     businessPhone: options.businessPhone,
     lastPayment: options.lastPayment,
     language: options.language || 'en',
+    currencyCode: options.currencyCode,
   });
 
   const encodedMsg = encodeURIComponent(message);

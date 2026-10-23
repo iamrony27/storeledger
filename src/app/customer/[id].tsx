@@ -1138,8 +1138,19 @@ export default function CustomerDetailScreen() {
                               { color: colors.textPrimary },
                             ]}
                           >
-                            {tx.description || (isGave ? 'You Gave' : 'You Got')}
+                            {isGave ? 'You Gave' : 'You Got'}
                           </Text>
+                          {Boolean(tx.description) && (
+                            <Text
+                              style={[
+                                styles.txSubDescription,
+                                { color: colors.textSecondary },
+                              ]}
+                              numberOfLines={1}
+                            >
+                              {tx.description}
+                            </Text>
+                          )}
                           <Text
                             style={[
                               styles.txDate,
@@ -2116,6 +2127,11 @@ const styles = StyleSheet.create({
   txDescription: {
     fontSize: 13,
     fontWeight: '600',
+    letterSpacing: -0.1,
+  },
+  txSubDescription: {
+    fontSize: 11.5,
+    marginTop: 1,
     letterSpacing: -0.1,
   },
   txDate: {

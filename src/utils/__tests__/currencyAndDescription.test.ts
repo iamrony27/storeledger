@@ -10,6 +10,8 @@ import {
   formatTransactionReceiptText,
   formatCustomerStatementText,
 } from '../receiptGenerator';
+import { formatCustomerDueShareMessage } from '../reminderMessages';
+import { generateCustomerStatementHtml } from '../pdfTemplates';
 import { Customer, LedgerTransaction } from '../../types/customer';
 
 function assertEquals<T>(actual: T, expected: T, message: string) {
@@ -211,6 +213,39 @@ export function runAllCurrencyAndDescriptionTests() {
   // Case 3E: Customer statement text with multi-currency
   const statementEUR = formatCustomerStatementText(customer, business, 'EUR');
   assertTrue(statementEUR.includes('Net Balance: *€500*'), 'Statement formats EUR balance');
+
+  // Case 3F: WhatsApp due reminders in multi-currency
+  const reminderUSD = formatCustomerDueShareMessage({
+    customerName: customer.name,
+    balancePaise: 50000,
+    businessName: business.business_name,
+    currencyCode: 'USD',
+    language: 'en',
+    lastPayment: { amountPaise: 25000, date: new Date().toISOString() },
+  });
+  assertTrue(reminderUSD.includes('TOTAL PENDING DUE:* *$500*'), 'WhatsApp reminder formats USD due');
+  assertTrue(reminderUSD.includes('Amount Paid:* *$250*'), 'WhatsApp reminder formats USD last paid');
+
+  const reminderBDT = formatCustomerDueShareMessage({
+    customerName: customer.name,
+    balancePaise: 75000,
+    businessName: business.business_name,
+    currencyCode: 'BDT',
+    language: 'bn',
+    lastPayment: { amountPaise: 30000, date: new Date().toISOString() },
+  });
+  assertTrue(reminderBDT.includes('মোট বকেয়া পাওনা (Total Due):* *৳750*') || reminderBDT.includes('মোট বকেয়া পাওনা (Total Due):* *৳৭৫০*'), 'WhatsApp reminder formats BDT due');
+
+  // Case 3G: PDF statement with currency and notes
+  const pdfHtml = generateCustomerStatementHtml(
+    customer,
+    [txGaveWithDesc],
+    business,
+    { currencyCode: 'GBP' }
+  );
+  assertTrue(pdfHtml.includes('£350'), 'PDF statement formats amounts in GBP');
+  assertTrue(pdfHtml.includes('Bale of Cotton Yarn (Grade A)'), 'PDF statement contains transaction note');
+  assertTrue(pdfHtml.includes('Credit Given'), 'PDF statement contains Credit Given particulars');
 
   console.log('All Multi-Currency & Universal Description test assertions passed!\n');
 }

@@ -11,8 +11,9 @@ import {
   Platform,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
+import { useCurrency } from '../currency/CurrencyContext';
 import { SupportedLanguage } from '../i18n/translations';
-import { Customer, formatINR } from '../types/customer';
+import { Customer } from '../types/customer';
 import { AppIcon } from './AppIcon';
 import {
   LastPaymentInfo,
@@ -41,6 +42,7 @@ export const WhatsAppShareModal: React.FC<WhatsAppShareModalProps> = ({
   initialLanguage = 'en',
 }) => {
   const { colors, isDark } = useTheme();
+  const { currency, formatAmount } = useCurrency();
   const [selectedLanguage, setSelectedLanguage] =
     useState<SupportedLanguage>(initialLanguage);
 
@@ -53,10 +55,11 @@ export const WhatsAppShareModal: React.FC<WhatsAppShareModalProps> = ({
       businessPhone,
       lastPayment,
       language: selectedLanguage,
+      currencyCode: currency,
     });
-  }, [customer, businessName, businessPhone, lastPayment, selectedLanguage]);
+  }, [customer, businessName, businessPhone, lastPayment, selectedLanguage, currency]);
 
-  const dueAmountStr = formatINR(Math.abs(customer.currentBalancePaise));
+  const dueAmountStr = formatAmount(Math.abs(customer.currentBalancePaise));
   const isDue = customer.currentBalancePaise > 0;
   const isAdvance = customer.currentBalancePaise < 0;
 
@@ -81,6 +84,7 @@ export const WhatsAppShareModal: React.FC<WhatsAppShareModalProps> = ({
       businessPhone,
       lastPayment,
       language: selectedLanguage,
+      currencyCode: currency,
     });
 
     if (opened) {
@@ -246,7 +250,7 @@ export const WhatsAppShareModal: React.FC<WhatsAppShareModalProps> = ({
                   <Text
                     style={[styles.statValue, { color: colors.success }]}
                   >
-                    {formatINR(lastPayment.amountPaise)}
+                    {formatAmount(lastPayment.amountPaise)}
                   </Text>
                   <Text
                     style={[styles.statSubValue, { color: colors.textMuted }]}

@@ -161,7 +161,9 @@ export function generateCustomerStatementHtml(
         : t.type === 'GAVE'
         ? 'Credit Given'
         : 'Payment Received';
-      const descEscaped = escapeHtml(t.description) || defaultDesc;
+      const descEscaped = t.description
+        ? `<div>${defaultDesc}</div><div style="font-size: 11px; color: #64748b; margin-top: 2px;">Note: ${escapeHtml(t.description)}</div>`
+        : defaultDesc;
       const billEscaped = t.billNumber
         ? `<div style="margin-top: 3px;"><span style="display: inline-block; background-color: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; border-radius: 3px; padding: 1px 6px; font-size: 10px; font-weight: 700; letter-spacing: 0.3px;">Slip/Inv #: ${escapeHtml(t.billNumber)}</span></div>`
         : '';

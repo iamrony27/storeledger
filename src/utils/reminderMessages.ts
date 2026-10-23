@@ -1,6 +1,6 @@
 import { SupportedLanguage } from '../i18n/translations';
 import { LedgerTransaction } from '../types/customer';
-import { formatINR } from './ledgerMath';
+import { formatCurrency, formatINR, SupportedCurrency } from './ledgerMath';
 
 export interface LastPaymentInfo {
   amountPaise: number;
@@ -14,6 +14,7 @@ export interface DueReminderShareOptions {
   businessPhone?: string | null;
   lastPayment?: LastPaymentInfo | null;
   language?: SupportedLanguage;
+  currencyCode?: SupportedCurrency;
 }
 
 /**
@@ -106,9 +107,12 @@ export function formatCustomerDueShareMessage(
     businessPhone,
     lastPayment,
     language = 'en',
+    currencyCode = 'INR',
   } = options;
 
-  const dueStr = formatINR(Math.abs(balancePaise));
+  const formatAmount = (paise: number) => formatCurrency(paise, currencyCode);
+  const dueStr = formatAmount(Math.abs(balancePaise));
+  const zeroStr = formatAmount(0);
   const biz = businessName?.trim() || 'Store Ledger';
   const divider = '━━━━━━━━━━━━━━━━━━━━━━━━━';
 
@@ -117,7 +121,7 @@ export function formatCustomerDueShareMessage(
     const lastPaidBlock = lastPayment
       ? [
           `📥 *সর্বশেষ জমা পরিশোধ (Last Payment):*`,
-          `💵 *জমা দেওয়া টাকা:* *${formatINR(lastPayment.amountPaise)}*`,
+          `💵 *জমা দেওয়া টাকা:* *${formatAmount(lastPayment.amountPaise)}*`,
           `🗓️ *জমার তারিখ:* *${formatFriendlyDate(lastPayment.date, 'bn')}*`,
         ].join('\n')
       : `📥 *সর্বশেষ জমা:* *পূর্বে কোনো জমা রেকর্ড নেই (নতুন খাতা)*`;
@@ -182,7 +186,7 @@ export function formatCustomerDueShareMessage(
         `নমস্কার *${customerName}* বাবু,`,
         `আপনার লেজার খাতার সমস্ত হিসাব সম্পন্ন হয়েছে। কোনো বকেয়া নেই।`,
         ``,
-        `✅ *মোট বকেয়া (Balance):* *₹০.০০ (পরিশোধিত)*`,
+        `✅ *মোট বকেয়া (Balance):* *${zeroStr} (পরিশোধিত)*`,
         ``,
         divider,
         lastPaidBlock,
@@ -201,7 +205,7 @@ export function formatCustomerDueShareMessage(
     const lastPaidBlock = lastPayment
       ? [
           `📥 *पिछला भुगतान प्राप्त (Last Payment):*`,
-          `💵 *जमा राशि:* *${formatINR(lastPayment.amountPaise)}*`,
+          `💵 *जमा राशि:* *${formatAmount(lastPayment.amountPaise)}*`,
           `🗓️ *भुगतान तिथि:* *${formatFriendlyDate(lastPayment.date, 'hi')}*`,
         ].join('\n')
       : `📥 *पिछला भुगतान:* *अभी तक कोई पिछला भुगतान दर्ज नहीं है (नया खाता)*`;
@@ -266,7 +270,7 @@ export function formatCustomerDueShareMessage(
         `नमस्ते *${customerName}* जी,`,
         `आपके खाते का पूरा हिसाब चुकता हो चुका है। कोई बकाया नहीं है।`,
         ``,
-        `✅ *कुल बकाया (Balance):* *₹0.00 (चुका दिया गया)*`,
+        `✅ *कुल बकाया (Balance):* *${zeroStr} (चुका दिया गया)*`,
         ``,
         divider,
         lastPaidBlock,
@@ -284,7 +288,7 @@ export function formatCustomerDueShareMessage(
   const lastPaidBlock = lastPayment
     ? [
         `📥 *LAST PAYMENT RECEIVED:*`,
-        `💵 *Amount Paid:* *${formatINR(lastPayment.amountPaise)}*`,
+        `💵 *Amount Paid:* *${formatAmount(lastPayment.amountPaise)}*`,
         `🗓️ *Payment Date:* *${formatFriendlyDate(lastPayment.date, 'en')}*`,
       ].join('\n')
     : `📥 *LAST PAYMENT:* *No previous payment recorded yet (Opening Account)*`;
@@ -349,7 +353,7 @@ export function formatCustomerDueShareMessage(
       `Dear *${customerName}*,`,
       `Greetings from ${biz}! Your account is fully settled with zero pending balance.`,
       ``,
-      `✅ *TOTAL BALANCE:* *₹0.00 (Fully Settled)*`,
+      `✅ *TOTAL BALANCE:* *${zeroStr} (Fully Settled)*`,
       ``,
       divider,
       lastPaidBlock,
@@ -372,7 +376,8 @@ export function getLocalizedReminderText(
   businessName: string,
   language: SupportedLanguage = 'en',
   lastPayment?: LastPaymentInfo | null,
-  businessPhone?: string | null
+  businessPhone?: string | null,
+  currencyCode?: SupportedCurrency
 ): string {
   return formatCustomerDueShareMessage({
     customerName,
@@ -381,5 +386,6 @@ export function getLocalizedReminderText(
     businessPhone,
     lastPayment,
     language,
+    currencyCode,
   });
 }

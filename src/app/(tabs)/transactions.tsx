@@ -919,13 +919,16 @@ export default function TransactionsScreen() {
                 borderTopRightRadius: borderRadius.xl,
                 borderBottomLeftRadius: 0,
                 borderBottomRightRadius: 0,
-                marginBottom: Platform.OS === 'android' ? (keyboardHeight > 0 ? keyboardHeight : 0) : 0,
+                marginBottom:
+                  Platform.OS === 'android'
+                    ? (keyboardHeight > 0 ? keyboardHeight + 20 : 0)
+                    : 0,
                 maxHeight:
                   Dimensions.get('window').height -
-                  (Platform.OS === 'android' && keyboardHeight > 0 ? keyboardHeight : 0) -
+                  (Platform.OS === 'android' && keyboardHeight > 0 ? keyboardHeight + 24 : 0) -
                   insets.top -
                   16,
-                paddingBottom: Platform.OS === 'android' ? 10 : (insets.bottom || 14),
+                paddingBottom: Platform.OS === 'android' ? 12 : (insets.bottom || 14),
               },
             ]}
           >
@@ -1107,7 +1110,7 @@ export default function TransactionsScreen() {
             <View
               style={{
                 paddingTop: 10,
-                paddingBottom: Platform.OS === 'android' ? 6 : 2,
+                paddingBottom: Platform.OS === 'android' ? 8 : 4,
                 borderTopWidth: 1,
                 borderTopColor: colors.borderLight,
                 backgroundColor: colors.surface,

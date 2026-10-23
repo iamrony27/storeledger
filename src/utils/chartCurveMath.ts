@@ -89,6 +89,46 @@ export function calculateChartScale(
 }
 
 /**
+ * Formats a currency amount in paise/minor units into a compact Y-axis chart tick label.
+ * Guarantees that lower ticks never round up to match upper ticks (prevents "1k above 1k" bugs).
+ *
+ * Rules:
+ * - 0 -> '0'
+ * - Under 1,000 units (e.g. ₹50, ₹250, ₹500) -> exact units without 'k' (e.g. '₹500', '₹250')
+ * - 1,000 to 999,999 units (e.g. ₹1,000, ₹1,500, ₹25,000) -> '₹1k', '₹1.5k', '₹25k'
+ * - 1,000,000+ units -> '₹1M', '₹1.5M', etc.
+ */
+export function formatChartAxisTick(paise: number, symbol: string = '₹'): string {
+  if (!paise || paise <= 0) return '0';
+  const units = Math.round(paise) / 100;
+
+  if (units < 1) {
+    return `${symbol}${units.toFixed(2)}`;
+  }
+  if (units < 1000) {
+    // Under 1,000 units (e.g. ₹50, ₹250, ₹500): show clean units, never '1k'
+    const formatted = units % 1 === 0 ? units.toFixed(0) : units.toFixed(1).replace(/\.0$/, '');
+    return `${symbol}${formatted}`;
+  }
+  if (units < 1000000) {
+    // 1k up to 999k: show up to 1 decimal place without trailing .0 (e.g. ₹1k, ₹1.5k, ₹25k)
+    const kVal = units / 1000;
+    const formatted = kVal >= 100 ? Math.round(kVal).toString() : kVal.toFixed(1).replace(/\.0$/, '');
+    return `${symbol}${formatted}k`;
+  }
+  if (units < 1000000000) {
+    // 1M up to 999M
+    const mVal = units / 1000000;
+    const formatted = mVal >= 100 ? Math.round(mVal).toString() : mVal.toFixed(1).replace(/\.0$/, '');
+    return `${symbol}${formatted}M`;
+  }
+  // Billions
+  const bVal = units / 1000000000;
+  const formatted = bVal.toFixed(1).replace(/\.0$/, '');
+  return `${symbol}${formatted}B`;
+}
+
+/**
  * Aggregates transactions into an N-day chronological timeseries (e.g. 7 days or 30 days).
  */
 export function aggregateLastNDays(

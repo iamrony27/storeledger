@@ -3,6 +3,7 @@ import {
   generateClosedAreaPath,
   calculateChartScale,
   aggregateLastNDays,
+  formatChartAxisTick,
 } from '../chartCurveMath';
 
 function assert(condition: boolean, message: string) {
@@ -62,5 +63,31 @@ assert(todayPoint.shortLabel === 'Today', 'Last item in 7-day should have shortL
 assert(todayPoint.gavePaise === 240000, `Today gavePaise should exclude voided (expected 240000, got ${todayPoint.gavePaise})`);
 assert(todayPoint.gotPaise === 510000, `Today gotPaise should be 510000 (got ${todayPoint.gotPaise})`);
 assert(todayPoint.netPaise === 270000, `Today netPaise should be 270000 (got ${todayPoint.netPaise})`);
+
+// 5. Chart Y-Axis Tick Formatting & Non-Duplication (Prevents '1k above 1k' bug)
+console.log('5. Testing Chart Y-Axis Tick Formatting & Non-Duplication...');
+assert(formatChartAxisTick(0, '₹') === '0', '0 paise should format as "0"');
+assert(formatChartAxisTick(50000, '₹') === '₹500', '50,000 paise (₹500) must format as ₹500, never as ₹1k');
+assert(formatChartAxisTick(100000, '₹') === '₹1k', '100,000 paise (₹1,000) formats as ₹1k');
+assert(formatChartAxisTick(25000, '₹') === '₹250', '25,000 paise formats as ₹250');
+assert(formatChartAxisTick(150000, '₹') === '₹1.5k', '150,000 paise formats as ₹1.5k');
+assert(formatChartAxisTick(200000, '₹') === '₹2k', '200,000 paise formats as ₹2k');
+assert(formatChartAxisTick(250000, '₹') === '₹2.5k', '250,000 paise formats as ₹2.5k');
+assert(formatChartAxisTick(1000000, '₹') === '₹10k', '1,000,000 paise formats as ₹10k');
+assert(formatChartAxisTick(10000000, '₹') === '₹100k', '10,000,000 paise formats as ₹100k');
+assert(formatChartAxisTick(150000000, '₹') === '₹1.5M', '150,000,000 paise formats as ₹1.5M');
+assert(formatChartAxisTick(50000, '$') === '$500', 'USD 50,000 cents ($500) formats as $500');
+assert(formatChartAxisTick(100000, '$') === '$1k', 'USD 100,000 cents ($1,000) formats as $1k');
+
+// Verify that for any standard scale (e.g. maxVal = 100000), tick(0.5) is strictly distinct from tick(1.0)
+const testCeilings = [100000, 150000, 200000, 300000, 500000, 1000000, 5000000];
+for (const ceil of testCeilings) {
+  const midLabel = formatChartAxisTick(ceil * 0.5, '₹');
+  const topLabel = formatChartAxisTick(ceil, '₹');
+  assert(
+    midLabel !== topLabel,
+    `Middle tick (${midLabel}) and top tick (${topLabel}) must never be identical for ceiling ${ceil}`
+  );
+}
 
 console.log('\nAll Dashboard Chart Curve Math & Aggregation Tests Passed Successfully! ✨\n');

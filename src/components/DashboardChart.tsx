@@ -27,6 +27,7 @@ import {
   generateClosedAreaPath,
   calculateChartScale,
   aggregateLastNDays,
+  formatChartAxisTick,
   ChartDataPoint,
 } from '../utils/chartCurveMath';
 
@@ -145,7 +146,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
   // Dimensions & Scale Math
   const screenWidth = Dimensions.get('window').width;
   const isScrollable = horizon === '30days';
-  const paddingLeft = 32;
+  const paddingLeft = 36;
   const paddingRight = 20;
   const paddingTop = 20;
   const paddingBottom = 30;
@@ -649,7 +650,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                         fontWeight="600"
                         textAnchor="end"
                       >
-                        {pct === 0 ? '0' : `${currencyConfig.symbol}${Math.round(gridVal / 100000)}k`}
+                        {formatChartAxisTick(gridVal, currencyConfig.symbol)}
                       </SvgText>
                     </G>
                   );

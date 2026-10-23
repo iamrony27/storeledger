@@ -133,7 +133,7 @@ function ModernDockTabBar({
               <AppIcon name="book-open" size={20} color={colors.primary} />
             </View>
             <Text style={[styles.navRailBrandTitle, { color: colors.textPrimary }]}>
-              GWD
+              Store Ledger
             </Text>
           </View>
 

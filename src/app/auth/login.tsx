@@ -131,7 +131,7 @@ export default function LoginScreen() {
                 },
               ]}
             >
-              <AppIcon family="material" name="book" size={32} color={colors.primary} />
+              <AppIcon family="material" name="book-open-page-variant" size={32} color={colors.primary} />
             </View>
             <Text style={[styles.title, { color: colors.textPrimary }]}>Store Ledger</Text>
             <Text style={[styles.subtitle, { color: colors.textSecondary }]}>

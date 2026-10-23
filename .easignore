@@ -1,0 +1,15 @@
+# EAS Ignore file
+# Ignores files from being uploaded to EAS Build
+
+node_modules/
+.expo/
+dist/
+web-build/
+.git/
+.claude/
+skills/
+.agents/
+docs/
+*.log
+*.tsbuildinfo
+.DS_Store

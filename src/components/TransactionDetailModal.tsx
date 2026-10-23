@@ -133,7 +133,12 @@ export const TransactionDetailModal: React.FC<TransactionDetailModalProps> = ({
               <Text style={[styles.amountLabel, { color: colors.textSecondary }]}>
                 {isGave ? 'Amount Given' : 'Amount Received'}
               </Text>
-              <Text style={[styles.amountText, { color: typeColor }]}>
+              <Text
+                style={[styles.amountText, { color: typeColor }]}
+                numberOfLines={1}
+                adjustsFontSizeToFit={true}
+                minimumFontScale={0.5}
+              >
                 {formatAmount(transaction.amountPaise)}
               </Text>
               <View

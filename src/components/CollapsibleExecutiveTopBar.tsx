@@ -199,7 +199,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 ]}
                 numberOfLines={1}
                 adjustsFontSizeToFit={true}
-                minimumFontScale={0.8}
+                minimumFontScale={0.55}
               >
                 {formatAmount(youWillGetPaise)}
               </Text>
@@ -222,6 +222,9 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                         backgroundColor: isDark ? 'rgba(224, 122, 95, 0.18)' : '#FCE4DD',
                       },
                     ]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit={true}
+                    minimumFontScale={0.7}
                   >
                     +{formatAmount(todayGavePaise)} today
                   </Text>
@@ -283,7 +286,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 ]}
                 numberOfLines={1}
                 adjustsFontSizeToFit={true}
-                minimumFontScale={0.8}
+                minimumFontScale={0.55}
               >
                 {formatAmount(totalGotPaise)}
               </Text>
@@ -306,6 +309,9 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                         backgroundColor: isDark ? 'rgba(78, 170, 132, 0.18)' : '#D7EFE4',
                       },
                     ]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit={true}
+                    minimumFontScale={0.7}
                   >
                     +{formatAmount(todayGotPaise)} today
                   </Text>
@@ -576,6 +582,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   ]}
                   numberOfLines={1}
                   adjustsFontSizeToFit={true}
+                  minimumFontScale={0.6}
                 >
                   {formatAmount(youWillGetPaise)}
                 </Text>
@@ -606,6 +613,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   ]}
                   numberOfLines={1}
                   adjustsFontSizeToFit={true}
+                  minimumFontScale={0.6}
                 >
                   {formatAmount(totalGotPaise)}
                 </Text>
@@ -795,6 +803,7 @@ const styles = StyleSheet.create({
   microChip: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexShrink: 1,
   },
   microChipLabel: {
     fontSize: 10,
@@ -803,6 +812,7 @@ const styles = StyleSheet.create({
   microChipValue: {
     fontSize: 10.5,
     fontWeight: '800',
+    flexShrink: 1,
   },
   microDivider: {
     fontSize: 9,

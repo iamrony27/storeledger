@@ -25,7 +25,7 @@ import { findDuplicateCustomer } from '../../utils/customerValidation';
 export default function AddCustomerScreen() {
   const { colors, spacing, isDark } = useTheme();
   const { t } = useLanguage();
-  const { currencyConfig } = useCurrency();
+  const { currencyConfig, useDecimals } = useCurrency();
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -87,7 +87,7 @@ export default function AddCustomerScreen() {
     try {
       let openingPaise = 0;
       if (openingBalance.trim()) {
-        const absPaise = rupeesToPaise(openingBalance);
+        const absPaise = rupeesToPaise(openingBalance, useDecimals);
         openingPaise = balanceType === 'GET' ? absPaise : -absPaise;
       }
 
@@ -190,8 +190,22 @@ export default function AddCustomerScreen() {
               placeholder="0"
               prefixText={currencyConfig.symbol}
               value={openingBalance}
-              onChangeText={(text) => setOpeningBalance(text.split('.')[0].replace(/[^0-9]/g, ''))}
-              keyboardType="number-pad"
+              onChangeText={(text) => {
+                if (useDecimals) {
+                  let cleaned = text.replace(/[^0-9.]/g, '');
+                  const parts = cleaned.split('.');
+                  if (parts.length > 2) {
+                    cleaned = parts[0] + '.' + parts.slice(1).join('');
+                  }
+                  if (parts.length > 1 && parts[1].length > 2) {
+                    cleaned = parts[0] + '.' + parts[1].slice(0, 2);
+                  }
+                  setOpeningBalance(cleaned);
+                } else {
+                  setOpeningBalance(text.split('.')[0].replace(/[^0-9]/g, ''));
+                }
+              }}
+              keyboardType={useDecimals ? (Platform.OS === 'ios' ? 'decimal-pad' : 'numeric') : 'number-pad'}
             />
 
             {/* Opening Balance Type Selector */}

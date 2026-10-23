@@ -219,6 +219,7 @@ export default function ReportsScreen() {
               ]}
               numberOfLines={1}
               adjustsFontSizeToFit={true}
+              minimumFontScale={0.55}
             >
               {formatAmount(dateFilter === 'ALL' ? summary.totalGotPaise : periodMetrics.gotPaise)}
             </Text>
@@ -262,6 +263,7 @@ export default function ReportsScreen() {
               ]}
               numberOfLines={1}
               adjustsFontSizeToFit={true}
+              minimumFontScale={0.55}
             >
               {formatAmount(dateFilter === 'ALL' ? summary.youWillGetPaise : periodMetrics.gavePaise)}
             </Text>
@@ -375,6 +377,9 @@ export default function ReportsScreen() {
                         color: isDue ? colors.youWillGet : colors.youWillGive,
                       },
                     ]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit={true}
+                    minimumFontScale={0.6}
                   >
                     {formatAmount(cust.currentBalancePaise)}
                   </Text>
@@ -636,12 +641,15 @@ const styles = StyleSheet.create({
   accountRightCol: {
     flexDirection: 'row',
     alignItems: 'center',
+    maxWidth: '45%',
+    flexShrink: 0,
     gap: 6,
   },
   accountAmount: {
     fontSize: 14.5,
     fontWeight: '800',
     letterSpacing: -0.2,
+    flexShrink: 1,
   },
   pdfActionRow: {
     marginTop: 4,

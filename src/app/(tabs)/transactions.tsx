@@ -54,7 +54,7 @@ type TypeFilterPreset = 'ALL' | 'GAVE' | 'GOT';
 export default function TransactionsScreen() {
   const { colors, spacing, borderRadius, isDark } = useTheme();
   const { profile } = useAuth();
-  const { currencyConfig, formatAmount, currency } = useCurrency();
+  const { currencyConfig, formatAmount, currency, useDecimals } = useCurrency();
   const { handleScroll } = useTabBarVisibility();
   const insets = useSafeAreaInsets();
   const [selectedDetailTx, setSelectedDetailTx] = useState<LedgerTransaction | null>(null);
@@ -286,7 +286,8 @@ export default function TransactionsScreen() {
   // Edit Transaction Handler
   const handleOpenEdit = (tx: LedgerTransaction) => {
     setEditingTx(tx);
-    setEditAmount(paiseToRupees(tx.amountPaise).toString());
+    const rawRupees = tx.amountPaise / 100;
+    setEditAmount(useDecimals ? rawRupees.toString() : Math.round(rawRupees).toString());
     setEditType(tx.type);
     setEditDate(tx.date || new Date().toISOString());
     setEditDesc(tx.description || '');
@@ -298,9 +299,9 @@ export default function TransactionsScreen() {
 
   const handleSaveEdit = async () => {
     if (!editingTx) return;
-    const parsedPaise = rupeesToPaise(editAmount);
+    const parsedPaise = rupeesToPaise(editAmount, useDecimals);
     if (parsedPaise <= 0) {
-      setEditAmountError('Enter a valid amount greater than ₹0');
+      setEditAmountError(`Enter a valid amount greater than ${currencyConfig.symbol}0`);
       return;
     }
 
@@ -578,7 +579,12 @@ export default function TransactionsScreen() {
                     You Gave
                   </Text>
                 </View>
-                <Text style={[styles.kpiAmount, { color: colors.danger }]}>
+                <Text
+                  style={[styles.kpiAmount, { color: colors.danger }]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit={true}
+                  minimumFontScale={0.55}
+                >
                   {formatAmount(summary.totalGavePaise)}
                 </Text>
                 <Text style={[styles.kpiSub, { color: colors.textMuted }]}>
@@ -610,7 +616,12 @@ export default function TransactionsScreen() {
                     You Got
                   </Text>
                 </View>
-                <Text style={[styles.kpiAmount, { color: colors.success }]}>
+                <Text
+                  style={[styles.kpiAmount, { color: colors.success }]}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit={true}
+                  minimumFontScale={0.55}
+                >
                   {formatAmount(summary.totalGotPaise)}
                 </Text>
                 <Text style={[styles.kpiSub, { color: colors.textMuted }]}>
@@ -781,6 +792,9 @@ export default function TransactionsScreen() {
                         color: isGave ? colors.danger : colors.success,
                       },
                     ]}
+                    numberOfLines={1}
+                    adjustsFontSizeToFit={true}
+                    minimumFontScale={0.6}
                   >
                     {formatAmount(tx.amountPaise)}
                   </Text>
@@ -1066,13 +1080,25 @@ export default function TransactionsScreen() {
                 prefixText={currencyConfig.symbol}
                 value={editAmount}
                 onChangeText={(text) => {
-                  const withoutDecimals = text.split('.')[0];
-                  const filtered = withoutDecimals.replace(/[^0-9]/g, '');
-                  setEditAmount(filtered);
+                  if (useDecimals) {
+                    let cleaned = text.replace(/[^0-9.]/g, '');
+                    const parts = cleaned.split('.');
+                    if (parts.length > 2) {
+                      cleaned = parts[0] + '.' + parts.slice(1).join('');
+                    }
+                    if (parts.length > 1 && parts[1].length > 2) {
+                      cleaned = parts[0] + '.' + parts[1].slice(0, 2);
+                    }
+                    setEditAmount(cleaned);
+                  } else {
+                    const withoutDecimals = text.split('.')[0];
+                    const filtered = withoutDecimals.replace(/[^0-9]/g, '');
+                    setEditAmount(filtered);
+                  }
                   if (editAmountError) setEditAmountError('');
                 }}
                 error={editAmountError}
-                keyboardType="number-pad"
+                keyboardType={useDecimals ? (Platform.OS === 'ios' ? 'decimal-pad' : 'numeric') : 'number-pad'}
                 autoFocus
               />
 
@@ -1471,6 +1497,8 @@ const styles = StyleSheet.create({
   },
   txAmountCol: {
     alignItems: 'flex-end',
+    maxWidth: '45%',
+    flexShrink: 1,
   },
   txAmountText: {
     fontSize: 15.5,

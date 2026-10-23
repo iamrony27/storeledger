@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Modal,
   Alert,
+  Switch,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { RadioButton } from 'react-native-paper';
@@ -45,8 +46,8 @@ export default function SettingsScreen() {
     updateBusinessProfile,
   } = useAuth();
 
-  // Multi-Currency Selection State
-  const { currency, currencyConfig, setCurrency } = useCurrency();
+  // Multi-Currency & Decimal Amount State
+  const { currency, currencyConfig, setCurrency, useDecimals, setUseDecimals } = useCurrency();
   const [currencyModalVisible, setCurrencyModalVisible] = useState(false);
 
   // Profile Edit Modal State
@@ -512,6 +513,39 @@ export default function SettingsScreen() {
               <AppIcon name="chevron-right" size={16} color={colors.textSecondary} />
             </View>
           </TouchableOpacity>
+
+          {/* Decimal Amount Option Row */}
+          <View
+            style={[
+              styles.decimalSettingRow,
+              {
+                backgroundColor: colors.background,
+                borderColor: colors.border,
+                borderRadius: borderRadius.md,
+              },
+            ]}
+          >
+            <View style={{ flex: 1, paddingRight: 12 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
+                <AppIcon name="hash" size={15} color={colors.primary} />
+                <Text style={[styles.decimalSettingTitle, { color: colors.textPrimary }]}>
+                  Use Decimal Amounts (.00)
+                </Text>
+              </View>
+              <Text style={[styles.decimalSettingDesc, { color: colors.textSecondary }]}>
+                {useDecimals
+                  ? 'Enabled: Allow fractions & cents (e.g. ₹1,250.50)'
+                  : 'Disabled: Round to whole numbers only (e.g. ₹1,251)'}
+              </Text>
+            </View>
+
+            <Switch
+              value={useDecimals}
+              onValueChange={setUseDecimals}
+              trackColor={{ false: isDark ? 'rgba(255,255,255,0.2)' : '#CBD5E1', true: colors.primary }}
+              thumbColor="#FFFFFF"
+            />
+          </View>
         </View>
 
         {/* Theme Selection Card */}
@@ -1166,5 +1200,22 @@ const styles = StyleSheet.create({
   currencyRowMeta: {
     fontSize: 11,
     marginTop: 1,
+  },
+  decimalSettingRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
+    borderWidth: 1,
+    marginTop: 10,
+  },
+  decimalSettingTitle: {
+    fontSize: 13.5,
+    fontWeight: '700',
+  },
+  decimalSettingDesc: {
+    fontSize: 11.5,
+    marginTop: 3,
+    lineHeight: 16,
   },
 });

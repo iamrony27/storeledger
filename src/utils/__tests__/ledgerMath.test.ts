@@ -22,6 +22,9 @@ export function runAllLedgerMathTests() {
   // Test 1: rupeesToPaise string conversions (whole rupees, ignores .00)
   assertEquals(rupeesToPaise('100'), 10000, 'rupeesToPaise("100")');
   assertEquals(rupeesToPaise('100.50'), 10050, 'rupeesToPaise("100.50") with paise');
+  assertEquals(rupeesToPaise('100.50', false), 10100, 'rupeesToPaise("100.50", false) rounds to 10100');
+  assertEquals(rupeesToPaise('100.40', false), 10000, 'rupeesToPaise("100.40", false) rounds to 10000');
+  assertEquals(rupeesToPaise('15,000,000', false), 1500000000, 'rupeesToPaise large number 1.5 Crore');
   assertEquals(rupeesToPaise('1,500'), 150000, 'rupeesToPaise("1,500") with commas');
   assertEquals(rupeesToPaise('-250.00'), -25000, 'rupeesToPaise("-250.00") negative');
   assertEquals(rupeesToPaise(''), 0, 'rupeesToPaise("") empty string');

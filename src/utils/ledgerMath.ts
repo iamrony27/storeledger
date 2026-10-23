@@ -19,14 +19,20 @@ export type BalanceType = 'GET' | 'GIVE' | 'SETTLED';
  * e.g. "100.50" -> 10050
  * e.g. "1,500" -> 150000
  */
-export function rupeesToPaise(input: string | number): number {
+export function rupeesToPaise(input: string | number, allowDecimals: boolean = true): number {
   if (typeof input === 'number') {
     if (isNaN(input)) return 0;
-    return Math.round(input * 100);
+    return allowDecimals ? Math.round(input * 100) : Math.round(input) * 100;
   }
 
   const cleaned = input.trim().replace(/,/g, '');
   if (!cleaned) return 0;
+
+  if (!allowDecimals) {
+    const parsed = parseFloat(cleaned);
+    if (isNaN(parsed)) return 0;
+    return Math.round(parsed) * 100;
+  }
 
   const parts = cleaned.split('.');
   const wholePart = parseInt(parts[0] || '0', 10);
@@ -156,11 +162,28 @@ export function getCurrencyConfig(currencyCode: string = DEFAULT_CURRENCY): Curr
  */
 export function formatCurrency(
   minorUnits: number,
-  currencyCode: SupportedCurrency | string = DEFAULT_CURRENCY
+  currencyCode: SupportedCurrency | string = DEFAULT_CURRENCY,
+  showDecimals: boolean = true
 ): string {
   const config = getCurrencyConfig(currencyCode);
   const isNegative = minorUnits < 0;
   const absoluteMinor = Math.abs(Math.round(minorUnits));
+
+  if (!showDecimals) {
+    // Whole numbers only: round to nearest whole unit
+    const roundedWhole = Math.round(absoluteMinor / 100);
+    let wholeStr: string;
+    try {
+      wholeStr = roundedWhole.toLocaleString(config.locale);
+    } catch {
+      wholeStr = roundedWhole.toLocaleString('en-US');
+    }
+    const prefix = isNegative ? '-' : '';
+    const space = config.symbol.length > 2 ? ' ' : '';
+    return `${prefix}${config.symbol}${space}${wholeStr}`;
+  }
+
+  // Decimal mode
   const wholeUnits = Math.floor(absoluteMinor / 100);
   const fraction = absoluteMinor % 100;
 

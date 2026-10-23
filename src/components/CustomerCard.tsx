@@ -229,6 +229,7 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
             ]}
             numberOfLines={1}
             adjustsFontSizeToFit={true}
+            minimumFontScale={0.55}
           >
             {formatAmount(Math.abs(balancePaise))}
           </Text>
@@ -363,7 +364,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.1,
   },
   rightCol: {
-    minWidth: 105,
+    minWidth: 95,
+    maxWidth: '48%',
+    flexShrink: 0,
     alignItems: 'flex-end',
     justifyContent: 'center',
     paddingRight: 14,
@@ -371,6 +374,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   amountTouchArea: {
+    maxWidth: '100%',
     alignItems: 'flex-end',
     justifyContent: 'center',
     paddingVertical: 1,

@@ -71,7 +71,7 @@ export default function CustomerDetailScreen() {
   const { colors, spacing, borderRadius, isDark } = useTheme();
   const { t, language } = useLanguage();
   const { profile } = useAuth();
-  const { currencyConfig, formatAmount, currency } = useCurrency();
+  const { currencyConfig, formatAmount, currency, useDecimals } = useCurrency();
   const { quickAmounts } = useQuickAmounts();
   const insets = useSafeAreaInsets();
 
@@ -313,7 +313,8 @@ export default function CustomerDetailScreen() {
     if (existingTx) {
       setEditingTx(existingTx);
       setModalType(existingTx.type);
-      setTxAmount(paiseToRupees(existingTx.amountPaise).toString());
+      const val = paiseToRupees(existingTx.amountPaise);
+      setTxAmount(useDecimals ? val.toString() : Math.round(val).toString());
       setTxDate(existingTx.date || new Date().toISOString());
       setTxDesc(existingTx.description || '');
       setTxBill(existingTx.type === 'GAVE' ? (existingTx.billNumber || '') : '');
@@ -406,7 +407,7 @@ export default function CustomerDetailScreen() {
 
   const handleSaveTransaction = async () => {
     if (!customer) return;
-    const parsedPaise = rupeesToPaise(txAmount);
+    const parsedPaise = rupeesToPaise(txAmount, useDecimals);
     if (parsedPaise <= 0) {
       setAmountError('Enter a valid amount greater than 0');
       return;
@@ -601,6 +602,9 @@ export default function CustomerDetailScreen() {
                     : colors.settled,
               },
             ]}
+            numberOfLines={1}
+            adjustsFontSizeToFit={true}
+            minimumFontScale={0.5}
           >
             {formatAmount(customer.currentBalancePaise)}
           </Text>
@@ -630,6 +634,9 @@ export default function CustomerDetailScreen() {
                   styles.customerKpiValue,
                   { color: colors.youWillGet },
                 ]}
+                numberOfLines={1}
+                adjustsFontSizeToFit={true}
+                minimumFontScale={0.55}
               >
                 {formatAmount(breakdown.totalGavePaise)}
               </Text>
@@ -649,6 +656,9 @@ export default function CustomerDetailScreen() {
                   styles.customerKpiValue,
                   { color: colors.youWillGive },
                 ]}
+                numberOfLines={1}
+                adjustsFontSizeToFit={true}
+                minimumFontScale={0.55}
               >
                 {formatAmount(breakdown.totalGotPaise)}
               </Text>
@@ -675,6 +685,9 @@ export default function CustomerDetailScreen() {
                         : colors.settled,
                   },
                 ]}
+                numberOfLines={1}
+                adjustsFontSizeToFit={true}
+                minimumFontScale={0.55}
               >
                 {formatAmount(breakdown.netBalancePaise)}
               </Text>
@@ -1215,6 +1228,9 @@ export default function CustomerDetailScreen() {
                             color: isGave ? colors.youWillGet : colors.youWillGive,
                           },
                         ]}
+                        numberOfLines={1}
+                        adjustsFontSizeToFit={true}
+                        minimumFontScale={0.6}
                       >
                         {formatAmount(tx.amountPaise)}
                       </Text>
@@ -1524,16 +1540,29 @@ export default function CustomerDetailScreen() {
                   <AppTextInput
                     ref={amountInputRef}
                     label="Amount"
-                    placeholder="0"
+                    placeholder={useDecimals ? '0.00' : '0'}
                     prefixText={currencyConfig.symbol}
                     value={txAmount}
                     onChangeText={(text) => {
-                      const filtered = text.replace(/[^0-9]/g, '');
-                      setTxAmount(filtered);
+                      if (useDecimals) {
+                        let cleaned = text.replace(/[^0-9.]/g, '');
+                        const parts = cleaned.split('.');
+                        if (parts.length > 2) {
+                          cleaned = parts[0] + '.' + parts.slice(1).join('');
+                        }
+                        if (parts.length > 1 && parts[1].length > 2) {
+                          cleaned = parts[0] + '.' + parts[1].slice(0, 2);
+                        }
+                        setTxAmount(cleaned);
+                      } else {
+                        const withoutDecimals = text.split('.')[0];
+                        const filtered = withoutDecimals.replace(/[^0-9]/g, '');
+                        setTxAmount(filtered);
+                      }
                       if (amountError) setAmountError('');
                     }}
                     error={amountError}
-                    keyboardType="numeric"
+                    keyboardType={useDecimals ? (Platform.OS === 'ios' ? 'decimal-pad' : 'numeric') : 'number-pad'}
                   />
                 </View>
 
@@ -2141,6 +2170,8 @@ const styles = StyleSheet.create({
   },
   txRightCol: {
     alignItems: 'flex-end',
+    maxWidth: '45%',
+    flexShrink: 1,
     gap: 2,
   },
   txAmount: {

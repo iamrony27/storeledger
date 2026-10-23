@@ -343,7 +343,12 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
               </Text>
               <AppIcon name="arrow-down-left" size={11} color={colors.youWillGive} style={{ marginTop: 1, flexShrink: 0 }} />
             </View>
-            <Text style={[styles.metricValue, { color: colors.youWillGive }]}>
+            <Text
+              style={[styles.metricValue, { color: colors.youWillGive }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit={true}
+              minimumFontScale={0.55}
+            >
               {formatAmount(periodTotals.totalGot)}
             </Text>
           </View>
@@ -367,7 +372,12 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
               </Text>
               <AppIcon name="arrow-up-right" size={11} color={colors.youWillGet} style={{ marginTop: 1, flexShrink: 0 }} />
             </View>
-            <Text style={[styles.metricValue, { color: colors.youWillGet }]}>
+            <Text
+              style={[styles.metricValue, { color: colors.youWillGet }]}
+              numberOfLines={1}
+              adjustsFontSizeToFit={true}
+              minimumFontScale={0.55}
+            >
               {formatAmount(periodTotals.totalGave)}
             </Text>
           </View>
@@ -424,6 +434,9 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                   color: periodTotals.netFlow >= 0 ? colors.youWillGive : colors.youWillGet,
                 },
               ]}
+              numberOfLines={1}
+              adjustsFontSizeToFit={true}
+              minimumFontScale={0.55}
             >
               {periodTotals.netFlow >= 0 ? '+' : '-'}
               {formatAmount(Math.abs(periodTotals.netFlow))}
@@ -517,7 +530,12 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
               <Text style={[styles.tooltipMetricLabel, { color: colors.youWillGive }]}>
                 GOT (JAMA)
               </Text>
-              <Text style={[styles.tooltipMetricAmount, { color: colors.youWillGive }]}>
+              <Text
+                style={[styles.tooltipMetricAmount, { color: colors.youWillGive }]}
+                numberOfLines={1}
+                adjustsFontSizeToFit={true}
+                minimumFontScale={0.6}
+              >
                 {formatAmount(selectedPoint.gotPaise)}
               </Text>
             </View>
@@ -528,7 +546,12 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
               <Text style={[styles.tooltipMetricLabel, { color: colors.youWillGet }]}>
                 GAVE (UDHAAR)
               </Text>
-              <Text style={[styles.tooltipMetricAmount, { color: colors.youWillGet }]}>
+              <Text
+                style={[styles.tooltipMetricAmount, { color: colors.youWillGet }]}
+                numberOfLines={1}
+                adjustsFontSizeToFit={true}
+                minimumFontScale={0.6}
+              >
                 {formatAmount(selectedPoint.gavePaise)}
               </Text>
             </View>
@@ -551,6 +574,9 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                         : colors.textPrimary,
                   },
                 ]}
+                numberOfLines={1}
+                adjustsFontSizeToFit={true}
+                minimumFontScale={0.6}
               >
                 {selectedPoint.netPaise >= 0 ? '+' : '-'}
                 {formatAmount(Math.abs(selectedPoint.netPaise))}

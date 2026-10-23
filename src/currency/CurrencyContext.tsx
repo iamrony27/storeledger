@@ -11,12 +11,15 @@ import {
 import { useAuth } from '../auth/AuthContext';
 
 export const CURRENCY_STORAGE_KEY = '@store_ledger:currency_v1';
+export const USE_DECIMALS_STORAGE_KEY = '@store_ledger:use_decimals_v1';
 
 export interface CurrencyContextType {
   currency: SupportedCurrency;
   currencyConfig: CurrencyConfig;
   setCurrency: (currency: SupportedCurrency) => Promise<void>;
-  formatAmount: (minorUnits: number) => string;
+  useDecimals: boolean;
+  setUseDecimals: (useDecimals: boolean) => Promise<void>;
+  formatAmount: (minorUnits: number, overrideUseDecimals?: boolean) => string;
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
@@ -24,29 +27,36 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined
 export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { profile } = useAuth();
   const [currency, setCurrencyState] = useState<SupportedCurrency>(DEFAULT_CURRENCY);
+  const [useDecimals, setUseDecimalsState] = useState<boolean>(true);
 
-  // 1. Load user saved currency on initial mount
+  // 1. Load user saved currency and decimal preference on initial mount
   useEffect(() => {
     let isMounted = true;
 
-    async function loadSavedCurrency() {
+    async function loadSavedPreferences() {
       try {
-        const saved = await AsyncStorage.getItem(CURRENCY_STORAGE_KEY);
-        if (saved && SUPPORTED_CURRENCIES[saved as SupportedCurrency]) {
-          if (isMounted) setCurrencyState(saved as SupportedCurrency);
-          return;
-        }
+        const [savedCurrency, savedDecimals] = await Promise.all([
+          AsyncStorage.getItem(CURRENCY_STORAGE_KEY),
+          AsyncStorage.getItem(USE_DECIMALS_STORAGE_KEY),
+        ]);
 
-        // Fallback to profile.currency if saved is missing
-        if (profile?.currency && SUPPORTED_CURRENCIES[profile.currency as SupportedCurrency]) {
-          if (isMounted) setCurrencyState(profile.currency as SupportedCurrency);
+        if (isMounted) {
+          if (savedCurrency && SUPPORTED_CURRENCIES[savedCurrency as SupportedCurrency]) {
+            setCurrencyState(savedCurrency as SupportedCurrency);
+          } else if (profile?.currency && SUPPORTED_CURRENCIES[profile.currency as SupportedCurrency]) {
+            setCurrencyState(profile.currency as SupportedCurrency);
+          }
+
+          if (savedDecimals !== null) {
+            setUseDecimalsState(savedDecimals === 'true');
+          }
         }
       } catch (err) {
-        console.warn('Failed to load saved currency from storage:', err);
+        console.warn('Failed to load saved currency preferences from storage:', err);
       }
     }
 
-    loadSavedCurrency();
+    loadSavedPreferences();
 
     return () => {
       isMounted = false;
@@ -63,10 +73,20 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
+  const setUseDecimals = async (enabled: boolean) => {
+    setUseDecimalsState(enabled);
+    try {
+      await AsyncStorage.setItem(USE_DECIMALS_STORAGE_KEY, enabled ? 'true' : 'false');
+    } catch (err) {
+      console.warn('Failed to persist decimal preference:', err);
+    }
+  };
+
   const currencyConfig = getCurrencyConfig(currency);
 
-  const formatAmount = (minorUnits: number): string => {
-    return formatCurrency(minorUnits, currency);
+  const formatAmount = (minorUnits: number, overrideUseDecimals?: boolean): string => {
+    const showDec = overrideUseDecimals !== undefined ? overrideUseDecimals : useDecimals;
+    return formatCurrency(minorUnits, currency, showDec);
   };
 
   return (
@@ -75,6 +95,8 @@ export const CurrencyProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         currency,
         currencyConfig,
         setCurrency,
+        useDecimals,
+        setUseDecimals,
         formatAmount,
       }}
     >

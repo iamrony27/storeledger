@@ -50,7 +50,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
   initialType,
 }) => {
   const { colors, spacing, borderRadius, isDark } = useTheme();
-  const { currencyConfig, formatAmount } = useCurrency();
+  const { currencyConfig, formatAmount, useDecimals } = useCurrency();
   const { quickAmounts } = useQuickAmounts();
   const insets = useSafeAreaInsets();
 
@@ -228,9 +228,9 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
       return;
     }
 
-    const parsedPaise = rupeesToPaise(amount);
+    const parsedPaise = rupeesToPaise(amount, useDecimals);
     if (parsedPaise <= 0) {
-      setAmountError('Enter a valid amount greater than ₹0');
+      setAmountError(`Enter a valid amount greater than ${currencyConfig.symbol}0`);
       return;
     }
 
@@ -761,13 +761,25 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                       prefixText={currencyConfig.symbol}
                       value={amount}
                       onChangeText={(text) => {
-                        const withoutDecimals = text.split('.')[0];
-                        const filtered = withoutDecimals.replace(/[^0-9]/g, '');
-                        setAmount(filtered);
+                        if (useDecimals) {
+                          let cleaned = text.replace(/[^0-9.]/g, '');
+                          const parts = cleaned.split('.');
+                          if (parts.length > 2) {
+                            cleaned = parts[0] + '.' + parts.slice(1).join('');
+                          }
+                          if (parts.length > 1 && parts[1].length > 2) {
+                            cleaned = parts[0] + '.' + parts[1].slice(0, 2);
+                          }
+                          setAmount(cleaned);
+                        } else {
+                          const withoutDecimals = text.split('.')[0];
+                          const filtered = withoutDecimals.replace(/[^0-9]/g, '');
+                          setAmount(filtered);
+                        }
                         if (amountError) setAmountError('');
                       }}
                       error={amountError}
-                      keyboardType="numeric"
+                      keyboardType={useDecimals ? (Platform.OS === 'ios' ? 'decimal-pad' : 'numeric') : 'number-pad'}
                     />
                   </View>
 

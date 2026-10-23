@@ -129,6 +129,26 @@ export function runAllCurrencyAndDescriptionTests() {
   assertEquals(originalPaise, 250000, 'Stored minor units completely unchanged');
 
   // ==========================================
+  // SUITE 2b: Decimal Toggle (showDecimals: true/false) & Big Numbers
+  // ==========================================
+  console.log('2b. Testing Decimal Toggle (showDecimals: true/false) & Big Numbers Formatting...');
+
+  // With showDecimals = false (whole units rounded, no fractional decimals rendered)
+  assertEquals(formatCurrency(10050, 'INR', false), '₹101', 'INR 100.50 rounded to whole unit ₹101');
+  assertEquals(formatCurrency(10040, 'INR', false), '₹100', 'INR 100.40 rounded to whole unit ₹100');
+  assertEquals(formatCurrency(12575, 'USD', false), '$126', 'USD 125.75 rounded to whole unit $126');
+  assertEquals(formatCurrency(10000, 'USD', false), '$100', 'USD 100 with showDecimals false');
+  assertEquals(formatCurrency(0, 'INR', false), '₹0', 'INR 0 with showDecimals false');
+  assertEquals(formatCurrency(-10050, 'INR', false), '-₹101', 'INR -100.50 rounded to -₹101');
+
+  // Big numbers formatting (Lakhs, Crores, Millions)
+  assertEquals(formatCurrency(1500000000, 'INR', true), '₹1,50,00,000', 'INR 1.5 Crore formatted correctly');
+  assertEquals(formatCurrency(1500000000, 'INR', false), '₹1,50,00,000', 'INR 1.5 Crore without decimals');
+  assertEquals(formatCurrency(10000000000, 'USD', true), '$100,000,000', 'USD 100 Million formatted correctly');
+  assertEquals(formatCurrency(10000000000, 'USD', false), '$100,000,000', 'USD 100 Million without decimals');
+  assertEquals(formatCurrency(99999999999, 'INR', false), '₹1,00,00,00,000', 'INR 100 Crore rounded');
+
+  // ==========================================
   // SUITE 3: Universal Description Handling
   // ==========================================
   console.log('3. Testing universal transaction descriptions (GAVE and GOT)...');

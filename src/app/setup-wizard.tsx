@@ -10,10 +10,12 @@ import {
   Share,
   Platform,
   ActivityIndicator,
+  Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '../theme/ThemeContext';
+import { useCurrency } from '../currency/CurrencyContext';
 import { AppIcon } from '../components/AppIcon';
 import { AppButton } from '../components/AppButton';
 import { AppTextInput } from '../components/AppTextInput';
@@ -42,6 +44,7 @@ export default function SetupWizardScreen() {
 
   const { colors, borderRadius, isDark } = useTheme();
   const { reloadConfig } = useAuth();
+  const { currencyConfig, useDecimals, setUseDecimals } = useCurrency();
 
   const [currentStep, setCurrentStep] = useState<WizardStep>('welcome');
 
@@ -410,6 +413,80 @@ export default function SetupWizardScreen() {
           <Text style={[styles.calloutSubtext, { color: colors.textSecondary }]}>
             Connecting your own Supabase database is completely optional. You can connect it now or later anytime from Settings.
           </Text>
+        </View>
+
+        {/* Ledger Number & Decimal Preferences Card */}
+        <View
+          style={[
+            styles.calloutCard,
+            {
+              backgroundColor: isDark ? '#131B2E' : '#FFFFFF',
+              borderColor: colors.border,
+              borderRadius: borderRadius.lg,
+              padding: 16,
+              marginBottom: 16,
+            },
+          ]}
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 8 }}>
+            <View
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: borderRadius.sm,
+                backgroundColor: isDark ? 'rgba(56, 189, 248, 0.15)' : '#E0F2FE',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <AppIcon name="dollar-sign" size={16} color={colors.primary} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: colors.textPrimary }}>
+                Currency & Decimal Setting
+              </Text>
+              <Text style={{ fontSize: 11.5, color: colors.textSecondary, marginTop: 1 }}>
+                Store Currency: {currencyConfig.code} ({currencyConfig.symbol})
+              </Text>
+            </View>
+          </View>
+
+          {/* Decimal Toggle */}
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingVertical: 10,
+              paddingHorizontal: 12,
+              backgroundColor: isDark ? 'rgba(255,255,255,0.04)' : '#F8FAFC',
+              borderColor: colors.border,
+              borderWidth: 1,
+              borderRadius: borderRadius.md,
+              marginTop: 6,
+            }}
+          >
+            <View style={{ flex: 1, paddingRight: 12 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <AppIcon name="hash" size={14} color={colors.primary} />
+                <Text style={{ fontSize: 13, fontWeight: '700', color: colors.textPrimary }}>
+                  Use Decimal Amounts (.00)
+                </Text>
+              </View>
+              <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 2 }}>
+                {useDecimals
+                  ? 'Enabled: Allow decimal amounts (e.g. ₹1,250.50)'
+                  : 'Disabled: Round to whole numbers (e.g. ₹1,251)'}
+              </Text>
+            </View>
+
+            <Switch
+              value={useDecimals}
+              onValueChange={setUseDecimals}
+              trackColor={{ false: isDark ? 'rgba(255,255,255,0.2)' : '#CBD5E1', true: colors.primary }}
+              thumbColor="#FFFFFF"
+            />
+          </View>
         </View>
 
         {/* Two Primary Choices */}

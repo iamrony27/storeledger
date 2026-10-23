@@ -347,7 +347,7 @@ export default function ReportsScreen() {
               </Text>
             </View>
 
-            <View style={{ width: 230 }}>
+            <View style={{ minWidth: 200, maxWidth: 260, flex: 1 }}>
               <SegmentedButtons
                 density="small"
                 value={rankingTab}

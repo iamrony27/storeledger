@@ -327,7 +327,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 style={[
                   styles.searchInputContainer,
                   {
-                    backgroundColor: isDark ? colors.surface : '#FFFFFF',
+                    backgroundColor: colors.surface,
                     borderColor: colors.border,
                   },
                 ]}

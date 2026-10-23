@@ -832,13 +832,13 @@ export default function CustomerDetailScreen() {
                   <AppIcon
                     name="calendar"
                     size={12}
-                    color={sortMode === 'DATE' ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary)}
+                    color={sortMode === 'DATE' ? colors.textInverse : colors.textSecondary}
                   />
                   <Text
                     style={[
                       styles.modeSegmentText,
                       {
-                        color: sortMode === 'DATE' ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary),
+                        color: sortMode === 'DATE' ? colors.textInverse : colors.textSecondary,
                         fontWeight: sortMode === 'DATE' ? '700' : '500',
                       },
                     ]}
@@ -862,13 +862,13 @@ export default function CustomerDetailScreen() {
                   <AppIcon
                     name="clock"
                     size={12}
-                    color={sortMode === 'ENTRY' ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary)}
+                    color={sortMode === 'ENTRY' ? colors.textInverse : colors.textSecondary}
                   />
                   <Text
                     style={[
                       styles.modeSegmentText,
                       {
-                        color: sortMode === 'ENTRY' ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary),
+                        color: sortMode === 'ENTRY' ? colors.textInverse : colors.textSecondary,
                         fontWeight: sortMode === 'ENTRY' ? '700' : '500',
                       },
                     ]}

@@ -583,11 +583,11 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                         backgroundColor:
                           txType === 'GAVE'
                             ? colors.danger
-                            : (isDark ? 'rgba(255, 255, 255, 0.06)' : colors.borderLight),
+                            : colors.surfaceElevated,
                         borderColor:
                           txType === 'GAVE'
                             ? colors.danger
-                            : (isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border),
+                            : colors.border,
                         borderRadius: borderRadius.md,
                       },
                     ]}
@@ -595,13 +595,13 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                     <AppIcon
                       name="arrow-up-right"
                       size={18}
-                      color={txType === 'GAVE' ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary)}
+                      color={txType === 'GAVE' ? '#FFFFFF' : colors.textSecondary}
                     />
                     <Text
                       style={[
                         styles.typeToggleLabel,
                         {
-                          color: txType === 'GAVE' ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textPrimary),
+                          color: txType === 'GAVE' ? '#FFFFFF' : colors.textPrimary,
                         },
                       ]}
                     >
@@ -617,11 +617,11 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                         backgroundColor:
                           txType === 'GOT'
                             ? colors.success
-                            : (isDark ? 'rgba(255, 255, 255, 0.06)' : colors.borderLight),
+                            : colors.surfaceElevated,
                         borderColor:
                           txType === 'GOT'
                             ? colors.success
-                            : (isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border),
+                            : colors.border,
                         borderRadius: borderRadius.md,
                       },
                     ]}
@@ -629,13 +629,13 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                     <AppIcon
                       name="arrow-down-left"
                       size={18}
-                      color={txType === 'GOT' ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary)}
+                      color={txType === 'GOT' ? colors.textInverse : colors.textSecondary}
                     />
                     <Text
                       style={[
                         styles.typeToggleLabel,
                         {
-                          color: txType === 'GOT' ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textPrimary),
+                          color: txType === 'GOT' ? colors.textInverse : colors.textPrimary,
                         },
                       ]}
                     >

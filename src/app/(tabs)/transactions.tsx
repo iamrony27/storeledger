@@ -1005,7 +1005,7 @@ export default function TransactionsScreen() {
                     styles.typeSwitcherBtn,
                     {
                       backgroundColor:
-                        editType === 'GOT' ? colors.success : colors.borderLight,
+                        editType === 'GOT' ? colors.success : colors.surfaceElevated,
                       borderColor:
                         editType === 'GOT' ? colors.success : colors.border,
                       borderRadius: borderRadius.md,
@@ -1015,12 +1015,12 @@ export default function TransactionsScreen() {
                   <AppIcon
                     name="arrow-down-left"
                     size={16}
-                    color={editType === 'GOT' ? '#FFFFFF' : colors.textSecondary}
+                    color={editType === 'GOT' ? colors.textInverse : colors.textSecondary}
                   />
                   <Text
                     style={[
                       styles.typeSwitcherText,
-                      { color: editType === 'GOT' ? '#FFFFFF' : colors.textPrimary },
+                      { color: editType === 'GOT' ? colors.textInverse : colors.textPrimary },
                     ]}
                   >
                     YOU GOT

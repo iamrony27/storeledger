@@ -383,24 +383,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: -0.6,
   },
-  amountDueDark: {
-    color: '#F87171', // Luminous coral for dark mode
-  },
-  amountDueLight: {
-    color: '#EF4444', // Clean red for light mode
-  },
-  amountAdvanceDark: {
-    color: '#10B981', // Crisp emerald for dark mode
-  },
-  amountAdvanceLight: {
-    color: '#059669', // Deep green for light mode
-  },
-  amountSettledDark: {
-    color: '#94A3B8',
-  },
-  amountSettledLight: {
-    color: '#64748B',
-  },
   remindPill: {
     marginTop: 3.5,
     paddingHorizontal: 8,

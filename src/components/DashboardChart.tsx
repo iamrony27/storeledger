@@ -328,9 +328,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                   styles.tabBtnText,
                   {
                     color: isActive
-                      ? '#FFFFFF'
-                      : isDark
-                      ? '#94A3B8'
+                      ? colors.textInverse
                       : colors.textSecondary,
                   },
                 ]}
@@ -438,7 +436,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
               ]}
             />
             <View style={styles.tappedCol}>
-              <Text style={[styles.tappedColLabel, { color: isDark ? '#94A3B8' : colors.textSecondary }]}>
+              <Text style={[styles.tappedColLabel, { color: colors.textSecondary }]}>
                 NET FLOW
               </Text>
               <Text
@@ -447,9 +445,9 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                   {
                     color:
                       selectedPoint.gavePaise - selectedPoint.gotPaise > 0
-                        ? (isDark ? '#F87171' : colors.youWillGet)
+                        ? colors.youWillGet
                         : selectedPoint.gavePaise - selectedPoint.gotPaise < 0
-                        ? (isDark ? '#10B981' : colors.youWillGive)
+                        ? colors.youWillGive
                         : colors.textPrimary,
                   },
                 ]}
@@ -655,13 +653,13 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                         styles.debtorBarFill,
                         {
                           width: `${Math.max(5, sharePct)}%`,
-                          backgroundColor: isDark ? '#F87171' : colors.youWillGet,
+                          backgroundColor: colors.youWillGet,
                         },
                       ]}
                     />
                   </View>
 
-                  <Text style={[styles.debtorSub, { color: isDark ? '#94A3B8' : colors.textMuted }]}>
+                  <Text style={[styles.debtorSub, { color: colors.textSecondary }]}>
                     {sharePct}% of total dues {deb.phone ? `• ${deb.phone}` : ''}
                   </Text>
                 </View>

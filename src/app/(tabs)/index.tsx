@@ -459,7 +459,7 @@ export default function CustomersScreen() {
                     textStyle={[
                       styles.filterChipText,
                       {
-                        color: isActive ? '#FFFFFF' : colors.textSecondary,
+                        color: isActive ? colors.textInverse : colors.textSecondary,
                         fontWeight: isActive ? '700' : '600',
                       },
                     ]}
@@ -573,7 +573,7 @@ export default function CustomersScreen() {
             backgroundColor: colors.primary,
           },
         ]}
-        color="#FFFFFF"
+        color={colors.textInverse}
       />
 
       {/* Modern Long-Height Collapsible Executive Title Bar with Integrated Search (Color Hunt: #EF6905) */}

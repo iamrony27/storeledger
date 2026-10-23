@@ -8,6 +8,25 @@
 
 ---
 
+## 📱 App Screenshots
+
+<div align="center">
+  <table>
+    <tr>
+      <th align="center"><b>Executive Dashboard & Ledger</b></th>
+      <th align="center"><b>Customer Statement & Khata</b></th>
+      <th align="center"><b>Cash Flow Velocity & Analytics</b></th>
+    </tr>
+    <tr>
+      <td align="center"><img src="./assets/screenshots/orion_screenshot_1_dashboard.png" width="250" alt="Executive Dashboard" /></td>
+      <td align="center"><img src="./assets/screenshots/orion_screenshot_2_customer_statement.png" width="250" alt="Customer Statement" /></td>
+      <td align="center"><img src="./assets/screenshots/orion_screenshot_3_analytics_reports.png" width="250" alt="Cash Flow Analytics" /></td>
+    </tr>
+  </table>
+</div>
+
+---
+
 ## 🌟 Key Features
 
 ### 1. 100% Offline-First Architecture

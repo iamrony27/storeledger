@@ -921,18 +921,20 @@ export default function TransactionsScreen() {
                 borderBottomRightRadius: 0,
                 marginBottom:
                   Platform.OS === 'android'
-                    ? (keyboardHeight > 0 ? keyboardHeight + 20 : 0)
+                    ? (keyboardHeight > 0 ? keyboardHeight + 36 : 0)
                     : 0,
                 maxHeight:
                   Dimensions.get('window').height -
-                  (Platform.OS === 'android' && keyboardHeight > 0 ? keyboardHeight + 24 : 0) -
+                  (Platform.OS === 'android' && keyboardHeight > 0 ? keyboardHeight + 40 : 0) -
                   insets.top -
-                  16,
-                paddingBottom: Platform.OS === 'android' ? 12 : (insets.bottom || 14),
+                  12,
+                paddingHorizontal: 16,
+                paddingTop: 12,
+                paddingBottom: Platform.OS === 'android' ? 8 : (insets.bottom || 12),
               },
             ]}
           >
-            <View style={styles.modalHeader}>
+            <View style={[styles.modalHeader, { marginBottom: 12 }]}>
               <View style={styles.modalHeaderTitleRow}>
                 <View
                   style={[
@@ -974,7 +976,7 @@ export default function TransactionsScreen() {
               style={{ maxHeight: 600 }}
               contentContainerStyle={{
                 padding: 16,
-                paddingBottom: (keyboardVisible || keyboardHeight > 0) ? 90 : 36,
+                paddingBottom: 10,
               }}
               keyboardShouldPersistTaps="handled"
               keyboardDismissMode="interactive"

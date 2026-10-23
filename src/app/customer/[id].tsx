@@ -1339,18 +1339,20 @@ export default function CustomerDetailScreen() {
                 borderTopRightRadius: borderRadius.xl,
                 marginBottom:
                   Platform.OS === 'android'
-                    ? (keyboardHeight > 0 ? keyboardHeight + 20 : 0)
+                    ? (keyboardHeight > 0 ? keyboardHeight + 36 : 0)
                     : 0,
                 maxHeight:
                   Dimensions.get('window').height -
-                  (Platform.OS === 'android' && keyboardHeight > 0 ? keyboardHeight + 24 : 0) -
+                  (Platform.OS === 'android' && keyboardHeight > 0 ? keyboardHeight + 40 : 0) -
                   insets.top -
-                  16,
-                paddingBottom: Platform.OS === 'android' ? 12 : (insets.bottom || 14),
+                  12,
+                paddingHorizontal: 16,
+                paddingTop: 12,
+                paddingBottom: Platform.OS === 'android' ? 6 : (insets.bottom || 12),
               },
             ]}
           >
-            <View style={styles.modalHeader}>
+            <View style={[styles.modalHeader, { marginBottom: 10 }]}>
               <View style={styles.modalTitleRow}>
                 <View
                   style={[
@@ -1431,7 +1433,7 @@ export default function CustomerDetailScreen() {
               keyboardDismissMode="none"
               contentContainerStyle={[
                 styles.modalBody,
-                { paddingBottom: (keyboardVisible || keyboardHeight > 0) ? 80 : 28 },
+                { paddingBottom: 6 },
               ]}
             >
               {/* Type Switcher for Edit & Entry */}
@@ -1661,18 +1663,20 @@ export default function CustomerDetailScreen() {
                 borderBottomRightRadius: 0,
                 marginBottom:
                   Platform.OS === 'android'
-                    ? (keyboardHeight > 0 ? keyboardHeight + 20 : 0)
+                    ? (keyboardHeight > 0 ? keyboardHeight + 36 : 0)
                     : 0,
                 maxHeight:
                   Dimensions.get('window').height -
-                  (Platform.OS === 'android' && keyboardHeight > 0 ? keyboardHeight + 24 : 0) -
+                  (Platform.OS === 'android' && keyboardHeight > 0 ? keyboardHeight + 40 : 0) -
                   insets.top -
-                  16,
-                paddingBottom: Platform.OS === 'android' ? 12 : (insets.bottom || 14),
+                  12,
+                paddingHorizontal: 16,
+                paddingTop: 12,
+                paddingBottom: Platform.OS === 'android' ? 8 : (insets.bottom || 12),
               },
             ]}
           >
-            <View style={styles.modalHeader}>
+            <View style={[styles.modalHeader, { marginBottom: 12 }]}>
               <View style={styles.modalTitleRow}>
                 <View
                   style={[

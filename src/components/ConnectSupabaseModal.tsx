@@ -281,6 +281,7 @@ export const ConnectSupabaseModal: React.FC<ConnectSupabaseModalProps> = ({
                   ]}
                 >
                   <AppIcon
+                    family="material"
                     name={isCurrentlyConnected ? 'cloud-check' : 'cloud'}
                     size={22}
                     color={isCurrentlyConnected ? colors.success : colors.primary}
@@ -326,7 +327,7 @@ export const ConnectSupabaseModal: React.FC<ConnectSupabaseModalProps> = ({
                   },
                 ]}
               >
-                <AppIcon name="shield-check" size={18} color={colors.success} />
+                <AppIcon family="material" name="shield-check" size={18} color={colors.success} />
                 <Text style={[styles.offlineBannerText, { color: isDark ? '#A7F3D0' : '#065F46' }]}>
                   <Text style={{ fontWeight: '700' }}>100% Offline Capable: </Text>
                   Store Ledger works fully offline on this device. Connecting Supabase is optional and enables real-time cloud backup & sync.

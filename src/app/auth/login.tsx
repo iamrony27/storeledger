@@ -164,7 +164,7 @@ export default function LoginScreen() {
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1, paddingRight: 6 }}>
               <AppIcon
                 family="material"
-                name={isConfigured ? 'cloud-done' : 'cloud-off'}
+                name={isConfigured ? 'cloud-check' : 'cloud-off'}
                 size={18}
                 color={isConfigured ? colors.primary : colors.warning}
               />

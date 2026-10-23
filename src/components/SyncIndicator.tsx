@@ -273,7 +273,7 @@ export const SyncIndicator: React.FC<SyncIndicatorProps> = ({
         </Animated.View>
       ) : (
         <AppIcon
-          family={config.family || 'feather'}
+          family={config.family || (config.icon === 'cloud-check' ? 'material' : 'feather')}
           name={config.icon || 'cloud-check'}
           size={14}
           color={config.textColor}

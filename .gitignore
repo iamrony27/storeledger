@@ -45,3 +45,8 @@ yarn-error.*
 .claude/
 skills/
 
+# local builds
+builds/
+*.apk
+
+

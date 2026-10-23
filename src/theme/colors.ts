@@ -88,10 +88,10 @@ export const lightColors: ColorTheme = {
   tabBarBorder: 'rgba(255, 255, 255, 0.12)',
   tabBarActive: '#2E7D52', // Secondary green highlight
   tabBarInactive: '#A39F93', // Warm linen taupe
-  headerBg: '#2E7D52', // Grounded secondary forest green (requested by user)
+  headerBg: '#1B6358', // Rich editorial forest teal (from All Customers chip)
   headerText: '#FFFFFF',
-  headerSubtext: 'rgba(255, 255, 255, 0.85)',
-  headerBorder: '#236341', // Harmonious deep green bottom divider
+  headerSubtext: 'rgba(255, 255, 255, 0.88)',
+  headerBorder: '#134E45', // Harmonious deep teal bottom divider
   headerAccent: 'rgba(255, 255, 255, 0.25)',
 };
 
@@ -132,9 +132,9 @@ export const darkColors: ColorTheme = {
   tabBarBorder: 'rgba(237, 232, 223, 0.1)',
   tabBarActive: '#4EAA84', // Secondary green highlight
   tabBarInactive: '#8E8A7E', // Soft warm taupe
-  headerBg: '#1E5A44', // Deep secondary forest green
+  headerBg: '#134E45', // Deep editorial forest teal
   headerText: '#FFFFFF',
-  headerSubtext: 'rgba(255, 255, 255, 0.82)',
-  headerBorder: '#232B26',
-  headerAccent: 'rgba(78, 170, 132, 0.35)',
+  headerSubtext: 'rgba(255, 255, 255, 0.88)',
+  headerBorder: '#0D352F',
+  headerAccent: 'rgba(77, 182, 167, 0.35)',
 };

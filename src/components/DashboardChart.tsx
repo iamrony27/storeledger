@@ -218,7 +218,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
             >
               <AppIcon name="trending-up" size={16} color={colors.primary} />
             </View>
-            <div>
+            <View style={{ flex: 1 }}>
               <Text style={[styles.title, { color: colors.textPrimary }]}>
                 Financial Velocity & Cash Flow
               </Text>
@@ -231,7 +231,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                   ? '12 Months operational overview'
                   : 'Commercial exposure ranking'}
               </Text>
-            </div>
+            </View>
           </View>
         </View>
 

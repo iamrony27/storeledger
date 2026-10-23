@@ -18,6 +18,7 @@
     },
     "android": {
       "package": "com.gwd.book",
+      "versionCode": 2,
       "permissions": [
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"

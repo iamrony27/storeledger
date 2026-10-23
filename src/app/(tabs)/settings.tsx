@@ -302,17 +302,32 @@ export default function SettingsScreen() {
                 iconName="cloud"
                 style={{ marginTop: 8 }}
               />
+
+              <AppButton
+                title="Setup Wizard & Beginner Guide"
+                variant="outline"
+                onPress={() => router.push('/setup-wizard?from=settings' as any)}
+                iconName="help-circle"
+                style={{ marginTop: 8 }}
+              />
             </View>
           )}
 
           {user && (
-            <AppButton
-              title="Manage Supabase Connection"
-              variant="outline"
-              onPress={() => setSbModalVisible(true)}
-              iconName="cloud"
-              style={{ marginTop: 8 }}
-            />
+            <View style={{ gap: 8, marginTop: 8 }}>
+              <AppButton
+                title="Manage Supabase Connection"
+                variant="outline"
+                onPress={() => setSbModalVisible(true)}
+                iconName="cloud"
+              />
+              <AppButton
+                title="Setup Wizard & Beginner Guide"
+                variant="outline"
+                onPress={() => router.push('/setup-wizard?from=settings' as any)}
+                iconName="help-circle"
+              />
+            </View>
           )}
         </View>
 

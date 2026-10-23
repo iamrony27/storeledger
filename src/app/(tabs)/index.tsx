@@ -22,6 +22,7 @@ import { CollapsibleExecutiveTopBar } from '../../components/CollapsibleExecutiv
 import { CustomerCard } from '../../components/CustomerCard';
 import { EmptyState } from '../../components/EmptyState';
 import { ConnectSupabaseModal } from '../../components/ConnectSupabaseModal';
+import { isOnboardingCompleted } from '../../storage/onboardingStorage';
 import { useTabBarVisibility } from '../../context/TabBarVisibilityContext';
 import { syncEngine } from '../../sync/syncEngine';
 import {
@@ -98,6 +99,19 @@ export default function CustomersScreen() {
     return () => {
       isMounted = false;
       unsubscribe();
+    };
+  }, []);
+
+  // First-launch setup wizard check
+  useEffect(() => {
+    let isMounted = true;
+    isOnboardingCompleted().then((completed) => {
+      if (isMounted && !completed) {
+        router.replace('/setup-wizard' as any);
+      }
+    });
+    return () => {
+      isMounted = false;
     };
   }, []);
 

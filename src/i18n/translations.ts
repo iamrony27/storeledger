@@ -110,7 +110,7 @@ export interface Translations {
 export const translations: Record<SupportedLanguage, Translations> = {
   en: {
     common: {
-      appName: 'GWD book',
+      appName: 'GWD Book',
       search: 'Search',
       save: 'Save',
       cancel: 'Cancel',

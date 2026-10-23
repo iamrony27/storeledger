@@ -203,15 +203,16 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
 
   const getInitials = (name: string): string => {
     if (!name) return '?';
-    const trimmed = name.trim();
-    if (!trimmed) return '?';
-    const parts = trimmed.split(/\s+/).filter(Boolean);
+    const cleaned = name.replace(/[-_\\/|•:,().]+/g, ' ').trim();
+    if (!cleaned) return '?';
+    const parts = cleaned.split(/\s+/).filter((p) => p.length > 0 && !/^[-_\\/|•:,().]+$/.test(p));
     if (parts.length >= 2) {
       const first = Array.from(parts[0])[0] || '';
       const second = Array.from(parts[1])[0] || '';
       return `${first}${second}`.toUpperCase();
     }
-    return Array.from(trimmed).slice(0, 2).join('').toUpperCase();
+    const single = parts[0] || cleaned;
+    return Array.from(single).slice(0, 2).join('').toUpperCase();
   };
 
   const handleSelectCustomer = (customer: Customer) => {
@@ -300,6 +301,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
               borderTopRightRadius: 24,
               borderBottomLeftRadius: 0,
               borderBottomRightRadius: 0,
+              height: Math.min(720, Dimensions.get('window').height * 0.88),
               maxHeight: Dimensions.get('window').height - insets.top - 16,
               paddingBottom:
                 Platform.OS === 'android' && keyboardHeight > 0
@@ -892,6 +894,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   sheet: {
+    height: '88%',
     maxHeight: '94%',
     borderTopWidth: 1,
     borderLeftWidth: 1,

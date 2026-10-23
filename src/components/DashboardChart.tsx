@@ -143,18 +143,25 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
   // Dimensions & Scale Math
   const screenWidth = Dimensions.get('window').width;
   const isScrollable = horizon === '30days';
-  const columnSlotWidth = horizon === '7days' ? Math.max(44, (screenWidth - 72) / 7) : horizon === '30days' ? 28 : 34;
-  const chartHeight = 180;
   const paddingLeft = 32;
   const paddingRight = 20;
   const paddingTop = 20;
   const paddingBottom = 30;
+  const chartHeight = 180;
   const innerHeight = chartHeight - paddingTop - paddingBottom;
+  const containerWidth = screenWidth - 64;
 
-  const svgCalculatedWidth = Math.max(
-    screenWidth - 64,
-    paddingLeft + paddingRight + currentDataset.length * columnSlotWidth
-  );
+  const columnSlotWidth =
+    horizon === '7days'
+      ? Math.max(40, (containerWidth - paddingLeft - paddingRight) / 7)
+      : horizon === '30days'
+      ? 28
+      : Math.max(24, (containerWidth - paddingLeft - paddingRight) / 12);
+
+  const svgCalculatedWidth =
+    horizon === '30days'
+      ? Math.max(containerWidth, paddingLeft + paddingRight + currentDataset.length * columnSlotWidth)
+      : containerWidth;
 
   const allValues = useMemo(() => {
     const vals: number[] = [];
@@ -782,6 +789,10 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                           ? idx % 4 === 0 || isSelected
                             ? d.shortLabel
                             : ''
+                          : horizon === 'monthly'
+                          ? idx % 2 === 0 || idx === 11 || isSelected
+                            ? d.shortLabel
+                            : ''
                           : d.shortLabel}
                       </SvgText>
                     </G>
@@ -886,21 +897,23 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
 
       {/* 7. Bottom Legend */}
       {horizon !== 'topDebtors' && (
-        <View style={styles.legendRow}>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: colors.youWillGive }]} />
-            <Text style={[styles.legendText, { color: colors.textSecondary }]}>
-              Collections / Jama (Got)
-            </Text>
-          </View>
-          <View style={styles.legendItem}>
-            <View style={[styles.legendDot, { backgroundColor: colors.youWillGet }]} />
-            <Text style={[styles.legendText, { color: colors.textSecondary }]}>
-              Credit / Udhaar (Gave)
-            </Text>
+        <View style={styles.legendContainer}>
+          <View style={styles.legendRow}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: colors.youWillGive }]} />
+              <Text style={[styles.legendText, { color: colors.textSecondary }]}>
+                Collections (Got)
+              </Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: colors.youWillGet }]} />
+              <Text style={[styles.legendText, { color: colors.textSecondary }]}>
+                Credit (Gave)
+              </Text>
+            </View>
           </View>
           <Text style={[styles.legendHint, { color: colors.textMuted }]}>
-            Tap column to inspect
+            Tap to inspect
           </Text>
         </View>
       )}
@@ -1139,13 +1152,19 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: '500',
   },
-  legendRow: {
+  legendContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.05)',
+    borderTopColor: 'rgba(255, 255, 255, 0.08)',
+    gap: 8,
+  },
+  legendRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   legendItem: {
     flexDirection: 'row',

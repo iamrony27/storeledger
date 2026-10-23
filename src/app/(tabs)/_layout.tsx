@@ -161,8 +161,8 @@ function ModernDockTabBar({
                       style={[
                         styles.navRailHeroCircle,
                         {
-                          backgroundColor: colors.primary,
-                          shadowColor: colors.primary,
+                          backgroundColor: colors.secondary,
+                          shadowColor: colors.secondary,
                         },
                       ]}
                     >
@@ -267,9 +267,9 @@ function ModernDockTabBar({
                     style={[
                       styles.heroButtonCircle,
                       {
-                        backgroundColor: colors.primary,
+                        backgroundColor: colors.secondary,
                         borderColor: colors.tabBarBg,
-                        shadowColor: colors.primary,
+                        shadowColor: colors.secondary,
                       },
                     ]}
                   >

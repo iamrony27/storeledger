@@ -88,17 +88,18 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
   const hasAdvance = balancePaise < 0;
   const isSettled = balancePaise === 0;
 
-  const getInitials = (name: string) => {
+  const getInitials = (name: string): string => {
     if (!name) return '?';
-    const trimmed = name.trim();
-    if (!trimmed) return '?';
-    const parts = trimmed.split(/\s+/).filter(Boolean);
+    const cleaned = name.replace(/[-_\\/|•:,().]+/g, ' ').trim();
+    if (!cleaned) return '?';
+    const parts = cleaned.split(/\s+/).filter((p) => p.length > 0 && !/^[-_\\/|•:,().]+$/.test(p));
     if (parts.length >= 2) {
       const firstChar = Array.from(parts[0])[0] || '';
       const secondChar = Array.from(parts[1])[0] || '';
       return `${firstChar}${secondChar}`.toUpperCase();
     }
-    return Array.from(trimmed).slice(0, 2).join('').toUpperCase();
+    const single = parts[0] || cleaned;
+    return Array.from(single).slice(0, 2).join('').toUpperCase();
   };
 
   const handleWhatsApp = (e: any) => {

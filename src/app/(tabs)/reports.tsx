@@ -163,7 +163,7 @@ export default function ReportsScreen() {
       />
 
       <ScrollView
-        contentContainerStyle={[styles.content, { padding: spacing.md, paddingBottom: 130 }]}
+        contentContainerStyle={[styles.content, { padding: spacing.md, paddingBottom: 180 }]}
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
         scrollEventThrottle={16}
@@ -267,59 +267,6 @@ export default function ReportsScreen() {
             <Text style={[styles.cashCardSubtitle, { color: colors.textSecondary }]}>
               {dateFilter === 'ALL' ? 'Total Outstanding' : 'Disbursed in period'}
             </Text>
-          </View>
-        </View>
-
-        {/* Net Ledger Position Banner */}
-        <View
-          style={[
-            styles.netBannerCard,
-            {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-            },
-          ]}
-        >
-          <View style={styles.netBannerLeft}>
-            <Text style={[styles.netBannerTitle, { color: colors.textSecondary }]}>
-              NET LEDGER POSITION
-            </Text>
-            <Text
-              style={[
-                styles.netBannerAmount,
-                {
-                  color:
-                    summary.netBalancePaise >= 0
-                      ? colors.youWillGet
-                      : colors.youWillGive,
-                },
-              ]}
-            >
-              {formatINR(summary.netBalancePaise)}
-            </Text>
-            <Text style={[styles.netBannerSub, { color: colors.textMuted }]}>
-              {summary.netBalancePaise >= 0 ? 'Net pending collection from debtors' : 'Net surplus in customer advances'}
-            </Text>
-          </View>
-
-          {/* Collection Recovery Rate Circular Meter */}
-          <View style={styles.recoveryMeterBox}>
-            <View
-              style={[
-                styles.recoveryBadge,
-                {
-                  backgroundColor: isDark ? 'rgba(77, 182, 167, 0.16)' : '#E6F2F0',
-                  borderColor: isDark ? 'rgba(77, 182, 167, 0.35)' : '#BDE0DA',
-                },
-              ]}
-            >
-              <Text style={[styles.recoveryRateText, { color: colors.primary }]}>
-                {periodMetrics.collectionRate}%
-              </Text>
-              <Text style={[styles.recoveryLabel, { color: colors.textSecondary }]}>
-                Recovery
-              </Text>
-            </View>
           </View>
         </View>
 

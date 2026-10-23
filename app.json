@@ -1,12 +1,17 @@
 {
   "expo": {
-    "name": "GWD book",
+    "name": "GWD Book",
     "slug": "gwd-book",
     "scheme": "gwdbook",
     "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
+    "androidStatusBar": {
+      "barStyle": "dark-content",
+      "backgroundColor": "#00000000",
+      "translucent": true
+    },
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.gwd.book"

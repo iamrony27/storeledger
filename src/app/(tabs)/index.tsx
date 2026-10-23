@@ -15,7 +15,6 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { router } from 'expo-router';
-import { Chip as PaperChip } from 'react-native-paper';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { AppIcon } from '../../components/AppIcon';
@@ -336,35 +335,67 @@ export default function CustomersScreen() {
                 const isActive = activeFilter === f.key;
                 const count = filterCounts[f.key];
                 return (
-                  <PaperChip
+                  <TouchableOpacity
                     key={f.key}
-                    selected={isActive}
-                    showSelectedOverlay
-                    mode={isActive ? 'flat' : 'outlined'}
                     onPress={() => setActiveFilter(f.key)}
+                    activeOpacity={0.78}
                     style={[
                       styles.filterChip,
                       {
                         backgroundColor: isActive
-                          ? colors.primary
+                          ? colors.secondary
                           : colors.surfaceElevated,
                         borderColor: isActive
-                          ? colors.primary
+                          ? colors.secondary
                           : colors.border,
-                        borderRadius: 20,
+                        borderRadius: 9999,
                       },
                       isActive && styles.filterChipActiveShadow,
                     ]}
-                    textStyle={[
-                      styles.filterChipText,
-                      {
-                        color: isActive ? colors.textInverse : colors.textSecondary,
-                        fontWeight: isActive ? '700' : '600',
-                      },
-                    ]}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: isActive }}
                   >
-                    {`${f.label} • ${count}`}
-                  </PaperChip>
+                    {isActive && (
+                      <AppIcon
+                        name="check"
+                        size={12}
+                        color={colors.textInverse}
+                        style={{ marginRight: 4 }}
+                      />
+                    )}
+                    <Text
+                      style={[
+                        styles.filterChipText,
+                        {
+                          color: isActive ? colors.textInverse : colors.textSecondary,
+                          fontWeight: isActive ? '700' : '600',
+                        },
+                      ]}
+                    >
+                      {f.label}
+                    </Text>
+                    <View
+                      style={[
+                        styles.filterChipBadge,
+                        {
+                          backgroundColor: isActive
+                            ? 'rgba(255, 255, 255, 0.25)'
+                            : colors.badgeBg,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.filterChipBadgeText,
+                          {
+                            color: isActive ? colors.textInverse : colors.textPrimary,
+                          },
+                        ]}
+                      >
+                        {count}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
                 );
               })}
             </ScrollView>
@@ -670,6 +701,7 @@ const styles = StyleSheet.create({
   filterChip: {
     flexDirection: 'row',
     alignItems: 'center',
+    alignSelf: 'flex-start',
     gap: 6,
     borderWidth: 1,
     paddingHorizontal: 13,

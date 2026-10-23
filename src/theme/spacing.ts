@@ -20,10 +20,10 @@ export const borderRadius = {
 };
 
 const fontBase = Platform.select({
-  ios: 'System',
-  android: 'sans-serif-medium',
+  ios: 'Outfit',
+  android: 'Outfit',
   web: "'Outfit', -apple-system, BlinkMacSystemFont, sans-serif",
-  default: 'sans-serif',
+  default: 'Outfit',
 });
 
 export const typography = {

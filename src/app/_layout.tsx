@@ -4,6 +4,13 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
+import {
+  Outfit_400Regular,
+  Outfit_500Medium,
+  Outfit_600SemiBold,
+  Outfit_700Bold,
+  Outfit_800ExtraBold,
+} from '@expo-google-fonts/outfit';
 import { Feather, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { ThemeProvider, useTheme } from '../theme/ThemeContext';
 import { LanguageProvider } from '../i18n/LanguageContext';
@@ -42,9 +49,10 @@ function RootLayoutContent() {
 
   useEffect(() => {
     if (Platform.OS === 'android') {
-      RNStatusBar.setBackgroundColor(colors.surface, true);
+      RNStatusBar.setTranslucent(true);
+      RNStatusBar.setBackgroundColor('transparent', true);
     }
-  }, [colors.surface]);
+  }, []);
 
   return (
     <>
@@ -96,6 +104,12 @@ export default function RootLayout() {
     ...Feather.font,
     ...MaterialCommunityIcons.font,
     ...Ionicons.font,
+    Outfit: Outfit_400Regular,
+    'Outfit-Regular': Outfit_400Regular,
+    'Outfit-Medium': Outfit_500Medium,
+    'Outfit-SemiBold': Outfit_600SemiBold,
+    'Outfit-Bold': Outfit_700Bold,
+    'Outfit-ExtraBold': Outfit_800ExtraBold,
   });
   const [isSplashMinTimeDone, setIsSplashMinTimeDone] = useState(false);
 

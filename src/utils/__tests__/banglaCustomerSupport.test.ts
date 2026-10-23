@@ -26,15 +26,16 @@ console.log('Running Bengali (বাংলা) Customer Name Support & Invariant
 console.log('1. Testing Bengali Customer Avatar Initials Logic...');
 function getInitials(name: string): string {
   if (!name) return '?';
-  const trimmed = name.trim();
-  if (!trimmed) return '?';
-  const parts = trimmed.split(/\s+/).filter(Boolean);
+  const cleaned = name.replace(/[-_\\/|•:,().]+/g, ' ').trim();
+  if (!cleaned) return '?';
+  const parts = cleaned.split(/\s+/).filter((p) => p.length > 0 && !/^[-_\\/|•:,().]+$/.test(p));
   if (parts.length >= 2) {
     const firstChar = Array.from(parts[0])[0] || '';
     const secondChar = Array.from(parts[1])[0] || '';
     return `${firstChar}${secondChar}`.toUpperCase();
   }
-  return Array.from(trimmed).slice(0, 2).join('').toUpperCase();
+  const single = parts[0] || cleaned;
+  return Array.from(single).slice(0, 2).join('').toUpperCase();
 }
 
 assertEquals(getInitials('মনিরুল মামা'), 'মম', 'Two-word Bangla name extracts first letters');
@@ -42,6 +43,9 @@ assertEquals(getInitials('রফিক'), 'রফ', 'Single-word Bangla name ext
 assertEquals(getInitials('সুবীর দা'), 'সদ', 'Two-word Bangla name extracts initials');
 assertEquals(getInitials('রহিম উদ্দিন শেখ'), 'রউ', 'Three-word Bangla name extracts first two words initials');
 assertEquals(getInitials('John Doe'), 'JD', 'English names remain fully supported');
+assertEquals(getInitials('Ruhul - DAMDAMAPARA'), 'RD', 'Hyphen separated names ignore hyphen and extract initials');
+assertEquals(getInitials('Chanarul / Agent'), 'CA', 'Slash separated names ignore slash and extract initials');
+assertEquals(getInitials('Chanarul/'), 'CH', 'Trailing slash ignores slash and takes first two letters');
 
 // 2. Search & Filter with Bengali Unicode Matching
 console.log('2. Testing Bengali Search Query and Collation Invariants...');

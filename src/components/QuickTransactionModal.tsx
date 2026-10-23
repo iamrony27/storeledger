@@ -304,8 +304,8 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
               height: Math.min(720, Dimensions.get('window').height * 0.88),
               maxHeight: Dimensions.get('window').height - insets.top - 16,
               paddingBottom:
-                Platform.OS === 'android' && keyboardHeight > 0
-                  ? keyboardHeight + 20
+                (keyboardVisible || keyboardHeight > 0)
+                  ? (keyboardHeight > 0 ? keyboardHeight : 280) + (Platform.OS === 'android' ? 85 : 55)
                   : (Platform.OS === 'ios' ? 24 : 12),
             },
           ]}

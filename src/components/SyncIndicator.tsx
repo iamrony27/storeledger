@@ -17,11 +17,13 @@ import { AppIcon } from './AppIcon';
 interface SyncIndicatorProps {
   compact?: boolean;
   showLabel?: boolean;
+  onHeader?: boolean;
 }
 
 export const SyncIndicator: React.FC<SyncIndicatorProps> = ({
   compact = false,
   showLabel = true,
+  onHeader = false,
 }) => {
   const { colors, isDark } = useTheme();
   const [syncState, setSyncState] = useState<SyncState>(syncEngine.getState());
@@ -145,6 +147,54 @@ export const SyncIndicator: React.FC<SyncIndicatorProps> = ({
   // WARNING / AMBER = Warning / Offline / Pending changes
   // BLUE = Syncing
   const getStatusConfig = () => {
+    if (onHeader) {
+      if (syncState.status === 'syncing') {
+        return {
+          bg: 'rgba(255, 255, 255, 0.22)',
+          border: 'rgba(255, 255, 255, 0.38)',
+          textColor: '#FFFFFF',
+          dotColor: '#4ADE80',
+          label: 'Syncing',
+          isSyncing: true,
+        };
+      }
+
+      if (syncState.status === 'error') {
+        return {
+          bg: 'rgba(186, 72, 44, 0.45)',
+          border: 'rgba(255, 255, 255, 0.4)',
+          textColor: '#FFFFFF',
+          dotColor: '#F87171',
+          label: 'Error',
+          icon: 'alert-circle',
+          family: 'feather' as const,
+        };
+      }
+
+      if (syncState.status === 'offline' || syncState.pendingCount > 0) {
+        return {
+          bg: 'rgba(212, 163, 89, 0.35)',
+          border: 'rgba(255, 255, 255, 0.35)',
+          textColor: '#FFFFFF',
+          dotColor: '#FBBF24',
+          label: syncState.pendingCount > 0 ? `${syncState.pendingCount} Pending` : 'Offline',
+          icon: syncState.pendingCount > 0 ? 'clock' : 'cloud-off',
+          family: 'feather' as const,
+        };
+      }
+
+      // Default on header: Synced (frosted white badge with bright pulse dot)
+      return {
+        bg: 'rgba(255, 255, 255, 0.18)',
+        border: 'rgba(255, 255, 255, 0.3)',
+        textColor: '#FFFFFF',
+        dotColor: '#4ADE80',
+        label: 'Synced',
+        icon: 'cloud-check',
+        family: 'material' as const,
+      };
+    }
+
     if (syncState.status === 'syncing') {
       return {
         bg: colors.primaryLight,

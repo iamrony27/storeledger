@@ -385,8 +385,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
           {
             height: FIXED_BAR_HEIGHT,
             paddingTop: safeTopPadding,
-            backgroundColor: colors.background,
-            borderBottomColor: colors.headerBorder || colors.border,
+            backgroundColor: colors.headerBg,
+            borderBottomColor: colors.headerBorder,
           },
         ]}
       >
@@ -414,8 +414,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 style={[
                   styles.appIconSquircle,
                   {
-                    backgroundColor: isDark ? 'rgba(77, 182, 167, 0.16)' : '#E6F2F0',
-                    borderColor: isDark ? 'rgba(77, 182, 167, 0.35)' : '#BDE0DA',
+                    backgroundColor: 'rgba(255, 255, 255, 0.16)',
+                    borderColor: 'rgba(255, 255, 255, 0.28)',
                   },
                 ]}
               >
@@ -423,7 +423,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   family="material"
                   name="book-open-page-variant"
                   size={18}
-                  color={colors.primary}
+                  color="#FFFFFF"
                 />
               </View>
               <View style={styles.brandTextGroup}>
@@ -431,7 +431,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   <Text
                     style={[
                       styles.brandTitle,
-                      { color: colors.textPrimary },
+                      { color: colors.headerText },
                     ]}
                     numberOfLines={1}
                   >
@@ -441,16 +441,16 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                     style={[
                       styles.liveBadge,
                       {
-                        backgroundColor: isDark ? 'rgba(78, 170, 132, 0.18)' : 'rgba(38, 108, 82, 0.12)',
-                        borderColor: isDark ? 'rgba(78, 170, 132, 0.35)' : 'rgba(38, 108, 82, 0.25)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.18)',
+                        borderColor: 'rgba(255, 255, 255, 0.3)',
                       },
                     ]}
                   >
-                    <View style={[styles.livePulseDot, { backgroundColor: colors.youWillGive }]} />
+                    <View style={[styles.livePulseDot, { backgroundColor: '#4ADE80' }]} />
                     <Text
                       style={[
                         styles.liveBadgeText,
-                        { color: colors.youWillGive },
+                        { color: '#FFFFFF' },
                       ]}
                     >
                       LIVE
@@ -460,7 +460,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 <Text
                   style={[
                     styles.brandSubtitle,
-                    { color: colors.textSecondary },
+                    { color: colors.headerSubtext },
                   ]}
                   numberOfLines={1}
                 >
@@ -475,8 +475,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 style={[
                   styles.datePill,
                   {
-                    backgroundColor: isDark ? 'rgba(237, 232, 223, 0.08)' : '#EAE5DC',
-                    borderColor: colors.border,
+                    backgroundColor: 'rgba(255, 255, 255, 0.16)',
+                    borderColor: 'rgba(255, 255, 255, 0.28)',
                   },
                 ]}
               >
@@ -484,19 +484,19 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   family="feather"
                   name="calendar"
                   size={12}
-                  color={colors.textSecondary}
+                  color="#FFFFFF"
                 />
                 <Text
                   style={[
                     styles.datePillText,
-                    { color: colors.textSecondary },
+                    { color: '#FFFFFF' },
                   ]}
                 >
                   {todayFormattedDate}
                 </Text>
               </View>
 
-              {showSync && <SyncIndicator compact={true} />}
+              {showSync && <SyncIndicator compact={true} onHeader={true} />}
             </View>
           </Animated.View>
 
@@ -523,8 +523,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 style={[
                   styles.collapsedIconSquircle,
                   {
-                    backgroundColor: isDark ? 'rgba(77, 182, 167, 0.16)' : '#E6F2F0',
-                    borderColor: isDark ? 'rgba(77, 182, 167, 0.35)' : '#BDE0DA',
+                    backgroundColor: 'rgba(255, 255, 255, 0.16)',
+                    borderColor: 'rgba(255, 255, 255, 0.28)',
                   },
                 ]}
               >
@@ -532,13 +532,13 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   family="material"
                   name="book-open-page-variant"
                   size={14}
-                  color={colors.primary}
+                  color="#FFFFFF"
                 />
               </View>
               <Text
                 style={[
                   styles.collapsedBrandTitle,
-                  { color: colors.textPrimary },
+                  { color: colors.headerText },
                 ]}
               >
                 GWD
@@ -552,8 +552,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
               style={[
                 styles.collapsedSummaryPill,
                 {
-                  backgroundColor: isDark ? colors.surface : '#EDE8DE',
-                  borderColor: colors.border,
+                  backgroundColor: 'rgba(255, 255, 255, 0.16)',
+                  borderColor: 'rgba(255, 255, 255, 0.28)',
                 },
               ]}
               accessibilityRole="button"
@@ -563,7 +563,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 <Text
                   style={[
                     styles.microChipLabel,
-                    { color: colors.youWillGet },
+                    { color: '#FFAAA6' },
                   ]}
                 >
                   Due:{' '}
@@ -571,7 +571,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 <Text
                   style={[
                     styles.microChipValue,
-                    { color: colors.youWillGet },
+                    { color: '#FFAAA6' },
                   ]}
                   numberOfLines={1}
                   adjustsFontSizeToFit={true}
@@ -583,7 +583,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
               <Text
                 style={[
                   styles.microDivider,
-                  { color: colors.border },
+                  { color: 'rgba(255, 255, 255, 0.4)' },
                 ]}
               >
                 •
@@ -593,7 +593,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 <Text
                   style={[
                     styles.microChipLabel,
-                    { color: colors.youWillGive },
+                    { color: '#A7F3D0' },
                   ]}
                 >
                   Paid:{' '}
@@ -601,7 +601,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 <Text
                   style={[
                     styles.microChipValue,
-                    { color: colors.youWillGive },
+                    { color: '#A7F3D0' },
                   ]}
                   numberOfLines={1}
                   adjustsFontSizeToFit={true}
@@ -617,8 +617,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 style={[
                   styles.collapsedDatePill,
                   {
-                    backgroundColor: isDark ? 'rgba(237, 232, 223, 0.08)' : '#EAE5DC',
-                    borderColor: colors.border,
+                    backgroundColor: 'rgba(255, 255, 255, 0.16)',
+                    borderColor: 'rgba(255, 255, 255, 0.28)',
                   },
                 ]}
               >
@@ -626,19 +626,19 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   family="feather"
                   name="calendar"
                   size={11}
-                  color={colors.textSecondary}
+                  color="#FFFFFF"
                 />
                 <Text
                   style={[
                     styles.collapsedDateText,
-                    { color: colors.textSecondary },
+                    { color: '#FFFFFF' },
                   ]}
                 >
                   {todayFormattedDate}
                 </Text>
               </View>
 
-              {showSync && <SyncIndicator compact={true} />}
+              {showSync && <SyncIndicator compact={true} onHeader={true} />}
             </View>
           </Animated.View>
         </View>

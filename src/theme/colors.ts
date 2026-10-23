@@ -44,6 +44,9 @@ export interface ColorTheme {
   tabBarBorder: string;
   tabBarActive: string;
   tabBarInactive: string;
+  headerBg: string;
+  headerText: string;
+  headerSubtext: string;
   headerBorder: string;
   headerAccent: string;
 }
@@ -85,8 +88,11 @@ export const lightColors: ColorTheme = {
   tabBarBorder: 'rgba(255, 255, 255, 0.12)',
   tabBarActive: '#2E7D52', // Secondary green highlight
   tabBarInactive: '#A39F93', // Warm linen taupe
-  headerBorder: '#DCD4C5',
-  headerAccent: 'rgba(46, 125, 82, 0.25)',
+  headerBg: '#2E7D52', // Grounded secondary forest green (requested by user)
+  headerText: '#FFFFFF',
+  headerSubtext: 'rgba(255, 255, 255, 0.85)',
+  headerBorder: '#236341', // Harmonious deep green bottom divider
+  headerAccent: 'rgba(255, 255, 255, 0.25)',
 };
 
 export const darkColors: ColorTheme = {
@@ -126,6 +132,9 @@ export const darkColors: ColorTheme = {
   tabBarBorder: 'rgba(237, 232, 223, 0.1)',
   tabBarActive: '#4EAA84', // Secondary green highlight
   tabBarInactive: '#8E8A7E', // Soft warm taupe
-  headerBorder: '#334155',
+  headerBg: '#1E5A44', // Deep secondary forest green
+  headerText: '#FFFFFF',
+  headerSubtext: 'rgba(255, 255, 255, 0.82)',
+  headerBorder: '#232B26',
   headerAccent: 'rgba(78, 170, 132, 0.35)',
 };

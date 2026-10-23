@@ -54,20 +54,22 @@ export default function TransactionsScreen() {
   const { profile } = useAuth();
   const { handleScroll } = useTabBarVisibility();
   const insets = useSafeAreaInsets();
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
   useEffect(() => {
     const showSub = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
       (e) => {
-        if (e?.endCoordinates?.height) {
-          setKeyboardHeight(e.endCoordinates.height);
-        }
+        setKeyboardVisible(true);
+        const h = e?.endCoordinates?.height || 280;
+        setKeyboardHeight(h);
       }
     );
     const hideSub = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
       () => {
+        setKeyboardVisible(false);
         setKeyboardHeight(0);
       }
     );
@@ -919,9 +921,9 @@ export default function TransactionsScreen() {
                 borderBottomRightRadius: 0,
                 maxHeight: Dimensions.get('window').height - insets.top - 16,
                 paddingBottom:
-                  Platform.OS === 'android' && keyboardHeight > 0
-                    ? keyboardHeight + 20
-                    : (insets.bottom || 16),
+                  (keyboardVisible || keyboardHeight > 0)
+                    ? (keyboardHeight > 0 ? keyboardHeight : 280) + (Platform.OS === 'android' ? 85 : 55)
+                    : Math.max(insets.bottom || 0, 16),
               },
             ]}
           >
@@ -965,7 +967,10 @@ export default function TransactionsScreen() {
 
             <ScrollView
               style={{ maxHeight: 600 }}
-              contentContainerStyle={{ padding: 16, paddingBottom: 80 }}
+              contentContainerStyle={{
+                padding: 16,
+                paddingBottom: (keyboardVisible || keyboardHeight > 0) ? 90 : 36,
+              }}
               keyboardShouldPersistTaps="handled"
               keyboardDismissMode="interactive"
               showsVerticalScrollIndicator={true}

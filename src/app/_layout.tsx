@@ -56,7 +56,7 @@ function RootLayoutContent() {
 
   return (
     <>
-      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <StatusBar style="light" />
       <Stack
         screenOptions={{
           headerShown: false,

@@ -150,7 +150,7 @@ export async function runAllBackupEngineTests() {
   const snapshot = assembleBackupSnapshot(sampleCustomers, sampleTransactions, cleanProfile);
 
   assertEquals(snapshot.metadata.schemaVersion, BACKUP_SCHEMA_VERSION, 'Snapshot schema version must be v1');
-  assertEquals(snapshot.metadata.appName, 'GWD Book', 'App name must be GWD Book');
+  assertEquals(snapshot.metadata.appName, 'Store Ledger', 'App name must be Store Ledger');
   assert(snapshot.metadata.backupId.startsWith('gwd-bk-'), 'Backup ID must have standard prefix');
   assert(snapshot.metadata.checksum.length === 64, 'Checksum must be a 64-character SHA-256 hex string');
   assert(snapshot.metadata.dataSizeBytes > 0, 'Data size in bytes must be positive');
@@ -332,7 +332,7 @@ export async function runAllBackupEngineTests() {
 
   // Test 8b: Reading local file using URI
   const packageJsonContent = await readTextFromFileUri('file://package.json');
-  assert(packageJsonContent.includes('"name": "gwd-book"'), 'Successfully reads local file content through resilient cascade');
+  assert(packageJsonContent.includes('"name": "store-ledger"'), 'Successfully reads local file content through resilient cascade');
 
   // ==========================================================================
   // Test 9: JSON Sanitization, BOM stripping & Content Scheme Resilience

@@ -35,8 +35,8 @@ export interface CollapsibleExecutiveTopBarProps {
 }
 
 export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProps> = ({
-  appName = 'GWD Book',
-  subtitle = 'Golden Weigh Bridge',
+  appName = 'Store Ledger',
+  subtitle = 'Store Customer Ledger',
   todayFormattedDate,
   youWillGetPaise,
   totalGotPaise,
@@ -541,7 +541,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   { color: colors.headerText },
                 ]}
               >
-                GWD
+                Store
               </Text>
             </TouchableOpacity>
 

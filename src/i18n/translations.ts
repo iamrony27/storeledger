@@ -110,7 +110,7 @@ export interface Translations {
 export const translations: Record<SupportedLanguage, Translations> = {
   en: {
     common: {
-      appName: 'GWD Book',
+      appName: 'Store Ledger',
       search: 'Search',
       save: 'Save',
       cancel: 'Cancel',
@@ -211,12 +211,12 @@ export const translations: Record<SupportedLanguage, Translations> = {
       themeDark: 'Dark Theme',
       businessProfile: 'Business Profile',
       backupRestore: 'Data Backup & Restore',
-      about: 'About GWD Book',
+      about: 'About Store Ledger',
     },
   },
   bn: {
     common: {
-      appName: 'জিডব্লিউডি বুক',
+      appName: 'স্টোর লেজার',
       search: 'অনুসন্ধান',
       save: 'সংরক্ষণ',
       cancel: 'বাতিল',
@@ -317,12 +317,12 @@ export const translations: Record<SupportedLanguage, Translations> = {
       themeDark: 'ডার্ক মোড',
       businessProfile: 'ব্যবসার প্রোফাইল',
       backupRestore: 'ডাটা ব্যাকআপ ও রিস্টোর',
-      about: 'জিডব্লিউডি বুক পরিচিতি',
+      about: 'স্টোর লেজার পরিচিতি',
     },
   },
   hi: {
     common: {
-      appName: 'जीडब्ल्यूडी बुक',
+      appName: 'स्टोर लेजर',
       search: 'खोजें',
       save: 'सुरक्षित करें',
       cancel: 'रद्द करें',
@@ -423,7 +423,7 @@ export const translations: Record<SupportedLanguage, Translations> = {
       themeDark: 'डार्क थीम',
       businessProfile: 'व्यापार प्रोफ़ाइल',
       backupRestore: 'डेटा बैकअप और पुनर्स्थापना',
-      about: 'जीडब्ल्यूडी बुक के बारे में',
+      about: 'स्टोर लेजर के बारे में',
     },
   },
 };

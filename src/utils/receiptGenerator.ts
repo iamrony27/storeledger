@@ -40,7 +40,7 @@ export function formatTransactionReceiptText(
     `Updated Balance: *${balanceStr}*`,
     `--------------------------------`,
     `Thank you for your business!`,
-    `Recorded securely on GWD Book.`,
+    `Recorded securely on Store Ledger.`,
   ]
     .filter(Boolean)
     .join('\n');

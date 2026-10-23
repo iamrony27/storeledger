@@ -4,7 +4,6 @@ import {
   formatTransactionReceiptText,
   formatCustomerStatementText,
 } from '../receiptGenerator';
-import { INITIAL_CUSTOMERS } from '../../data/mockStore';
 
 function assert(condition: boolean, message: string) {
   if (!condition) {
@@ -120,17 +119,23 @@ assert(html.includes('Noto Sans Bengali'), 'HTML includes Noto Sans Bengali font
 assert(html.includes('Bangla Sangam MN'), 'HTML includes Bangla Sangam MN font fallback');
 assert(html.includes('Kalpurush'), 'HTML includes Kalpurush font fallback');
 
-// 5. Bengali Customer Names in Demo / Mock Data
-console.log('5. Testing Bengali Customer Support in Demo Mock Data...');
+// 5. Bengali Customer Names in Customer Dataset
+console.log('5. Testing Bengali Customer Support in Customer Dataset...');
 
-const tafajul = INITIAL_CUSTOMERS.find((c) => c.name.includes('তাফাজুল'));
-assert(Boolean(tafajul), 'তাফাজুল found in mock customer dataset');
+const sampleBengaliCustomers: Customer[] = [
+  { id: 'bn-1', name: 'তাফাজুল হক', phone: '9647069868', currentBalancePaise: 50000, createdAt: '2026-10-12T10:00:00.000Z', isArchived: false },
+  { id: 'bn-2', name: 'Hazrath / পাঠ', phone: '9647069869', currentBalancePaise: 30000, createdAt: '2026-10-12T10:00:00.000Z', isArchived: false },
+  { id: 'bn-3', name: 'আজিজুল শেখ', phone: '9647069870', currentBalancePaise: -20000, createdAt: '2026-10-12T10:00:00.000Z', isArchived: false },
+];
+
+const tafajul = sampleBengaliCustomers.find((c) => c.name.includes('তাফাজুল'));
+assert(Boolean(tafajul), 'তাফাজুল found in customer dataset');
 assertEquals(tafajul!.phone, '9647069868', 'Tafajul phone number');
 
-const hazrath = INITIAL_CUSTOMERS.find((c) => c.name.includes('Hazrath') || c.name.includes('পাঠ'));
+const hazrath = sampleBengaliCustomers.find((c) => c.name.includes('Hazrath') || c.name.includes('পাঠ'));
 assert(Boolean(hazrath), 'Hazrath with Bengali text found');
 
-const ajijul = INITIAL_CUSTOMERS.find((c) => c.name.includes('আজিজুল'));
-assert(Boolean(ajijul), 'আজিজুল found in mock dataset');
+const ajijul = sampleBengaliCustomers.find((c) => c.name.includes('আজিজুল'));
+assert(Boolean(ajijul), 'আজিজুল found in dataset');
 
 console.log('\nAll Bengali Customer Support tests passed successfully!\n');

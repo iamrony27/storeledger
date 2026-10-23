@@ -493,7 +493,7 @@ export default function CustomersScreen() {
       {/* Modern Long-Height Collapsible Executive Title Bar with Integrated Search (Color Hunt: #EF6905) */}
       <CollapsibleExecutiveTopBar
         appName={t.common.appName}
-        subtitle="Golden Weigh Bridge"
+        subtitle="Store Customer Ledger"
         todayFormattedDate={todayFormattedDate}
         youWillGetPaise={summary.youWillGetPaise}
         totalGotPaise={summary.totalGotPaise > 0 ? summary.totalGotPaise : summary.youWillGivePaise}

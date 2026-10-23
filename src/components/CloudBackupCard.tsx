@@ -440,7 +440,7 @@ export const CloudBackupCard: React.FC = () => {
             </View>
             <Text style={[styles.persistentFolderDesc, { color: colors.textSecondary }]}>
               {gwdFolderUri
-                ? 'Backups in this folder stay on your phone permanently, even if GWD Book is uninstalled.'
+                ? 'Backups in this folder stay on your phone permanently, even if Store Ledger is uninstalled.'
                 : 'Grant storage permission to create the "GWD backup" folder so your backups survive app uninstallation.'}
             </Text>
           </View>

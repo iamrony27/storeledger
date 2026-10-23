@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "GWD Book",
-    "slug": "gwd-book",
-    "scheme": "gwdbook",
+    "name": "Store Ledger",
+    "slug": "store-ledger",
+    "scheme": "storeledger",
     "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

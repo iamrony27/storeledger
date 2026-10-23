@@ -10,7 +10,7 @@ import { Customer, LedgerTransaction } from '../types/customer';
 import { computeCanonicalChecksum } from './cryptoChecksum';
 
 export const BACKUP_SCHEMA_VERSION = 'v1';
-export const APP_NAME = 'GWD Book';
+export const APP_NAME = 'Store Ledger';
 export const MAX_RETAINED_LOCAL_BACKUPS = 10;
 export const GWD_BACKUP_FOLDER_NAME = 'GWD backup';
 export const CANONICAL_BACKUP_BASE_NAME = 'GWD_Ledger_Backup';
@@ -121,7 +121,7 @@ export interface RestorePreview {
  */
 export function sanitizeBusinessProfile(profile: any): SanitizedBusinessProfile {
   return {
-    business_name: String(profile?.business_name || 'GWD Book Business').trim().slice(0, 100),
+    business_name: String(profile?.business_name || 'Store Ledger Business').trim().slice(0, 100),
     owner_name: String(profile?.owner_name || 'Owner').trim().slice(0, 100),
     phone: String(profile?.phone || '').trim().slice(0, 25),
     currency: String(profile?.currency || 'INR').trim().slice(0, 10),

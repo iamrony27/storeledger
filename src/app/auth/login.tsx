@@ -194,7 +194,7 @@ export default function LoginScreen() {
             >
               <AppIcon family="material" name="book" size={32} color={colors.primary} />
             </View>
-            <Text style={[styles.title, { color: colors.textPrimary }]}>GWD Book</Text>
+            <Text style={[styles.title, { color: colors.textPrimary }]}>Store Ledger</Text>
             <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
               {mode === 'signin'
                 ? 'Sign in to access your cloud ledger'

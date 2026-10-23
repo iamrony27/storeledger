@@ -109,7 +109,7 @@ export function formatCustomerDueShareMessage(
   } = options;
 
   const dueStr = formatINR(Math.abs(balancePaise));
-  const biz = businessName?.trim() || 'GWD Book';
+  const biz = businessName?.trim() || 'Store Ledger';
   const divider = '━━━━━━━━━━━━━━━━━━━━━━━━━';
 
   // 1. Bengali (বাংলা)
@@ -144,7 +144,7 @@ export function formatCustomerDueShareMessage(
         `💳 *পেমেন্টের মাধ্যম:* UPI / নগদ (Cash) / ব্যাংক ট্রান্সফার`,
         ``,
         `✨ _আপনার অমূল্য সহযোগিতা ও বিশ্বাসের জন্য আন্তরিক ধন্যবাদ!_`,
-        `_GWD Book অ্যাপের মাধ্যমে তৈরি_`,
+        `_Store Ledger অ্যাপের মাধ্যমে তৈরি_`,
       ]
         .filter((line): line is string => line !== null)
         .join('\n');
@@ -167,7 +167,7 @@ export function formatCustomerDueShareMessage(
         divider,
         ``,
         `✨ _আপনার সাথে ব্যবসা করতে পেরে আমরা আনন্দিত। ধন্যবাদ!_`,
-        `_GWD Book অ্যাপের মাধ্যমে তৈরি_`,
+        `_Store Ledger অ্যাপের মাধ্যমে তৈরি_`,
       ]
         .filter((line): line is string => line !== null)
         .join('\n');
@@ -189,7 +189,7 @@ export function formatCustomerDueShareMessage(
         divider,
         ``,
         `✨ _নিয়মিত হিসাব পরিশোধের জন্য আন্তরিক ধন্যবাদ!_`,
-        `_GWD Book অ্যাপের মাধ্যমে তৈরি_`,
+        `_Store Ledger অ্যাপের মাধ্যমে তৈরি_`,
       ]
         .filter((line): line is string => line !== null)
         .join('\n');
@@ -228,7 +228,7 @@ export function formatCustomerDueShareMessage(
         `💳 *भुगतान के माध्यम:* UPI / नकद (Cash) / बैंक ट्रांसफर`,
         ``,
         `✨ _व्यापार में आपके निरंतर सहयोग एवं विश्वास के लिए हार्दिक धन्यवाद!_`,
-        `_GWD Book द्वारा सुरक्षित रूप से प्रेषित_`,
+        `_Store Ledger द्वारा सुरक्षित रूप से प्रेषित_`,
       ]
         .filter((line): line is string => line !== null)
         .join('\n');
@@ -251,7 +251,7 @@ export function formatCustomerDueShareMessage(
         divider,
         ``,
         `✨ _व्यापार में आपके सहयोग के लिए धन्यवाद!_`,
-        `_GWD Book द्वारा सुरक्षित रूप से प्रेषित_`,
+        `_Store Ledger द्वारा सुरक्षित रूप से प्रेषित_`,
       ]
         .filter((line): line is string => line !== null)
         .join('\n');
@@ -273,7 +273,7 @@ export function formatCustomerDueShareMessage(
         divider,
         ``,
         `✨ _समय पर भुगतान करने के लिए आपका बहुत-बहुत धन्यवाद!_`,
-        `_GWD Book द्वारा सुरक्षित रूप से प्रेषित_`,
+        `_Store Ledger द्वारा सुरक्षित रूप से प्रेषित_`,
       ]
         .filter((line): line is string => line !== null)
         .join('\n');
@@ -311,7 +311,7 @@ export function formatCustomerDueShareMessage(
       `💳 *Accepted Payment Modes:* UPI / Cash / Bank Transfer`,
       ``,
       `✨ _Thank you for your valued business & continued trust!_`,
-      `_Automated digital statement via GWD Book._`,
+      `_Automated digital statement via Store Ledger._`,
     ]
       .filter((line): line is string => line !== null)
       .join('\n');
@@ -334,7 +334,7 @@ export function formatCustomerDueShareMessage(
       divider,
       ``,
       `✨ _Thank you for your business and continued trust!_`,
-      `_Automated digital statement via GWD Book._`,
+      `_Automated digital statement via Store Ledger._`,
     ]
       .filter((line): line is string => line !== null)
       .join('\n');
@@ -356,7 +356,7 @@ export function formatCustomerDueShareMessage(
       divider,
       ``,
       `✨ _Thank you for your prompt payments and valued relationship!_`,
-      `_Automated digital statement via GWD Book._`,
+      `_Automated digital statement via Store Ledger._`,
     ]
       .filter((line): line is string => line !== null)
       .join('\n');

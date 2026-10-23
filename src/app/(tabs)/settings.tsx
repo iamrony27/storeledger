@@ -370,53 +370,6 @@ export default function SettingsScreen() {
         {/* Feature B: Supabase Plan Usage & Remaining Quota Monitor */}
         <CloudUsageCard />
 
-        {/* Feature C: Demo Data Import & Management */}
-        <View
-          style={[
-            styles.sectionCard,
-            {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-              borderRadius: borderRadius.lg,
-            },
-          ]}
-        >
-          <View style={styles.cardHeaderRow}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-              <View
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: borderRadius.sm,
-                  backgroundColor: colors.primaryLight,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <AppIcon name="database" size={17} color={colors.primary} />
-              </View>
-              <View>
-                <Text style={[styles.sectionHeading, { color: colors.textPrimary }]}>
-                  Demo Data Import
-                </Text>
-                <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 1 }}>
-                  Golden Weigh Bridge Sample Accounts
-                </Text>
-              </View>
-            </View>
-          </View>
-
-          <Text style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 12, lineHeight: 18 }}>
-            Preview and import 66 sample customer accounts totaling ₹44,180.00 in authentic active dues with duplicate prevention.
-          </Text>
-
-          <AppButton
-            title="Open Demo Data Importer"
-            variant="outline"
-            iconName="database"
-            onPress={() => router.push('/import' as any)}
-          />
-        </View>
 
         {/* Quick Amount Buttons Settings Card */}
         <View
@@ -587,10 +540,10 @@ export default function SettingsScreen() {
         {/* App Version Info */}
         <View style={styles.footerInfo}>
           <Text style={[styles.versionText, { color: colors.textMuted }]}>
-            GWD Book v2.0 (Expo SDK 57)
+            Store Ledger v2.0 (Expo SDK 57)
           </Text>
           <Text style={[styles.versionSub, { color: colors.textMuted }]}>
-            Mobile Customer Ledger Application
+            Store Customer Ledger Application
           </Text>
         </View>
       </ScrollView>

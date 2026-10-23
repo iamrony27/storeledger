@@ -6,7 +6,6 @@ import {
   AddTransactionInput,
   calculateCustomerBreakdown,
 } from '../types/customer';
-import { INITIAL_CUSTOMERS, INITIAL_TRANSACTIONS } from '../data/mockStore';
 import { syncEngine } from '../sync/syncEngine';
 import { findDuplicateCustomer } from '../utils/customerValidation';
 
@@ -39,63 +38,6 @@ export function subscribeToRepository(listener: () => void): () => void {
 }
 
 /**
- * Reset ledger completely to Golden Weigh Bridge (66 customers, ₹44,180.00 total)
- */
-export async function resetLedgerToGoldenWeighBridge(): Promise<void> {
-  try {
-    // 1. Wipe outbox to eliminate old failed queue items
-    await syncEngine.clearOutbox();
-
-    // 2. Prepare seeded customers with pending sync status and zero opening balance
-    const seededCustomers: Customer[] = INITIAL_CUSTOMERS.map((c) => ({
-      ...c,
-      openingBalancePaise: 0,
-      syncStatus: 'pending_insert',
-    }));
-
-    // 3. Persist to AsyncStorage
-    await AsyncStorage.setItem(
-      STORAGE_KEYS.CUSTOMERS,
-      JSON.stringify(seededCustomers)
-    );
-    await AsyncStorage.setItem(
-      STORAGE_KEYS.TRANSACTIONS,
-      JSON.stringify(INITIAL_TRANSACTIONS)
-    );
-    await AsyncStorage.setItem(STORAGE_KEYS.IS_INITIALIZED, 'true');
-
-    customersCache = seededCustomers;
-    transactionsCache = INITIAL_TRANSACTIONS;
-
-    // 4. Enqueue all 66 customers for cloud sync
-    for (const cust of seededCustomers) {
-      await syncEngine.addToOutbox({
-        entity: 'customer',
-        recordId: cust.id,
-        action: 'insert',
-        payload: cust,
-      });
-    }
-
-    // 5. Enqueue opening transactions
-    for (const txList of Object.values(INITIAL_TRANSACTIONS)) {
-      for (const tx of txList) {
-        await syncEngine.addToOutbox({
-          entity: 'transaction',
-          recordId: tx.id,
-          action: 'insert',
-          payload: tx,
-        });
-      }
-    }
-
-    notifyListeners();
-  } catch (error) {
-    console.error('Failed to reset ledger to Golden Weigh Bridge:', error);
-  }
-}
-
-/**
  * Initializes the repository with stored data or defaults
  */
 async function initializeIfNeeded(): Promise<void> {
@@ -104,7 +46,11 @@ async function initializeIfNeeded(): Promise<void> {
   try {
     const isInit = await AsyncStorage.getItem(STORAGE_KEYS.IS_INITIALIZED);
     if (!isInit) {
-      await resetLedgerToGoldenWeighBridge();
+      customersCache = [];
+      transactionsCache = {};
+      await AsyncStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify([]));
+      await AsyncStorage.setItem(STORAGE_KEYS.TRANSACTIONS, JSON.stringify({}));
+      await AsyncStorage.setItem(STORAGE_KEYS.IS_INITIALIZED, 'true');
       return;
     }
 
@@ -142,7 +88,8 @@ async function initializeIfNeeded(): Promise<void> {
     }
   } catch (error) {
     console.error('Failed to initialize local ledger repository:', error);
-    await resetLedgerToGoldenWeighBridge();
+    customersCache = [];
+    transactionsCache = {};
   }
 }
 

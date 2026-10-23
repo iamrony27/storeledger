@@ -3,7 +3,7 @@
     "name": "GWD Book",
     "slug": "gwd-book",
     "scheme": "gwdbook",
-    "version": "1.0.3",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -35,7 +35,8 @@
     },
     "plugins": [
       "expo-font",
-      "expo-router"
+      "expo-router",
+      "expo-sharing"
     ],
     "extra": {
       "router": {},

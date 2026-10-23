@@ -12,7 +12,6 @@ import { router } from 'expo-router';
 import { AppIcon } from './AppIcon';
 import { SyncIndicator } from './SyncIndicator';
 import { useTheme } from '../theme/ThemeContext';
-import { COLOR_HUNT_PALETTE } from '../theme/colors';
 
 export interface TopBarActionButtonProps {
   iconName: string;
@@ -165,8 +164,8 @@ export const AppTopBar: React.FC<AppTopBarProps> = ({
         styles.headerContainer,
         {
           paddingTop: safeTopPadding,
-          backgroundColor: isDark ? colors.surface : colors.surface,
-          borderBottomColor: colors.border,
+          backgroundColor: colors.background,
+          borderBottomColor: colors.headerBorder || colors.border,
           shadowColor: '#000000',
         },
         style,
@@ -291,30 +290,19 @@ export const AppTopBar: React.FC<AppTopBarProps> = ({
           {showSync && <SyncIndicator compact={syncCompact} />}
         </View>
       </View>
-
-      {!hideAccentLine && (
-        <View
-          style={[
-            styles.accentLine,
-            { backgroundColor: colors.headerAccent },
-          ]}
-        />
-      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   headerContainer: {
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
     borderBottomWidth: 1,
     paddingHorizontal: 16,
-    paddingBottom: 14,
-    elevation: 4,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
+    paddingBottom: 12,
+    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
     zIndex: 20,
   },
   contentRow: {
@@ -425,10 +413,5 @@ const styles = StyleSheet.create({
     fontSize: 8.5,
     fontWeight: '800',
     color: '#FFFFFF',
-  },
-  accentLine: {
-    marginTop: 10,
-    height: 2,
-    borderRadius: 1,
   },
 });

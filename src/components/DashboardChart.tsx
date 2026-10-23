@@ -333,10 +333,13 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
             ]}
           >
             <View style={styles.metricCardHeader}>
-              <Text style={[styles.metricLabel, { color: colors.youWillGive }]}>
+              <Text
+                style={[styles.metricLabel, { color: colors.youWillGive, flex: 1, paddingRight: 2 }]}
+                numberOfLines={2}
+              >
                 TOTAL GOT (COLLECTIONS)
               </Text>
-              <AppIcon name="arrow-down-left" size={12} color={colors.youWillGive} />
+              <AppIcon name="arrow-down-left" size={11} color={colors.youWillGive} style={{ marginTop: 1, flexShrink: 0 }} />
             </View>
             <Text style={[styles.metricValue, { color: colors.youWillGive }]}>
               {formatINR(periodTotals.totalGot)}
@@ -354,10 +357,13 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
             ]}
           >
             <View style={styles.metricCardHeader}>
-              <Text style={[styles.metricLabel, { color: colors.youWillGet }]}>
+              <Text
+                style={[styles.metricLabel, { color: colors.youWillGet, flex: 1, paddingRight: 2 }]}
+                numberOfLines={2}
+              >
                 TOTAL GAVE (CREDIT)
               </Text>
-              <AppIcon name="arrow-up-right" size={12} color={colors.youWillGet} />
+              <AppIcon name="arrow-up-right" size={11} color={colors.youWillGet} style={{ marginTop: 1, flexShrink: 0 }} />
             </View>
             <Text style={[styles.metricValue, { color: colors.youWillGet }]}>
               {formatINR(periodTotals.totalGave)}
@@ -375,13 +381,17 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
             ]}
           >
             <View style={styles.metricCardHeader}>
-              <Text style={[styles.metricLabel, { color: colors.textSecondary }]}>
+              <Text
+                style={[styles.metricLabel, { color: colors.textSecondary, flex: 1, paddingRight: 2 }]}
+                numberOfLines={2}
+              >
                 NET VELOCITY
               </Text>
               <View
                 style={[
                   styles.velocityPill,
                   {
+                    flexShrink: 0,
                     backgroundColor:
                       periodTotals.netFlow >= 0
                         ? isDark
@@ -983,34 +993,37 @@ const styles = StyleSheet.create({
   },
   metricsSummaryRow: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 6,
     marginBottom: 14,
   },
   metricCard: {
     flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    borderRadius: 14,
+    paddingVertical: 8,
+    paddingHorizontal: 7,
+    borderRadius: 12,
     borderWidth: 1,
   },
   metricCardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
+    minHeight: 26,
     marginBottom: 4,
   },
   metricLabel: {
-    fontSize: 8.5,
+    fontSize: 8,
     fontWeight: '800',
-    letterSpacing: 0.4,
+    letterSpacing: 0.2,
+    lineHeight: 11,
   },
   velocityPill: {
-    paddingHorizontal: 5,
-    paddingVertical: 1.5,
-    borderRadius: 6,
+    paddingHorizontal: 4,
+    paddingVertical: 1,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
   },
   velocityPillText: {
-    fontSize: 8,
+    fontSize: 7.5,
     fontWeight: '800',
   },
   metricValue: {

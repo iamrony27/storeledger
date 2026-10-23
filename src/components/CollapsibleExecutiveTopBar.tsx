@@ -16,7 +16,6 @@ import { SyncIndicator } from './SyncIndicator';
 import { useTabBarVisibility } from '../context/TabBarVisibilityContext';
 import { formatINR } from '../types/customer';
 import { useTheme } from '../theme/ThemeContext';
-import { COLOR_HUNT_PALETTE } from '../theme/colors';
 
 export interface CollapsibleExecutiveTopBarProps {
   appName?: string;
@@ -145,8 +144,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
             height: TOTAL_BAR_HEIGHT,
             paddingTop: FIXED_BAR_HEIGHT,
             transform: [{ translateY: drawerTranslateY }],
-            backgroundColor: colors.surface,
-            borderBottomColor: colors.border,
+            backgroundColor: colors.background,
+            borderBottomColor: colors.headerBorder || colors.border,
             shadowColor: '#000000',
           },
         ]}
@@ -386,7 +385,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
           {
             height: FIXED_BAR_HEIGHT,
             paddingTop: safeTopPadding,
-            backgroundColor: isDark ? colors.background : colors.surface,
+            backgroundColor: colors.background,
+            borderBottomColor: colors.headerBorder || colors.border,
           },
         ]}
       >

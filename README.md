@@ -1,87 +1,109 @@
-# GWD Book - Professional Mobile Customer Ledger & Cloud Backup
+# Store Ledger • Professional Business Ledger & Cloud Sync
 
-> **GWD Book** is a high-performance, offline-first mobile customer ledger (Khatabook-style) application built with **React Native (Expo SDK 57)**, **TypeScript**, and **Supabase (PostgreSQL with Row Level Security)**.
+<div align="center">
+  <img src="./assets/icon.png" width="128" height="128" alt="Store Ledger Icon" style="border-radius: 28px;" />
+  <h3>Modern, Offline-First Mobile Customer Ledger for Smart Business Owners</h3>
+  <p>Built with <b>React Native (Expo SDK 57)</b>, <b>TypeScript</b>, and <b>Supabase (PostgreSQL with Row Level Security)</b>.</p>
+</div>
 
 ---
 
 ## 🌟 Key Features
 
-### 1. Financial Ledger Core
-- **Integer Paise Precision:** All money calculations are stored strictly in integer paise (₹1 = 100 paise), eliminating IEEE-754 floating-point drift.
-- **Clean Indian Currency Display:** Formatted in clean Indian Numbering System without unnecessary trailing decimals (e.g. `₹4,000`, `₹1,500`, `₹2,500`, `₹0`).
-- **Real-Time Customer Breakdown:** "You Gave" (Udhaar / বাকি), "You Got" (Jama / জমা), and Net Balance with live balance recalculation.
-- **Audit Trails & Immutable History:** Voiding transactions preserves audit history without silent deletion.
+### 1. 100% Offline-First Architecture
+- **Full Offline Freedom:** All customer accounts, transactions, and balances operate locally on your phone without requiring an internet connection or cloud account.
+- **Integer Precision Math:** Stored internally in minor units (paise/cents) to prevent IEEE-754 floating-point errors.
+- **Privacy Guaranteed:** Financial data remains exclusively on your device unless you explicitly connect your own Supabase project.
 
-### 2. Feature A: Automatic Cloud Backup & Verified Snapshots
-- **4-Day Schedule (Default):** Runs automatically every 4 days (96 hours) from the last verified successful backup. Configurable to 5 days (120 hours).
-- **Android Lifecycle Hook:** On app start and when resuming from background (`AppState === 'active'`), checks if backup is overdue and executes unobtrusively when connected to the internet.
-- **Cryptographic Verification (SHA-256):** Every snapshot is hashed using canonical FIPS 180-4 SHA-256. Tampered or corrupted snapshots are strictly rejected.
-- **Safe Pre-Restore Preview:** Reviews matched vs new customers, matched vs new transactions, and net balances before restore with explicit user confirmation.
-- **Zero Duplicate Guarantee:** Restoring merges records by unique UUID and idempotency keys, never generating duplicate entries.
+### 2. Multi-Currency & Decimal Precision Control
+- **9 Global Currencies:** Native support for INR (₹), USD ($), EUR (€), GBP (£), BDT (৳), AED (AED), SAR (SAR), CAD (CA$), and AUD (A$).
+- **Decimal Amounts Toggle (`.00`):** Toggle between exact fractional decimals (e.g. `₹1,250.50`) and clean, rounded whole numbers (e.g. `₹1,251`) in Settings or during the Setup Wizard.
+- **Adaptive Keypads:** Number inputs automatically adapt their keyboard layout and sanitize decimal keystrokes based on the active setting.
+- **Big Number Autoscaling:** Amounts in Lakhs, Crores, and Millions gracefully scale down (`adjustsFontSizeToFit`) across headers, statement rows, and cards without awkward line wrapping or text truncation.
 
-### 3. Feature B: Supabase Plan Usage & Remaining Quota Monitor
-- **Real-Time Quota Dashboard:** Displays current Supabase plan (Free Plan), Database Storage (500 MB limit), File Storage (1 GB limit), and Active Users.
-- **Remaining Quota Arithmetic:** `Remaining = Limit - Confirmed Usage` with percentage calculation and non-negative bounds.
-- **Authoritative vs Estimated Distinction:** Clearly flags metrics as "Verified" (via PostgreSQL statistics RPC) or "Estimated" (from local row records).
-- **Strict Security Invariant:** Never embeds Supabase Service Role keys or Management API tokens in the mobile client bundle. Unretrievable metrics (like project-wide network egress) are transparently labeled "Unavailable" rather than inventing fake numbers.
-- **Threshold Warnings:** Unobtrusive warnings at 70%, 85%, and 95% capacity.
+### 3. Connect Your Supabase (Zero Vendor Lock-In)
+- **Bring Your Own Backend:** Connect directly to your own Supabase project using only your Project URL and Publishable/Anon Key.
+- **No Service Keys Exposed:** Mobile client never asks for database passwords or administrative service-role keys.
+- **One-Time SQL Schema Setup:** Self-hosted database schema with automatic idempotent table creation, indexes, and strict multi-tenant Row Level Security (`auth.uid() = user_id`).
+- **Cloud Sync Activation Guide:** Step-by-step instructions with infographic walkthrough in [CLOUD_SYNC_ACTIVATION_GUIDE.md](./CLOUD_SYNC_ACTIVATION_GUIDE.md).
+
+### 4. Interactive Financial Velocity & Cash Flow Analytics
+- **Smooth Bézier Splines:** Fluid cash flow trends showing Collections (Got) vs Credit (Gave) over 7-day, 30-day, and 12-month periods.
+- **Smart Adaptive Y-Axis Scale:** Dynamic non-colliding tick formatting with clean unit display (e.g., `0`, `₹500`, `₹1k`, `₹2.5k`, `₹10k`).
+- **Commercial Exposure Ranking:** Automatic top debtors analysis showing highest exposure accounts and collection priority.
+
+### 5. Receipts, Statements & Reminders
+- **PDF Export:** Clean, branded HTML-to-PDF customer statements and business master reports.
+- **Instant WhatsApp Reminders:** Multi-lingual reminder messages (English & Bengali / বাংলা) with last payment breakdown and balance calculation.
+- **Digital Payment Slips:** One-tap shareable transaction receipts via system share sheet.
+
+### 6. Cryptographic Backups
+- **SHA-256 Checksums:** Automated local and cloud snapshots verified using FIPS 180-4 cryptographic hashing.
+- **Zero Duplicates:** Smart UUID idempotency deduplication ensures restores never create duplicate records.
+- **Overdue Scheduler:** Unobtrusive lifecycle checks perform backups when scheduled without draining background battery.
 
 ---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js (v20.x, v22.x, or v24.x)
-- Linux / macOS / Windows development machine
-- Android smartphone with **Expo Go** installed (or Android Emulator)
+- [Node.js](https://nodejs.org/) (v20.x, v22.x, or v24.x)
+- [Expo CLI](https://docs.expo.dev/)
+- Android smartphone with **Expo Go** or an Android Emulator
 
 ### Installation
 ```bash
 # Clone the repository
-git clone <repository-url>
-cd "GWD Book"
+git clone https://github.com/iamrony27/storeledger.git
+cd storeledger
 
 # Install dependencies
 npm install
 
 # Start development server
-npm start
+npx expo start
 ```
 
-### Environment Configuration (.env)
-Create a `.env` file in the project root:
-```env
-EXPO_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your-public-anon-key-here
-EXPO_PUBLIC_APP_NAME="GWD Book"
-EXPO_PUBLIC_DEFAULT_CURRENCY="INR"
-```
-
----
-
-## 🧪 Testing & Quality Assurance
-
+### Run Tests & Verification
 ```bash
-# Run all 10 automated test suites (Math, Sync, Security, Backup, Quota)
+# Run all automated test suites (Math, Sync, Security, Backup, Quota, Visual)
 npm test
 
-# Run TypeScript strict type-checking
-npm run typecheck
+# Run strict TypeScript type-checking
+npx tsc --noEmit
 
-# Diagnose Expo dependencies
+# Diagnose Expo dependencies and configuration
 npx expo-doctor
 ```
 
 ---
 
-## 📱 Android Background Reality & Doze Mode
+## 📦 Building Standalone Android APK
 
-On physical Android devices:
-- Android OS enforces aggressive battery optimization (**Doze Mode**) and OEM task management (Samsung OneUI, Xiaomi MIUI, Oppo ColorOS) which restrict background execution and exact timer alarms.
-- In **Expo Go**, background daemons cannot run persistently.
-- **Reliable Solution:** GWD Book leverages the foreground lifecycle check: whenever the user opens or switches back to the app, the scheduler immediately detects if a backup is overdue and executes it cleanly over the network without battery drain.
+Store Ledger is configured with [EAS Build](https://docs.expo.dev/eas/index.md) to generate standalone APKs:
+
+```bash
+# Build standalone Android APK
+npx eas-cli build --platform android --profile production-apk
+```
 
 ---
 
-## 📄 License
+## 🔒 Security & Data Privacy
+
+1. **Client Isolation:** Never embeds administrative credentials, database master passwords, or service-role keys.
+2. **Row Level Security:** Remote data access is strictly bounded by PostgreSQL RLS (`auth.uid() = user_id`).
+3. **Data Preservation on Disconnect:** Disconnecting your Supabase project clears local credentials without deleting your remote database records.
+
+---
+
+## 📄 Documentation
+
+- [Cloud Sync Activation Guide](./CLOUD_SYNC_ACTIVATION_GUIDE.md) - Step-by-step walkthrough for Supabase connection, registration, and email verification.
+- [Setup Guide](./SETUP_GUIDE.md) - Initial project setup and developer environment guide.
+- [Deployment Manual](./DEPLOYMENT_AND_OPERATIONS_MANUAL.md) - EAS configuration, credentials, and release operations.
+
+---
+
+## 📜 License
 MIT License.

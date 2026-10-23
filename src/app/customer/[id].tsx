@@ -18,12 +18,14 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { useAuth } from '../../auth/AuthContext';
+import { useCurrency } from '../../currency/CurrencyContext';
 import { AppIcon } from '../../components/AppIcon';
 import { AppTopBar, TopBarActionButton } from '../../components/AppTopBar';
 import { Badge } from '../../components/Badge';
 import { AppTextInput } from '../../components/AppTextInput';
 import { AppButton } from '../../components/AppButton';
 import { TransactionDatePicker } from '../../components/TransactionDatePicker';
+import { TransactionDetailModal } from '../../components/TransactionDetailModal';
 import {
   Customer,
   LedgerTransaction,
@@ -69,6 +71,7 @@ export default function CustomerDetailScreen() {
   const { colors, spacing, borderRadius, isDark } = useTheme();
   const { t, language } = useLanguage();
   const { profile } = useAuth();
+  const { currencyConfig, formatAmount, currency } = useCurrency();
   const { quickAmounts } = useQuickAmounts();
   const insets = useSafeAreaInsets();
 
@@ -77,6 +80,7 @@ export default function CustomerDetailScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [whatsAppModalVisible, setWhatsAppModalVisible] = useState(false);
+  const [selectedDetailTx, setSelectedDetailTx] = useState<LedgerTransaction | null>(null);
 
   // Compute most recent legitimate payment received from customer
   const lastPayment = useMemo(
@@ -290,7 +294,7 @@ export default function CustomerDetailScreen() {
     if (!customer) return;
     setIsGeneratingPdf(true);
     try {
-      const uri = await generateCustomerStatementPdf(customer, transactions, profile);
+      const uri = await generateCustomerStatementPdf(customer, transactions, profile, { currencyCode: currency });
       await sharePdfFile(uri, `${customer.name} - Statement`);
     } catch (err: any) {
       Alert.alert('PDF Error', err?.message || 'Failed to generate PDF statement.');
@@ -301,7 +305,7 @@ export default function CustomerDetailScreen() {
 
   const handleShareReceipt = (tx: LedgerTransaction) => {
     if (!customer) return;
-    const receiptText = formatTransactionReceiptText(tx, customer, profile);
+    const receiptText = formatTransactionReceiptText(tx, customer, profile, currency);
     openWhatsAppMessage(customer.phone, receiptText);
   };
 
@@ -417,7 +421,7 @@ export default function CustomerDetailScreen() {
           transactionId: editingTx.id,
           amountPaise: parsedPaise,
           type: modalType,
-          description: modalType === 'GOT' && txDesc.trim() ? txDesc.trim() : undefined,
+          description: txDesc.trim() ? txDesc.trim() : undefined,
           billNumber: modalType === 'GAVE' && txBill.trim() ? txBill.trim() : undefined,
           date: txDate,
         });
@@ -427,7 +431,7 @@ export default function CustomerDetailScreen() {
           customerId: customer.id,
           amountPaise: parsedPaise,
           type: modalType,
-          description: modalType === 'GOT' && txDesc.trim() ? txDesc.trim() : undefined,
+          description: txDesc.trim() ? txDesc.trim() : undefined,
           billNumber: modalType === 'GAVE' && txBill.trim() ? txBill.trim() : undefined,
           date: txDate,
         });
@@ -598,7 +602,7 @@ export default function CustomerDetailScreen() {
               },
             ]}
           >
-            {formatINR(customer.currentBalancePaise)}
+            {formatAmount(customer.currentBalancePaise)}
           </Text>
 
           {/* 3-Column Financial Breakdown: You Gave | You Got | Net Amount */}
@@ -627,7 +631,7 @@ export default function CustomerDetailScreen() {
                   { color: colors.youWillGet },
                 ]}
               >
-                {formatINR(breakdown.totalGavePaise)}
+                {formatAmount(breakdown.totalGavePaise)}
               </Text>
             </View>
 
@@ -646,7 +650,7 @@ export default function CustomerDetailScreen() {
                   { color: colors.youWillGive },
                 ]}
               >
-                {formatINR(breakdown.totalGotPaise)}
+                {formatAmount(breakdown.totalGotPaise)}
               </Text>
             </View>
 
@@ -672,7 +676,7 @@ export default function CustomerDetailScreen() {
                   },
                 ]}
               >
-                {formatINR(breakdown.netBalancePaise)}
+                {formatAmount(breakdown.netBalancePaise)}
               </Text>
             </View>
           </View>
@@ -1095,8 +1099,10 @@ export default function CustomerDetailScreen() {
             displayedTransactions.map((tx) => {
                 const isGave = tx.type === 'GAVE';
                 return (
-                  <View
+                  <TouchableOpacity
                     key={tx.id}
+                    activeOpacity={0.82}
+                    onPress={() => setSelectedDetailTx(tx)}
                     style={[
                       styles.txCard,
                       {
@@ -1199,7 +1205,7 @@ export default function CustomerDetailScreen() {
                           },
                         ]}
                       >
-                        {formatINR(tx.amountPaise)}
+                        {formatAmount(tx.amountPaise)}
                       </Text>
                       <View
                         style={[
@@ -1229,7 +1235,7 @@ export default function CustomerDetailScreen() {
                           <TouchableOpacity
                             onPress={() => openTxModal(tx.type, tx)}
                             accessibilityRole="button"
-                            accessibilityLabel={`Edit transaction of ${formatINR(tx.amountPaise)}`}
+                            accessibilityLabel={`Edit transaction of ${formatAmount(tx.amountPaise)}`}
                             hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                             style={styles.editTxBtn}
                           >
@@ -1239,7 +1245,7 @@ export default function CustomerDetailScreen() {
                           <TouchableOpacity
                             onPress={() => handleShareReceipt(tx)}
                             accessibilityRole="button"
-                            accessibilityLabel={`Share receipt for transaction of ${formatINR(tx.amountPaise)} on WhatsApp`}
+                            accessibilityLabel={`Share receipt for transaction of ${formatAmount(tx.amountPaise)} on WhatsApp`}
                             hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                             style={styles.shareTxBtn}
                           >
@@ -1249,7 +1255,7 @@ export default function CustomerDetailScreen() {
                           <TouchableOpacity
                             onPress={() => handleVoidTx(tx.id)}
                             accessibilityRole="button"
-                            accessibilityLabel={`Delete transaction of ${formatINR(tx.amountPaise)}`}
+                            accessibilityLabel={`Delete transaction of ${formatAmount(tx.amountPaise)}`}
                             hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
                             style={styles.voidBtn}
                           >
@@ -1266,7 +1272,7 @@ export default function CustomerDetailScreen() {
                       )}
                     </View>
                   </View>
-                </View>
+                </TouchableOpacity>
               );
             })
           )}
@@ -1508,7 +1514,7 @@ export default function CustomerDetailScreen() {
                     ref={amountInputRef}
                     label="Amount"
                     placeholder="0"
-                    prefixText="₹"
+                    prefixText={currencyConfig.symbol}
                     value={txAmount}
                     onChangeText={(text) => {
                       const filtered = text.replace(/[^0-9]/g, '');
@@ -1544,7 +1550,7 @@ export default function CustomerDetailScreen() {
                             },
                           ]}
                           accessibilityRole="button"
-                          accessibilityLabel={`Quick select ₹${amt}`}
+                          accessibilityLabel={`Quick select ${currencyConfig.symbol}${amt}`}
                         >
                           <Text
                             style={[
@@ -1558,7 +1564,7 @@ export default function CustomerDetailScreen() {
                             adjustsFontSizeToFit={true}
                             minimumFontScale={0.75}
                           >
-                            ₹{amt}
+                            {currencyConfig.symbol}{amt}
                           </Text>
                         </TouchableOpacity>
                       );
@@ -1599,16 +1605,22 @@ export default function CustomerDetailScreen() {
                 />
               )}
 
-              {/* Note / Description Input (Only for YOU GOT) */}
-              {modalType === 'GOT' && (
-                <AppTextInput
-                  label="Payment Note / Description (Optional)"
-                  placeholder="e.g. Cash payment, GPay, Bank transfer, নগদ জমা"
-                  iconName="edit-3"
-                  value={txDesc}
-                  onChangeText={setTxDesc}
-                />
-              )}
+              {/* Optional Description / Note Input for both GAVE and GOT */}
+              <AppTextInput
+                label={
+                  modalType === 'GAVE'
+                    ? 'Description / Item Details (Optional)'
+                    : 'Payment Note / Description (Optional)'
+                }
+                placeholder={
+                  modalType === 'GAVE'
+                    ? 'e.g. Goods credit, 50 bags paddy, weighment charges'
+                    : 'e.g. Cash payment, GPay, Bank transfer, নগদ জমা'
+                }
+                iconName="file-text"
+                value={txDesc}
+                onChangeText={setTxDesc}
+              />
             </ScrollView>
 
             {/* Pinned Bottom Primary "SAVE" Button (Always Visible Above Keyboard) */}
@@ -1627,8 +1639,8 @@ export default function CustomerDetailScreen() {
                   editingTx
                     ? 'Save Changes'
                     : modalType === 'GAVE'
-                    ? `Save You Gave ${txAmount ? `₹${txAmount}` : ''}`
-                    : `Save You Got ${txAmount ? `₹${txAmount}` : ''}`
+                    ? `Save You Gave ${txAmount ? `${currencyConfig.symbol}${txAmount}` : ''}`
+                    : `Save You Got ${txAmount ? `${currencyConfig.symbol}${txAmount}` : ''}`
                 }
                 onPress={handleSaveTransaction}
                 variant={modalType === 'GAVE' ? 'danger' : 'success'}
@@ -1881,6 +1893,27 @@ export default function CustomerDetailScreen() {
           initialLanguage={language}
         />
       )}
+
+      {/* Transaction Details Modal */}
+      <TransactionDetailModal
+        visible={Boolean(selectedDetailTx)}
+        transaction={selectedDetailTx}
+        customerName={customer?.name}
+        customerPhone={customer?.phone}
+        onClose={() => setSelectedDetailTx(null)}
+        onEdit={(tx) => {
+          setSelectedDetailTx(null);
+          openTxModal(tx.type, tx);
+        }}
+        onShareReceipt={(tx) => {
+          setSelectedDetailTx(null);
+          handleShareReceipt(tx);
+        }}
+        onDelete={(tx) => {
+          setSelectedDetailTx(null);
+          handleVoidTx(tx.id);
+        }}
+      />
     </SafeAreaView>
   );
 }

@@ -52,21 +52,138 @@ export function paiseToRupees(paise: number): number {
   return Math.round(paise) / 100;
 }
 
+export type SupportedCurrency =
+  | 'INR'
+  | 'USD'
+  | 'EUR'
+  | 'GBP'
+  | 'BDT'
+  | 'AED'
+  | 'SAR'
+  | 'CAD'
+  | 'AUD';
+
+export interface CurrencyConfig {
+  code: SupportedCurrency;
+  symbol: string;
+  name: string;
+  nativeName?: string;
+  locale: string;
+  subunitName: string;
+}
+
+export const SUPPORTED_CURRENCIES: Record<SupportedCurrency, CurrencyConfig> = {
+  INR: {
+    code: 'INR',
+    symbol: '₹',
+    name: 'Indian Rupee',
+    nativeName: 'ভারতীয় রুপি / भारतीय रुपया',
+    locale: 'en-IN',
+    subunitName: 'Paise',
+  },
+  USD: {
+    code: 'USD',
+    symbol: '$',
+    name: 'US Dollar',
+    locale: 'en-US',
+    subunitName: 'Cents',
+  },
+  EUR: {
+    code: 'EUR',
+    symbol: '€',
+    name: 'Euro',
+    locale: 'en-IE',
+    subunitName: 'Cents',
+  },
+  GBP: {
+    code: 'GBP',
+    symbol: '£',
+    name: 'British Pound',
+    locale: 'en-GB',
+    subunitName: 'Pence',
+  },
+  BDT: {
+    code: 'BDT',
+    symbol: '৳',
+    name: 'Bangladeshi Taka',
+    nativeName: 'বাংলাদেশী টাকা',
+    locale: 'en-IN',
+    subunitName: 'Poisha',
+  },
+  AED: {
+    code: 'AED',
+    symbol: 'AED',
+    name: 'UAE Dirham',
+    nativeName: 'درهم إماراتي',
+    locale: 'en-AE',
+    subunitName: 'Fils',
+  },
+  SAR: {
+    code: 'SAR',
+    symbol: 'SAR',
+    name: 'Saudi Riyal',
+    nativeName: 'ريال سعودي',
+    locale: 'en-SA',
+    subunitName: 'Halalas',
+  },
+  CAD: {
+    code: 'CAD',
+    symbol: 'CA$',
+    name: 'Canadian Dollar',
+    locale: 'en-CA',
+    subunitName: 'Cents',
+  },
+  AUD: {
+    code: 'AUD',
+    symbol: 'A$',
+    name: 'Australian Dollar',
+    locale: 'en-AU',
+    subunitName: 'Cents',
+  },
+};
+
+export const DEFAULT_CURRENCY: SupportedCurrency = 'INR';
+
+export function getCurrencyConfig(currencyCode: string = DEFAULT_CURRENCY): CurrencyConfig {
+  const code = (currencyCode || '').toUpperCase() as SupportedCurrency;
+  return SUPPORTED_CURRENCIES[code] || SUPPORTED_CURRENCIES.INR;
+}
+
+/**
+ * Formats integer minor units (paise, cents, pence, etc.) into clean localized currency string.
+ * Whole amounts never show .00 (e.g. 150000 -> ₹1,500 / $1,500, 0 -> ₹0 / $0, -85000 -> -₹850 / -$850).
+ * Fraction amounts are formatted with 2 decimal places (e.g. 10050 -> ₹100.50 / $100.50).
+ */
+export function formatCurrency(
+  minorUnits: number,
+  currencyCode: SupportedCurrency | string = DEFAULT_CURRENCY
+): string {
+  const config = getCurrencyConfig(currencyCode);
+  const isNegative = minorUnits < 0;
+  const absoluteMinor = Math.abs(Math.round(minorUnits));
+  const wholeUnits = Math.floor(absoluteMinor / 100);
+  const fraction = absoluteMinor % 100;
+
+  let wholeStr: string;
+  try {
+    wholeStr = wholeUnits.toLocaleString(config.locale);
+  } catch {
+    wholeStr = wholeUnits.toLocaleString('en-US');
+  }
+
+  const fractionStr = fraction > 0 ? `.${fraction.toString().padStart(2, '0')}` : '';
+  const prefix = isNegative ? '-' : '';
+  const space = config.symbol.length > 2 ? ' ' : '';
+
+  return `${prefix}${config.symbol}${space}${wholeStr}${fractionStr}`;
+}
+
 /**
  * Formats integer paise into Indian Numbering System string without any .00
- * Whole rupee amounts never show .00 (e.g. 150000 -> ₹1,500, 0 -> ₹0, -85000 -> -₹850)
+ * Retained for 100% backward compatibility with existing code and tests.
  */
 export function formatINR(paise: number): string {
-  const isNegative = paise < 0;
-  const absolutePaise = Math.abs(Math.round(paise));
-  const wholeRupees = Math.floor(absolutePaise / 100);
-  const remainingPaise = absolutePaise % 100;
-
-  // Format Indian numbering grouping: 12,34,567
-  const rupeesStr = wholeRupees.toLocaleString('en-IN');
-  const paiseStr = remainingPaise > 0 ? `.${remainingPaise.toString().padStart(2, '0')}` : '';
-
-  return `${isNegative ? '-' : ''}₹${rupeesStr}${paiseStr}`;
+  return formatCurrency(paise, 'INR');
 }
 
 /**

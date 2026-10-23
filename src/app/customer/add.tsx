@@ -14,6 +14,7 @@ import { router } from 'expo-router';
 import { SegmentedButtons } from 'react-native-paper';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { useCurrency } from '../../currency/CurrencyContext';
 import { AppTopBar } from '../../components/AppTopBar';
 import { AppTextInput } from '../../components/AppTextInput';
 import { AppButton } from '../../components/AppButton';
@@ -24,6 +25,7 @@ import { findDuplicateCustomer } from '../../utils/customerValidation';
 export default function AddCustomerScreen() {
   const { colors, spacing, isDark } = useTheme();
   const { t } = useLanguage();
+  const { currencyConfig } = useCurrency();
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -186,7 +188,7 @@ export default function AddCustomerScreen() {
             <AppTextInput
               label={t.addCustomer.openingBalanceLabel}
               placeholder="0"
-              prefixText="₹"
+              prefixText={currencyConfig.symbol}
               value={openingBalance}
               onChangeText={(text) => setOpeningBalance(text.split('.')[0].replace(/[^0-9]/g, ''))}
               keyboardType="number-pad"

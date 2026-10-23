@@ -46,7 +46,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
-    "test": "tsx src/utils/__tests__/ledgerMath.test.ts && tsx src/utils/__tests__/supabaseSecurity.test.ts && tsx src/utils/__tests__/syncEngine.test.ts && tsx src/utils/__tests__/communicationAndPdf.test.ts && tsx src/utils/__tests__/securityAndXss.test.ts && tsx src/utils/__tests__/accessibilityAndContrast.test.ts && tsx src/utils/__tests__/backupEngine.test.ts && tsx src/utils/__tests__/backupScheduler.test.ts && tsx src/utils/__tests__/quotaMonitor.test.ts && tsx src/utils/__tests__/banglaCustomerSupport.test.ts && tsx src/utils/__tests__/transactionAndCustomerEdit.test.ts && tsx src/utils/__tests__/modernTopBar.test.ts && tsx src/utils/__tests__/customerSearch.test.ts && tsx src/utils/__tests__/dashboardChartMath.test.ts",
+    "test": "tsx src/utils/__tests__/ledgerMath.test.ts && tsx src/utils/__tests__/supabaseSecurity.test.ts && tsx src/utils/__tests__/syncEngine.test.ts && tsx src/utils/__tests__/communicationAndPdf.test.ts && tsx src/utils/__tests__/securityAndXss.test.ts && tsx src/utils/__tests__/accessibilityAndContrast.test.ts && tsx src/utils/__tests__/backupEngine.test.ts && tsx src/utils/__tests__/backupScheduler.test.ts && tsx src/utils/__tests__/quotaMonitor.test.ts && tsx src/utils/__tests__/banglaCustomerSupport.test.ts && tsx src/utils/__tests__/transactionAndCustomerEdit.test.ts && tsx src/utils/__tests__/modernTopBar.test.ts && tsx src/utils/__tests__/customerSearch.test.ts && tsx src/utils/__tests__/dashboardChartMath.test.ts && tsx src/utils/__tests__/currencyAndDescription.test.ts",
     "lint": "expo lint"
   },
   "private": true

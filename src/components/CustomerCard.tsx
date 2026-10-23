@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { useLanguage } from '../i18n/LanguageContext';
+import { useCurrency } from '../currency/CurrencyContext';
 import { Customer } from '../types/customer';
 import { openWhatsAppReminder } from '../utils/communication';
 import { AppIcon } from './AppIcon';
@@ -68,11 +69,6 @@ function formatRelativeTime(dateString?: string): string {
   return `${diffYears} year${diffYears === 1 ? '' : 's'} ago`;
 }
 
-// Format amount matching screenshot: "₹ 1,520", "₹ 13,900", "₹ 0"
-function formatDueAmount(paise: number): string {
-  const rupees = Math.round(Math.abs(paise) / 100);
-  return `₹ ${rupees.toLocaleString('en-IN')}`;
-}
 
 export const CustomerCard: React.FC<CustomerCardProps> = ({
   customer,
@@ -82,11 +78,11 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
 }) => {
   const { colors, isDark } = useTheme();
   const { language } = useLanguage();
+  const { formatAmount } = useCurrency();
 
   const balancePaise = customer.currentBalancePaise || 0;
   const hasDue = balancePaise > 0;
   const hasAdvance = balancePaise < 0;
-  const isSettled = balancePaise === 0;
 
   const getInitials = (name: string): string => {
     if (!name) return '?';
@@ -151,7 +147,7 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
         onPress={onPress}
         onLongPress={onLongPress}
         accessibilityRole="button"
-        accessibilityLabel={`${customer.name}, Due: ${formatDueAmount(balancePaise)}, ${relativeTime}`}
+        accessibilityLabel={`${customer.name}, Due: ${formatAmount(Math.abs(balancePaise))}, ${relativeTime}`}
         accessibilityHint="Tap to view customer ledger details"
         style={styles.leftCol}
       >
@@ -217,7 +213,7 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
           onPress={onPress}
           onLongPress={onLongPress}
           accessibilityRole="button"
-          accessibilityLabel={`Balance: ${formatDueAmount(balancePaise)}`}
+          accessibilityLabel={`Balance: ${formatAmount(Math.abs(balancePaise))}`}
           style={styles.amountTouchArea}
         >
           <Text
@@ -234,7 +230,7 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
             numberOfLines={1}
             adjustsFontSizeToFit={true}
           >
-            {formatDueAmount(balancePaise)}
+            {formatAmount(Math.abs(balancePaise))}
           </Text>
         </TouchableOpacity>
 

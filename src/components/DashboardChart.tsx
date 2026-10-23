@@ -19,8 +19,9 @@ import Svg, {
   G,
 } from 'react-native-svg';
 import { useTheme } from '../theme/ThemeContext';
+import { useCurrency } from '../currency/CurrencyContext';
 import { AppIcon } from './AppIcon';
-import { Customer, formatINR } from '../types/customer';
+import { Customer } from '../types/customer';
 import {
   generateSmoothSplinePath,
   generateClosedAreaPath,
@@ -47,6 +48,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
   allTransactions = [],
 }) => {
   const { colors, spacing, isDark } = useTheme();
+  const { formatAmount, currencyConfig } = useCurrency();
   const [horizon, setHorizon] = useState<ChartHorizon>('7days');
   const [styleMode, setStyleMode] = useState<ChartStyleMode>('spline');
   const [selectedPoint, setSelectedPoint] = useState<ChartDataPoint | null>(null);
@@ -342,7 +344,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
               <AppIcon name="arrow-down-left" size={11} color={colors.youWillGive} style={{ marginTop: 1, flexShrink: 0 }} />
             </View>
             <Text style={[styles.metricValue, { color: colors.youWillGive }]}>
-              {formatINR(periodTotals.totalGot)}
+              {formatAmount(periodTotals.totalGot)}
             </Text>
           </View>
 
@@ -366,7 +368,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
               <AppIcon name="arrow-up-right" size={11} color={colors.youWillGet} style={{ marginTop: 1, flexShrink: 0 }} />
             </View>
             <Text style={[styles.metricValue, { color: colors.youWillGet }]}>
-              {formatINR(periodTotals.totalGave)}
+              {formatAmount(periodTotals.totalGave)}
             </Text>
           </View>
 
@@ -424,7 +426,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
               ]}
             >
               {periodTotals.netFlow >= 0 ? '+' : '-'}
-              {formatINR(Math.abs(periodTotals.netFlow))}
+              {formatAmount(Math.abs(periodTotals.netFlow))}
             </Text>
           </View>
         </View>
@@ -516,7 +518,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                 GOT (JAMA)
               </Text>
               <Text style={[styles.tooltipMetricAmount, { color: colors.youWillGive }]}>
-                {formatINR(selectedPoint.gotPaise)}
+                {formatAmount(selectedPoint.gotPaise)}
               </Text>
             </View>
 
@@ -527,7 +529,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                 GAVE (UDHAAR)
               </Text>
               <Text style={[styles.tooltipMetricAmount, { color: colors.youWillGet }]}>
-                {formatINR(selectedPoint.gavePaise)}
+                {formatAmount(selectedPoint.gavePaise)}
               </Text>
             </View>
 
@@ -551,7 +553,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                 ]}
               >
                 {selectedPoint.netPaise >= 0 ? '+' : '-'}
-                {formatINR(Math.abs(selectedPoint.netPaise))}
+                {formatAmount(Math.abs(selectedPoint.netPaise))}
               </Text>
             </View>
           </View>
@@ -621,7 +623,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                         fontWeight="600"
                         textAnchor="end"
                       >
-                        {pct === 0 ? '0' : `₹${Math.round(gridVal / 100000)}k`}
+                        {pct === 0 ? '0' : `${currencyConfig.symbol}${Math.round(gridVal / 100000)}k`}
                       </SvgText>
                     </G>
                   );
@@ -863,7 +865,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                       {deb.name}
                     </Text>
                     <Text style={[styles.debtorAmount, { color: colors.youWillGet }]}>
-                      {formatINR(deb.currentBalancePaise)}
+                      {formatAmount(deb.currentBalancePaise)}
                     </Text>
                   </View>
 

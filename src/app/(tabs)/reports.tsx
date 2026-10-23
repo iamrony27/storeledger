@@ -18,9 +18,9 @@ import { AppButton } from '../../components/AppButton';
 import {
   Customer,
   LedgerTransaction,
-  formatINR,
   calculateLedgerTotals,
 } from '../../types/customer';
+import { useCurrency } from '../../currency/CurrencyContext';
 import {
   getCustomers,
   getAllTransactionsList,
@@ -40,6 +40,7 @@ export default function ReportsScreen() {
   const { colors, spacing, isDark } = useTheme();
   const { t } = useLanguage();
   const { profile } = useAuth();
+  const { formatAmount, currency } = useCurrency();
   const { handleScroll } = useTabBarVisibility();
   const [dateFilter, setDateFilter] = useState<DateFilter>('ALL');
   const [rankingTab, setRankingTab] = useState<RankingTab>('DEBTORS');
@@ -67,7 +68,7 @@ export default function ReportsScreen() {
         customers,
         profile,
         `Ledger Report (${dateFilter})`,
-        undefined,
+        { currencyCode: currency },
         transactions
       );
       await sharePdfFile(uri, `${profile.business_name} - Master Ledger`);
@@ -219,7 +220,7 @@ export default function ReportsScreen() {
               numberOfLines={1}
               adjustsFontSizeToFit={true}
             >
-              {formatINR(dateFilter === 'ALL' ? summary.totalGotPaise : periodMetrics.gotPaise)}
+              {formatAmount(dateFilter === 'ALL' ? summary.totalGotPaise : periodMetrics.gotPaise)}
             </Text>
             <Text style={[styles.cashCardSubtitle, { color: colors.textSecondary }]}>
               {dateFilter === 'ALL' ? 'Total Collections' : 'Collected in period'}
@@ -262,7 +263,7 @@ export default function ReportsScreen() {
               numberOfLines={1}
               adjustsFontSizeToFit={true}
             >
-              {formatINR(dateFilter === 'ALL' ? summary.youWillGetPaise : periodMetrics.gavePaise)}
+              {formatAmount(dateFilter === 'ALL' ? summary.youWillGetPaise : periodMetrics.gavePaise)}
             </Text>
             <Text style={[styles.cashCardSubtitle, { color: colors.textSecondary }]}>
               {dateFilter === 'ALL' ? 'Total Outstanding' : 'Disbursed in period'}
@@ -375,7 +376,7 @@ export default function ReportsScreen() {
                       },
                     ]}
                   >
-                    {formatINR(cust.currentBalancePaise)}
+                    {formatAmount(cust.currentBalancePaise)}
                   </Text>
                   <AppIcon name="chevron-right" size={14} color={colors.textMuted} />
                 </View>

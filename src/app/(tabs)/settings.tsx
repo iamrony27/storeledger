@@ -13,6 +13,8 @@ import { RadioButton } from 'react-native-paper';
 import { useTheme } from '../../theme/ThemeContext';
 import { useLanguage } from '../../i18n/LanguageContext';
 import { useAuth } from '../../auth/AuthContext';
+import { useCurrency } from '../../currency/CurrencyContext';
+import { SUPPORTED_CURRENCIES, SupportedCurrency } from '../../types/customer';
 import { AppIcon } from '../../components/AppIcon';
 import { AppTopBar } from '../../components/AppTopBar';
 import { AppButton } from '../../components/AppButton';
@@ -41,6 +43,10 @@ export default function SettingsScreen() {
     signOut,
     updateBusinessProfile,
   } = useAuth();
+
+  // Multi-Currency Selection State
+  const { currency, currencyConfig, setCurrency } = useCurrency();
+  const [currencyModalVisible, setCurrencyModalVisible] = useState(false);
 
   // Profile Edit Modal State
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -76,7 +82,7 @@ export default function SettingsScreen() {
     const num3 = parseInt(qaVal3.replace(/[^0-9]/g, ''), 10);
 
     if (isNaN(num1) || num1 <= 0 || isNaN(num2) || num2 <= 0 || isNaN(num3) || num3 <= 0) {
-      Alert.alert('Invalid Amounts', 'Please enter positive numbers greater than ₹0 for all 3 buttons.');
+      Alert.alert('Invalid Amounts', `Please enter positive numbers greater than ${currencyConfig.symbol}0 for all 3 buttons.`);
       return;
     }
 
@@ -84,7 +90,7 @@ export default function SettingsScreen() {
     try {
       await saveQuickAmounts([num1, num2, num3]);
       setQuickAmountsModalVisible(false);
-      Alert.alert('Presets Saved', `Quick amounts updated to ₹${num1}, ₹${num2}, and ₹${num3}.`);
+      Alert.alert('Presets Saved', `Quick amounts updated to ${currencyConfig.symbol}${num1}, ${currencyConfig.symbol}${num2}, and ${currencyConfig.symbol}${num3}.`);
     } catch {
       Alert.alert('Error', 'Failed to save quick amount settings.');
     } finally {
@@ -98,7 +104,7 @@ export default function SettingsScreen() {
     setQaVal3(DEFAULT_QUICK_AMOUNTS[2].toString());
     await saveQuickAmounts([...DEFAULT_QUICK_AMOUNTS]);
     setQuickAmountsModalVisible(false);
-    Alert.alert('Reset Done', 'Quick amounts reset to default ₹50, ₹100, and ₹200.');
+    Alert.alert('Reset Done', `Quick amounts reset to default ${currencyConfig.symbol}50, ${currencyConfig.symbol}100, and ${currencyConfig.symbol}200.`);
   };
 
   const handleOpenSbModal = () => {
@@ -447,11 +453,104 @@ export default function SettingsScreen() {
                   Button {idx + 1}
                 </Text>
                 <Text style={[styles.quickAmountPreviewValue, { color: colors.primary }]}>
-                  ₹{amt}
+                  {currencyConfig.symbol}{amt}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
+        </View>
+
+        {/* Currency Selection Card */}
+        <View
+          style={[
+            styles.sectionCard,
+            {
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
+              borderRadius: borderRadius.lg,
+            },
+          ]}
+        >
+          <View style={styles.cardHeaderRow}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <View
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: borderRadius.sm,
+                  backgroundColor: colors.primaryLight,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <AppIcon name="dollar-sign" size={17} color={colors.primary} />
+              </View>
+              <View>
+                <Text style={[styles.sectionHeading, { color: colors.textPrimary }]}>
+                  Default Currency
+                </Text>
+                <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 1 }}>
+                  Display symbol & locale number format
+                </Text>
+              </View>
+            </View>
+
+            <TouchableOpacity
+              onPress={() => setCurrencyModalVisible(true)}
+              style={[
+                styles.editBtn,
+                {
+                  backgroundColor: colors.primaryLight,
+                  borderRadius: borderRadius.sm,
+                },
+              ]}
+              accessibilityRole="button"
+              accessibilityLabel="Change default currency"
+            >
+              <AppIcon name="edit" size={14} color={colors.primary} />
+              <Text style={[styles.editBtnText, { color: colors.primary }]}>
+                Change
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => setCurrencyModalVisible(true)}
+            style={[
+              styles.currencyActivePill,
+              {
+                backgroundColor: colors.background,
+                borderColor: colors.border,
+                borderRadius: borderRadius.md,
+              },
+            ]}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+              <View
+                style={[
+                  styles.currencySymbolBadge,
+                  {
+                    backgroundColor: colors.primaryLight,
+                    borderColor: colors.primary,
+                  },
+                ]}
+              >
+                <Text style={[styles.currencySymbolBadgeText, { color: colors.primary }]}>
+                  {currencyConfig.symbol}
+                </Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.currencyCodeText, { color: colors.textPrimary }]}>
+                  {currencyConfig.code} — {currencyConfig.name}
+                </Text>
+                <Text style={[styles.currencySubText, { color: colors.textSecondary }]}>
+                  {currencyConfig.nativeName ? `${currencyConfig.nativeName} • ` : ''}Locale: {currencyConfig.locale}
+                </Text>
+              </View>
+              <AppIcon name="chevron-right" size={16} color={colors.textSecondary} />
+            </View>
+          </TouchableOpacity>
         </View>
 
         {/* Theme Selection Card */}
@@ -718,7 +817,7 @@ export default function SettingsScreen() {
             <View style={styles.modalForm}>
               <AppTextInput
                 label="Button 1 Amount"
-                prefixText="₹"
+                prefixText={currencyConfig.symbol}
                 placeholder="50"
                 keyboardType="numeric"
                 value={qaVal1}
@@ -726,7 +825,7 @@ export default function SettingsScreen() {
               />
               <AppTextInput
                 label="Button 2 Amount"
-                prefixText="₹"
+                prefixText={currencyConfig.symbol}
                 placeholder="100"
                 keyboardType="numeric"
                 value={qaVal2}
@@ -734,7 +833,7 @@ export default function SettingsScreen() {
               />
               <AppTextInput
                 label="Button 3 Amount"
-                prefixText="₹"
+                prefixText={currencyConfig.symbol}
                 placeholder="200"
                 keyboardType="numeric"
                 value={qaVal3}
@@ -754,6 +853,127 @@ export default function SettingsScreen() {
                 onPress={handleSaveQuickAmounts}
                 loading={savingQa}
                 style={styles.modalBtn}
+              />
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Multi-Currency Selection Modal */}
+      <Modal
+        visible={currencyModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setCurrencyModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View
+            style={[
+              styles.modalCard,
+              {
+                backgroundColor: colors.surface,
+                borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : colors.border,
+                borderRadius: borderRadius.lg,
+                maxHeight: '82%',
+              },
+            ]}
+          >
+            <View style={styles.modalHeader}>
+              <View style={{ flex: 1, paddingRight: 8 }}>
+                <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
+                  Select Currency
+                </Text>
+                <Text style={{ fontSize: 11.5, color: colors.textSecondary, marginTop: 2 }}>
+                  Amounts are preserved; only display symbol is updated
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setCurrencyModalVisible(false)}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel="Close currency modal"
+              >
+                <AppIcon name="x" size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={true} style={{ marginVertical: 4 }}>
+              {(Object.keys(SUPPORTED_CURRENCIES) as SupportedCurrency[]).map((cCode, idx, arr) => {
+                const conf = SUPPORTED_CURRENCIES[cCode];
+                const isSelected = currency === cCode;
+                return (
+                  <TouchableOpacity
+                    key={cCode}
+                    activeOpacity={0.7}
+                    onPress={async () => {
+                      await setCurrency(cCode);
+                      setCurrencyModalVisible(false);
+                    }}
+                    style={[
+                      styles.currencyModalRow,
+                      {
+                        borderBottomColor: idx === arr.length - 1 ? 'transparent' : colors.borderLight,
+                        backgroundColor: isSelected
+                          ? isDark
+                            ? 'rgba(77, 182, 167, 0.12)'
+                            : 'rgba(27, 99, 88, 0.08)'
+                          : 'transparent',
+                      },
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.currencyRowSymbolBox,
+                        {
+                          backgroundColor: isSelected ? colors.primary : colors.surfaceElevated,
+                          borderColor: isSelected ? colors.primary : colors.border,
+                        },
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.currencyRowSymbolText,
+                          { color: isSelected ? colors.textInverse : colors.textPrimary },
+                        ]}
+                      >
+                        {conf.symbol}
+                      </Text>
+                    </View>
+
+                    <View style={{ flex: 1 }}>
+                      <Text
+                        style={[
+                          styles.currencyRowCode,
+                          { color: isSelected ? colors.primary : colors.textPrimary },
+                        ]}
+                      >
+                        {conf.code} — {conf.name}
+                      </Text>
+                      <Text style={[styles.currencyRowMeta, { color: colors.textSecondary }]}>
+                        {conf.nativeName ? `${conf.nativeName} • ` : ''}
+                        Subunit: {conf.subunitName} ({conf.locale})
+                      </Text>
+                    </View>
+
+                    <RadioButton
+                      value={cCode}
+                      status={isSelected ? 'checked' : 'unchecked'}
+                      onPress={async () => {
+                        await setCurrency(cCode);
+                        setCurrencyModalVisible(false);
+                      }}
+                      color={colors.primary}
+                    />
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+
+            <View style={{ marginTop: 4 }}>
+              <AppButton
+                title="Done"
+                variant="primary"
+                onPress={() => setCurrencyModalVisible(false)}
               />
             </View>
           </View>
@@ -991,5 +1211,61 @@ const styles = StyleSheet.create({
   quickAmountPreviewValue: {
     fontSize: 16,
     fontWeight: '800',
+  },
+  currencyActivePill: {
+    padding: 12,
+    borderWidth: 1,
+    marginTop: 6,
+  },
+  currencySymbolBadge: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  currencySymbolBadgeText: {
+    fontSize: 16,
+    fontWeight: '800',
+  },
+  currencyCodeText: {
+    fontSize: 14.5,
+    fontWeight: '700',
+    letterSpacing: -0.2,
+  },
+  currencySubText: {
+    fontSize: 11.5,
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  currencyModalRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderRadius: 12,
+    gap: 12,
+  },
+  currencyRowSymbolBox: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  currencyRowSymbolText: {
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  currencyRowCode: {
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  currencyRowMeta: {
+    fontSize: 11,
+    marginTop: 1,
   },
 });

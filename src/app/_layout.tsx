@@ -15,6 +15,7 @@ import { Feather, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { ThemeProvider, useTheme } from '../theme/ThemeContext';
 import { LanguageProvider } from '../i18n/LanguageContext';
 import { AuthProvider } from '../auth/AuthContext';
+import { CurrencyProvider } from '../currency/CurrencyContext';
 import { syncEngine } from '../sync/syncEngine';
 
 // Polyfill Alert.alert for Web browsers
@@ -133,7 +134,9 @@ export default function RootLayout() {
       <ThemeProvider>
         <LanguageProvider>
           <AuthProvider>
-            <RootLayoutContent />
+            <CurrencyProvider>
+              <RootLayoutContent />
+            </CurrencyProvider>
           </AuthProvider>
         </LanguageProvider>
       </ThemeProvider>

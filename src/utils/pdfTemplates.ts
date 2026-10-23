@@ -1,5 +1,5 @@
 import { Customer, LedgerTransaction } from '../types/customer';
-import { formatINR, calculateCustomerBreakdown } from './ledgerMath';
+import { formatCurrency, SupportedCurrency, calculateCustomerBreakdown } from './ledgerMath';
 
 export interface BusinessHeader {
   business_name: string;
@@ -26,6 +26,7 @@ export interface StatementPdfOptions {
    * Defaults to false (only proper, active transactions are included).
    */
   includeVoided?: boolean;
+  currencyCode?: SupportedCurrency;
 }
 
 export interface BusinessReportPdfOptions {
@@ -34,6 +35,7 @@ export interface BusinessReportPdfOptions {
    * Defaults to false (only active, unarchived customer accounts are included).
    */
   includeArchived?: boolean;
+  currencyCode?: SupportedCurrency;
 }
 
 /**
@@ -47,6 +49,8 @@ export function generateCustomerStatementHtml(
   options?: StatementPdfOptions
 ): string {
   const includeVoided = options?.includeVoided ?? false;
+  const currencyCode: SupportedCurrency = options?.currencyCode || 'INR';
+  const formatAmt = (paise: number) => formatCurrency(paise, currencyCode);
 
   // Filter out voided unless specifically requested for audit: voided transactions must not appear on report PDF
   const validTx = transactions.filter(
@@ -150,8 +154,8 @@ export function generateCustomerStatementHtml(
         year: 'numeric',
       });
 
-      const gaveCol = t.type === 'GAVE' ? formatINR(t.amountPaise) : '-';
-      const gotCol = t.type === 'GOT' ? formatINR(t.amountPaise) : '-';
+      const gaveCol = t.type === 'GAVE' ? formatAmt(t.amountPaise) : '-';
+      const gotCol = t.type === 'GOT' ? formatAmt(t.amountPaise) : '-';
       const defaultDesc = t.isOpeningBalance
         ? 'Opening Balance'
         : t.type === 'GAVE'
@@ -189,7 +193,7 @@ export function generateCustomerStatementHtml(
             ${gotCol}
           </td>
           <td class="col-bal" style="padding: 10px 12px; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: 800; font-size: 13px; color: ${runningBalColor};">
-            ${formatINR(runningBalance)}${runningBalSuffix}
+            ${formatAmt(runningBalance)}${runningBalSuffix}
           </td>
         </tr>
       `;
@@ -394,7 +398,7 @@ export function generateCustomerStatementHtml(
               <td style="width: 42%; text-align: right; vertical-align: top;">
                 <span style="font-size: 11px; color: #64748b; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Account Status</span>
                 <div style="font-size: 12px; font-weight: 800; color: ${balanceColor}; margin-top: 2px;">${balanceLabel}</div>
-                <div style="font-size: 22px; font-weight: 900; color: ${balanceColor}; margin-top: 3px;">${formatINR(netBalancePaise)}</div>
+                <div style="font-size: 22px; font-weight: 900; color: ${balanceColor}; margin-top: 3px;">${formatAmt(netBalancePaise)}</div>
               </td>
             </tr>
           </table>
@@ -405,15 +409,15 @@ export function generateCustomerStatementHtml(
           <tr>
             <td class="kpi-cell" style="width: 33%; background: #fef2f2; border: 1.5px solid #fecaca;">
               <div style="font-size: 11px; font-weight: 800; color: #b91c1c; text-transform: uppercase; letter-spacing: 0.5px;">Total You Took (Debit)</div>
-              <div style="font-size: 19px; font-weight: 900; color: #dc2626; margin-top: 4px;">${formatINR(totalGavePaise)}</div>
+              <div style="font-size: 19px; font-weight: 900; color: #dc2626; margin-top: 4px;">${formatAmt(totalGavePaise)}</div>
             </td>
             <td class="kpi-cell" style="width: 33%; background: #ecfdf5; border: 1.5px solid #a7f3d0;">
               <div style="font-size: 11px; font-weight: 800; color: #047857; text-transform: uppercase; letter-spacing: 0.5px;">Total You Paid (Credit)</div>
-              <div style="font-size: 19px; font-weight: 900; color: #059669; margin-top: 4px;">${formatINR(totalGotPaise)}</div>
+              <div style="font-size: 19px; font-weight: 900; color: #059669; margin-top: 4px;">${formatAmt(totalGotPaise)}</div>
             </td>
             <td class="kpi-cell" style="width: 33%; background: ${balanceBg}; border: 1.5px solid ${balanceBorder};">
               <div style="font-size: 11px; font-weight: 800; color: ${balanceColor}; text-transform: uppercase; letter-spacing: 0.5px;">Net Outstanding</div>
-              <div style="font-size: 19px; font-weight: 900; color: ${balanceColor}; margin-top: 4px;">${formatINR(netBalancePaise)}</div>
+              <div style="font-size: 19px; font-weight: 900; color: ${balanceColor}; margin-top: 4px;">${formatAmt(netBalancePaise)}</div>
             </td>
           </tr>
         </table>
@@ -435,9 +439,9 @@ export function generateCustomerStatementHtml(
           <tfoot>
             <tr>
               <td colspan="2" style="text-align: left; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px;">Statement Totals</td>
-              <td style="text-align: right; font-weight: 900; color: #dc2626; background-color: #fef2f2;">${formatINR(totalGavePaise)}</td>
-              <td style="text-align: right; font-weight: 900; color: #059669; background-color: #ecfdf5;">${formatINR(totalGotPaise)}</td>
-              <td style="text-align: right; font-weight: 900; color: ${balanceColor}; background-color: ${balanceBg};">${formatINR(netBalancePaise)}</td>
+              <td style="text-align: right; font-weight: 900; color: #dc2626; background-color: #fef2f2;">${formatAmt(totalGavePaise)}</td>
+              <td style="text-align: right; font-weight: 900; color: #059669; background-color: #ecfdf5;">${formatAmt(totalGotPaise)}</td>
+              <td style="text-align: right; font-weight: 900; color: ${balanceColor}; background-color: ${balanceBg};">${formatAmt(netBalancePaise)}</td>
             </tr>
           </tfoot>
         </table>
@@ -471,6 +475,8 @@ export function generateBusinessReportHtml(
   allTransactions?: LedgerTransaction[]
 ): string {
   const includeArchived = options?.includeArchived ?? false;
+  const currencyCode: SupportedCurrency = options?.currencyCode || 'INR';
+  const formatAmt = (paise: number) => formatCurrency(paise, currencyCode);
 
   // Filter out archived and pending-delete customers so deleted accounts do not appear
   const validCustomers = includeArchived
@@ -566,13 +572,13 @@ export function generateBusinessReportHtml(
             ${escapeHtml(c.phone) || '-'}
           </td>
           <td style="padding: 9px 10px; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: 700; font-size: 12px; color: #dc2626;">
-            ${formatINR(custGave)}
+            ${formatAmt(custGave)}
           </td>
           <td style="padding: 9px 10px; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: 800; font-size: 12px; color: #059669; background-color: #f0fdf4;">
-            ${formatINR(custGot)}
+            ${formatAmt(custGot)}
           </td>
           <td style="padding: 9px 10px; border-bottom: 1px solid #e2e8f0; text-align: right; font-weight: 800; font-size: 13px; color: ${balanceColor};">
-            ${formatINR(c.currentBalancePaise)}
+            ${formatAmt(c.currentBalancePaise)}
           </td>
           <td style="padding: 9px 10px; border-bottom: 1px solid #e2e8f0; font-size: 10px; font-weight: 700; text-align: center;">
             <span style="display: inline-block; padding: 2px 6px; border-radius: 4px; background-color: ${statusBadgeBg}; color: ${balanceColor}; border: 1px solid ${statusBadgeBorder};">
@@ -743,19 +749,19 @@ export function generateBusinessReportHtml(
           <tr>
             <td class="kpi-cell" style="width: 25%; background: #fef2f2; border: 1.5px solid #fecaca;">
               <div style="font-size: 10px; font-weight: 800; color: #b91c1c; text-transform: uppercase; letter-spacing: 0.5px;">Total Took (You Gave)</div>
-              <div style="font-size: 17px; font-weight: 900; color: #dc2626; margin-top: 4px;">${formatINR(totalDebitGavePaise)}</div>
+              <div style="font-size: 17px; font-weight: 900; color: #dc2626; margin-top: 4px;">${formatAmt(totalDebitGavePaise)}</div>
             </td>
             <td class="kpi-cell" style="width: 25%; background: #ecfdf5; border: 1.5px solid #a7f3d0;">
               <div style="font-size: 10px; font-weight: 800; color: #047857; text-transform: uppercase; letter-spacing: 0.5px;">Total Received (Paid Amount)</div>
-              <div style="font-size: 17px; font-weight: 900; color: #059669; margin-top: 4px;">${formatINR(totalReceivedPaidPaise)}</div>
+              <div style="font-size: 17px; font-weight: 900; color: #059669; margin-top: 4px;">${formatAmt(totalReceivedPaidPaise)}</div>
             </td>
             <td class="kpi-cell" style="width: 25%; background: #fff7ed; border: 1.5px solid #fed7aa;">
               <div style="font-size: 10px; font-weight: 800; color: #c2410c; text-transform: uppercase; letter-spacing: 0.5px;">Total Due (You'll Get)</div>
-              <div style="font-size: 17px; font-weight: 900; color: #ea580c; margin-top: 4px;">${formatINR(totalReceivablePaise)}</div>
+              <div style="font-size: 17px; font-weight: 900; color: #ea580c; margin-top: 4px;">${formatAmt(totalReceivablePaise)}</div>
             </td>
             <td class="kpi-cell" style="width: 25%; background: #f8fafc; border: 1.5px solid #cbd5e1;">
               <div style="font-size: 10px; font-weight: 800; color: #334155; text-transform: uppercase; letter-spacing: 0.5px;">Net Market Balance</div>
-              <div style="font-size: 17px; font-weight: 900; color: ${netColor}; margin-top: 4px;">${formatINR(netMarketPaise)}</div>
+              <div style="font-size: 17px; font-weight: 900; color: ${netColor}; margin-top: 4px;">${formatAmt(netMarketPaise)}</div>
             </td>
           </tr>
         </table>
@@ -779,9 +785,9 @@ export function generateBusinessReportHtml(
           <tfoot>
             <tr>
               <td colspan="3" style="text-align: left; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.5px;">Total Market Ledger (${validCustomers.length} Accounts)</td>
-              <td style="text-align: right; font-weight: 800; color: #dc2626; background-color: #fef2f2;">${formatINR(totalDebitGavePaise)}</td>
-              <td style="text-align: right; font-weight: 800; color: #059669; background-color: #f0fdf4;">${formatINR(totalReceivedPaidPaise)}</td>
-              <td style="text-align: right; font-weight: 900; color: ${netColor}; background-color: #eff6ff;">${formatINR(netMarketPaise)}</td>
+              <td style="text-align: right; font-weight: 800; color: #dc2626; background-color: #fef2f2;">${formatAmt(totalDebitGavePaise)}</td>
+              <td style="text-align: right; font-weight: 800; color: #059669; background-color: #f0fdf4;">${formatAmt(totalReceivedPaidPaise)}</td>
+              <td style="text-align: right; font-weight: 900; color: ${netColor}; background-color: #eff6ff;">${formatAmt(netMarketPaise)}</td>
               <td></td>
             </tr>
           </tfoot>

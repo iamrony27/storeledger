@@ -19,11 +19,13 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { SegmentedButtons, Chip as PaperChip } from 'react-native-paper';
 import { useTheme } from '../../theme/ThemeContext';
 import { useAuth } from '../../auth/AuthContext';
+import { useCurrency } from '../../currency/CurrencyContext';
 import { AppIcon } from '../../components/AppIcon';
 import { AppTopBar, TopBarActionButton } from '../../components/AppTopBar';
 import { AppTextInput } from '../../components/AppTextInput';
 import { AppButton } from '../../components/AppButton';
 import { TransactionDatePicker } from '../../components/TransactionDatePicker';
+import { TransactionDetailModal } from '../../components/TransactionDetailModal';
 import { useTabBarVisibility } from '../../context/TabBarVisibilityContext';
 import { syncEngine } from '../../sync/syncEngine';
 import {
@@ -52,8 +54,10 @@ type TypeFilterPreset = 'ALL' | 'GAVE' | 'GOT';
 export default function TransactionsScreen() {
   const { colors, spacing, borderRadius, isDark } = useTheme();
   const { profile } = useAuth();
+  const { currencyConfig, formatAmount, currency } = useCurrency();
   const { handleScroll } = useTabBarVisibility();
   const insets = useSafeAreaInsets();
+  const [selectedDetailTx, setSelectedDetailTx] = useState<LedgerTransaction | null>(null);
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
 
@@ -309,7 +313,7 @@ export default function TransactionsScreen() {
         transactionId: editingTx.id,
         amountPaise: parsedPaise,
         type: editType,
-        description: editType === 'GOT' && editDesc.trim() ? editDesc.trim() : undefined,
+        description: editDesc.trim() ? editDesc.trim() : undefined,
         billNumber: editType === 'GAVE' && editBill.trim() ? editBill.trim() : undefined,
         date: editDate,
       });
@@ -332,7 +336,7 @@ export default function TransactionsScreen() {
 
     Alert.alert(
       'Delete Transaction',
-      `Are you sure you want to permanently delete this ${tx.type === 'GAVE' ? 'You Gave' : 'You Got'} entry of ${formatINR(tx.amountPaise)} for ${custName}? It will be completely removed from database and backup files.`,
+      `Are you sure you want to permanently delete this ${tx.type === 'GAVE' ? 'You Gave' : 'You Got'} entry of ${formatAmount(tx.amountPaise)} for ${custName}? It will be completely removed from database and backup files.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
@@ -359,7 +363,7 @@ export default function TransactionsScreen() {
       Alert.alert('No Phone', 'This customer does not have a registered mobile number.');
       return;
     }
-    const receiptText = formatTransactionReceiptText(tx, cust, profile);
+    const receiptText = formatTransactionReceiptText(tx, cust, profile, currency);
     openWhatsAppMessage(cust.phone, receiptText);
   };
 
@@ -575,7 +579,7 @@ export default function TransactionsScreen() {
                   </Text>
                 </View>
                 <Text style={[styles.kpiAmount, { color: colors.danger }]}>
-                  {formatINR(summary.totalGavePaise)}
+                  {formatAmount(summary.totalGavePaise)}
                 </Text>
                 <Text style={[styles.kpiSub, { color: colors.textMuted }]}>
                   Credit given
@@ -607,7 +611,7 @@ export default function TransactionsScreen() {
                   </Text>
                 </View>
                 <Text style={[styles.kpiAmount, { color: colors.success }]}>
-                  {formatINR(summary.totalGotPaise)}
+                  {formatAmount(summary.totalGotPaise)}
                 </Text>
                 <Text style={[styles.kpiSub, { color: colors.textMuted }]}>
                   Payment received
@@ -642,7 +646,7 @@ export default function TransactionsScreen() {
                         : colors.textPrimary,
                   }}
                 >
-                  {formatINR(summary.netPaise)}
+                  {formatAmount(summary.netPaise)}
                 </Text>
               </Text>
             </View>
@@ -763,7 +767,13 @@ export default function TransactionsScreen() {
                 </TouchableOpacity>
 
                 {/* Right: Amount & Badge */}
-                <View style={styles.txAmountCol}>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => setSelectedDetailTx(tx)}
+                  style={styles.txAmountCol}
+                  accessibilityRole="button"
+                  accessibilityLabel={`View details for transaction of ${formatAmount(tx.amountPaise)}`}
+                >
                   <Text
                     style={[
                       styles.txAmountText,
@@ -772,7 +782,7 @@ export default function TransactionsScreen() {
                       },
                     ]}
                   >
-                    {formatINR(tx.amountPaise)}
+                    {formatAmount(tx.amountPaise)}
                   </Text>
                   <View
                     style={[
@@ -794,16 +804,20 @@ export default function TransactionsScreen() {
                       {isGave ? 'YOU GAVE' : 'YOU GOT'}
                     </Text>
                   </View>
-                </View>
+                </TouchableOpacity>
               </View>
 
               {/* Note / Bill Description Row */}
               {(tx.description || (tx.type === 'GAVE' && tx.billNumber)) && (
-                <View
+                <TouchableOpacity
+                  activeOpacity={0.75}
+                  onPress={() => setSelectedDetailTx(tx)}
                   style={[
                     styles.txMetaDetailsRow,
                     { borderTopColor: colors.borderLight },
                   ]}
+                  accessibilityRole="button"
+                  accessibilityLabel="View full transaction details"
                 >
                   {tx.description ? (
                     <Text
@@ -831,7 +845,7 @@ export default function TransactionsScreen() {
                       </Text>
                     </View>
                   ) : null}
-                </View>
+                </TouchableOpacity>
               )}
 
               {/* Action Buttons: WhatsApp Share, Edit, Delete */}
@@ -1049,7 +1063,7 @@ export default function TransactionsScreen() {
                 ref={editAmountInputRef}
                 label="Amount"
                 placeholder="0"
-                prefixText="₹"
+                prefixText={currencyConfig.symbol}
                 value={editAmount}
                 onChangeText={(text) => {
                   const withoutDecimals = text.split('.')[0];
@@ -1096,16 +1110,22 @@ export default function TransactionsScreen() {
                 />
               )}
 
-              {/* Note / Description Input (Only for YOU GOT) */}
-              {editType === 'GOT' && (
-                <AppTextInput
-                  label="Payment Note / Description (Optional)"
-                  placeholder="e.g. Cash, UPI, Cheque payment, নগদ জমা"
-                  iconName="edit-3"
-                  value={editDesc}
-                  onChangeText={setEditDesc}
-                />
-              )}
+              {/* Optional Description / Details Input for both GAVE and GOT */}
+              <AppTextInput
+                label={
+                  editType === 'GAVE'
+                    ? 'Description / Details (Optional)'
+                    : 'Payment Note / Description (Optional)'
+                }
+                placeholder={
+                  editType === 'GAVE'
+                    ? 'e.g. Weighment charges, Goods credit, Item details'
+                    : 'e.g. Cash, UPI, Cheque payment, নগদ জমা'
+                }
+                iconName="file-text"
+                value={editDesc}
+                onChangeText={setEditDesc}
+              />
             </ScrollView>
 
             {/* Pinned Primary Save Button outside ScrollView */}
@@ -1188,6 +1208,29 @@ export default function TransactionsScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Transaction Details Modal */}
+      {selectedDetailTx && (
+        <TransactionDetailModal
+          visible={Boolean(selectedDetailTx)}
+          transaction={selectedDetailTx}
+          customerName={customerMap.get(selectedDetailTx.customerId)?.name}
+          customerPhone={customerMap.get(selectedDetailTx.customerId)?.phone}
+          onClose={() => setSelectedDetailTx(null)}
+          onEdit={(tx) => {
+            setSelectedDetailTx(null);
+            handleOpenEdit(tx);
+          }}
+          onShareReceipt={(tx) => {
+            setSelectedDetailTx(null);
+            handleShareReceipt(tx);
+          }}
+          onDelete={(tx) => {
+            setSelectedDetailTx(null);
+            handleVoid(tx);
+          }}
+        />
+      )}
     </View>
   );
 }

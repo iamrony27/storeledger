@@ -15,6 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useTheme } from '../theme/ThemeContext';
+import { useCurrency } from '../currency/CurrencyContext';
 import { AppIcon } from './AppIcon';
 import { AppTextInput } from './AppTextInput';
 import { AppButton } from './AppButton';
@@ -22,7 +23,6 @@ import { TransactionDatePicker } from './TransactionDatePicker';
 import {
   Customer,
   LedgerTransaction,
-  formatINR,
   getBalanceType,
   rupeesToPaise,
 } from '../types/customer';
@@ -50,6 +50,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
   initialType,
 }) => {
   const { colors, spacing, borderRadius, isDark } = useTheme();
+  const { currencyConfig, formatAmount } = useCurrency();
   const { quickAmounts } = useQuickAmounts();
   const insets = useSafeAreaInsets();
 
@@ -241,7 +242,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
         customerId: selectedCustomer.id,
         amountPaise: parsedPaise,
         type: txType,
-        description: txType === 'GOT' && description.trim() ? description.trim() : undefined,
+        description: description.trim() ? description.trim() : undefined,
         billNumber: txType === 'GAVE' && billNumber.trim() ? billNumber.trim() : undefined,
         date: date,
       });
@@ -488,9 +489,9 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                               numberOfLines={1}
                             >
                               {cust.currentBalancePaise > 0
-                                ? `Due ${formatINR(cust.currentBalancePaise)}`
+                                ? `Due ${formatAmount(cust.currentBalancePaise)}`
                                 : cust.currentBalancePaise < 0
-                                ? `Adv ${formatINR(Math.abs(cust.currentBalancePaise))}`
+                                ? `Adv ${formatAmount(Math.abs(cust.currentBalancePaise))}`
                                 : 'Settled'}
                             </Text>
                           </View>
@@ -603,7 +604,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                               },
                             ]}
                           >
-                            {formatINR(cust.currentBalancePaise)}
+                            {formatAmount(cust.currentBalancePaise)}
                           </Text>
                           <Text style={[styles.custBalanceSub, { color: colors.textMuted }]}>
                             {balanceType === 'GET'
@@ -655,7 +656,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                         {selectedCustomer.name}
                       </Text>
                       <Text style={[styles.custPhone, { color: colors.textSecondary }]}>
-                        Current Balance: {formatINR(selectedCustomer.currentBalancePaise)}
+                        Current Balance: {formatAmount(selectedCustomer.currentBalancePaise)}
                       </Text>
                     </View>
                   </View>
@@ -757,7 +758,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                       ref={amountInputRef}
                       label="Amount"
                       placeholder="0"
-                      prefixText="₹"
+                      prefixText={currencyConfig.symbol}
                       value={amount}
                       onChangeText={(text) => {
                         const withoutDecimals = text.split('.')[0];
@@ -798,7 +799,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                               },
                             ]}
                             accessibilityRole="button"
-                            accessibilityLabel={`Quick select ₹${amt}`}
+                            accessibilityLabel={`Quick select ${currencyConfig.symbol}${amt}`}
                           >
                             <Text
                               style={[
@@ -814,7 +815,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                               adjustsFontSizeToFit={true}
                               minimumFontScale={0.75}
                             >
-                              ₹{amt}
+                              {currencyConfig.symbol}{amt}
                             </Text>
                           </TouchableOpacity>
                         );
@@ -857,16 +858,22 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                   />
                 )}
 
-                {/* Description Input (Only for YOU GOT) */}
-                {txType === 'GOT' && (
-                  <AppTextInput
-                    label="Payment Note / Description (Optional)"
-                    placeholder="e.g. Cash payment, UPI, Bank Transfer, নগদ জমা"
-                    iconName="edit-3"
-                    value={description}
-                    onChangeText={setDescription}
-                  />
-                )}
+                {/* Optional Description / Details Input for both GAVE and GOT */}
+                <AppTextInput
+                  label={
+                    txType === 'GAVE'
+                      ? 'Description / Details (Optional)'
+                      : 'Payment Note / Description (Optional)'
+                  }
+                  placeholder={
+                    txType === 'GAVE'
+                      ? 'e.g. Weighment charges, Goods purchase, Items'
+                      : 'e.g. Cash payment, UPI, Bank Transfer, নগদ জমা'
+                  }
+                  iconName="file-text"
+                  value={description}
+                  onChangeText={setDescription}
+                />
               </View>
             )}
           </ScrollView>
@@ -885,8 +892,8 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
               <AppButton
                 title={
                   txType === 'GAVE'
-                    ? `Save You Gave ${amount ? `₹${amount}` : ''}`
-                    : `Save You Got ${amount ? `₹${amount}` : ''}`
+                    ? `Save You Gave ${amount ? `${currencyConfig.symbol}${amount}` : ''}`
+                    : `Save You Got ${amount ? `${currencyConfig.symbol}${amount}` : ''}`
                 }
                 onPress={handleSave}
                 variant={txType === 'GAVE' ? 'danger' : 'success'}

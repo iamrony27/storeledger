@@ -1,5 +1,5 @@
 import { Customer, LedgerTransaction } from '../types/customer';
-import { formatINR } from './ledgerMath';
+import { formatCurrency, SupportedCurrency } from './ledgerMath';
 
 interface BusinessHeader {
   business_name: string;
@@ -13,12 +13,14 @@ interface BusinessHeader {
 export function formatTransactionReceiptText(
   tx: LedgerTransaction,
   customer: Customer,
-  business: BusinessHeader
+  business: BusinessHeader,
+  currencyCode?: SupportedCurrency
 ): string {
+  const code = currencyCode || 'INR';
   const isPaymentReceived = tx.type === 'GOT';
   const typeLabel = isPaymentReceived ? 'YOU GOT' : 'YOU GAVE';
-  const amountStr = formatINR(tx.amountPaise);
-  const balanceStr = formatINR(customer.currentBalancePaise);
+  const amountStr = formatCurrency(tx.amountPaise, code);
+  const balanceStr = formatCurrency(customer.currentBalancePaise, code);
   const formattedDate = new Date(tx.date).toLocaleDateString('en-IN', {
     day: 'numeric',
     month: 'short',
@@ -51,9 +53,11 @@ export function formatTransactionReceiptText(
  */
 export function formatCustomerStatementText(
   customer: Customer,
-  business: BusinessHeader
+  business: BusinessHeader,
+  currencyCode?: SupportedCurrency
 ): string {
-  const balanceStr = formatINR(customer.currentBalancePaise);
+  const code = currencyCode || 'INR';
+  const balanceStr = formatCurrency(customer.currentBalancePaise, code);
   const statusLabel =
     customer.currentBalancePaise > 0
       ? 'Pending Due (You will pay)'

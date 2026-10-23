@@ -14,8 +14,8 @@ import { router } from 'expo-router';
 import { AppIcon } from './AppIcon';
 import { SyncIndicator } from './SyncIndicator';
 import { useTabBarVisibility } from '../context/TabBarVisibilityContext';
-import { formatINR } from '../types/customer';
 import { useTheme } from '../theme/ThemeContext';
+import { useCurrency } from '../currency/CurrencyContext';
 
 export interface CollapsibleExecutiveTopBarProps {
   appName?: string;
@@ -53,6 +53,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
   const insets = useSafeAreaInsets();
   const { topBarCollapseAnim, expandTopBar } = useTabBarVisibility();
   const { colors, isDark } = useTheme();
+  const { formatAmount } = useCurrency();
 
   // Metrics
   const hasSearchBar = onSearchQueryChange !== undefined || searchQuery !== undefined;
@@ -165,7 +166,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 },
               ]}
               accessibilityRole="button"
-              accessibilityLabel={`Till Today's Due: ${formatINR(youWillGetPaise)}. Tap to view today's transactions`}
+              accessibilityLabel={`Till Today's Due: ${formatAmount(youWillGetPaise)}. Tap to view today's transactions`}
             >
               <View style={styles.cardHeader}>
                 <View
@@ -200,7 +201,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 adjustsFontSizeToFit={true}
                 minimumFontScale={0.8}
               >
-                {formatINR(youWillGetPaise)}
+                {formatAmount(youWillGetPaise)}
               </Text>
 
               <View style={styles.cardFooterRow}>
@@ -222,7 +223,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                       },
                     ]}
                   >
-                    +{formatINR(todayGavePaise)} today
+                    +{formatAmount(todayGavePaise)} today
                   </Text>
                 ) : (
                   <Text
@@ -249,7 +250,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 },
               ]}
               accessibilityRole="button"
-              accessibilityLabel={`Total Paid: ${formatINR(totalGotPaise)}. Tap to view history`}
+              accessibilityLabel={`Total Paid: ${formatAmount(totalGotPaise)}. Tap to view history`}
             >
               <View style={styles.cardHeader}>
                 <View
@@ -284,7 +285,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 adjustsFontSizeToFit={true}
                 minimumFontScale={0.8}
               >
-                {formatINR(totalGotPaise)}
+                {formatAmount(totalGotPaise)}
               </Text>
 
               <View style={styles.cardFooterRow}>
@@ -306,7 +307,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                       },
                     ]}
                   >
-                    +{formatINR(todayGotPaise)} today
+                    +{formatAmount(todayGotPaise)} today
                   </Text>
                 ) : (
                   <Text
@@ -557,7 +558,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 },
               ]}
               accessibilityRole="button"
-              accessibilityLabel={`Due: ${formatINR(youWillGetPaise)}, Paid: ${formatINR(totalGotPaise)}. Tap to expand`}
+              accessibilityLabel={`Due: ${formatAmount(youWillGetPaise)}, Paid: ${formatAmount(totalGotPaise)}. Tap to expand`}
             >
               <View style={styles.microChip}>
                 <Text
@@ -576,7 +577,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   numberOfLines={1}
                   adjustsFontSizeToFit={true}
                 >
-                  {formatINR(youWillGetPaise)}
+                  {formatAmount(youWillGetPaise)}
                 </Text>
               </View>
 
@@ -606,7 +607,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   numberOfLines={1}
                   adjustsFontSizeToFit={true}
                 >
-                  {formatINR(totalGotPaise)}
+                  {formatAmount(totalGotPaise)}
                 </Text>
               </View>
             </TouchableOpacity>

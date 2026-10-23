@@ -126,7 +126,7 @@ export const translations: Record<SupportedLanguage, Translations> = {
       error: 'Error',
     },
     tabs: {
-      customers: 'Customers',
+      customers: 'Ledger',
       reports: 'Reports',
       transactions: 'History',
       import: 'Import',
@@ -232,7 +232,7 @@ export const translations: Record<SupportedLanguage, Translations> = {
       error: 'ত্রুটি',
     },
     tabs: {
-      customers: 'গ্রাহক',
+      customers: 'খাতা',
       reports: 'রিপোর্ট',
       transactions: 'লেনদেন',
       import: 'ইম্পোর্ট',
@@ -338,7 +338,7 @@ export const translations: Record<SupportedLanguage, Translations> = {
       error: 'त्रुटि',
     },
     tabs: {
-      customers: 'ग्राहक',
+      customers: 'खाता',
       reports: 'रिपोर्ट',
       transactions: 'लेन-देन',
       import: 'इंपोर्ट',

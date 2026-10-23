@@ -22,6 +22,7 @@ import {
 
 interface TabItemProps {
   iconName: string;
+  iconFamily?: 'feather' | 'material' | 'ionicons';
   label: string;
   isFocused: boolean;
   activeColor: string;
@@ -31,6 +32,7 @@ interface TabItemProps {
 
 const AnimatedTabItem: React.FC<TabItemProps> = ({
   iconName,
+  iconFamily = 'material',
   label,
   isFocused,
   activeColor,
@@ -52,22 +54,14 @@ const AnimatedTabItem: React.FC<TabItemProps> = ({
     <View style={styles.tabItemInner}>
       <Animated.View
         style={[
-          styles.iconPill,
-          isFocused && {
-            backgroundColor: isDark
-              ? 'rgba(77, 182, 167, 0.18)'
-              : 'rgba(27, 99, 88, 0.14)',
-            borderColor: isDark
-              ? 'rgba(77, 182, 167, 0.35)'
-              : 'rgba(27, 99, 88, 0.25)',
-            borderWidth: 1,
-          },
+          styles.iconContainer,
           { transform: [{ scale: scaleAnim }] },
         ]}
       >
         <AppIcon
+          family={iconFamily}
           name={iconName}
-          size={20}
+          size={22}
           color={isFocused ? activeColor : inactiveColor}
         />
       </Animated.View>
@@ -172,16 +166,20 @@ function ModernDockTabBar({
                 );
               }
 
-              let iconName = 'users';
+              let iconName = 'book-open-page-variant';
+              let iconFamily: 'feather' | 'material' | 'ionicons' = 'material';
               let label = t.tabs.customers;
-              if (route.name === 'reports') {
-                iconName = 'bar-chart-2';
-                label = t.tabs.reports;
-              } else if (route.name === 'transactions') {
-                iconName = 'clock';
+              if (route.name === 'transactions') {
+                iconName = 'swap-horizontal';
+                iconFamily = 'material';
                 label = t.tabs.transactions || 'History';
+              } else if (route.name === 'reports') {
+                iconName = 'chart-line';
+                iconFamily = 'material';
+                label = t.tabs.reports;
               } else if (route.name === 'settings') {
-                iconName = 'settings';
+                iconName = 'cog';
+                iconFamily = 'material';
                 label = t.tabs.settings;
               }
 
@@ -206,6 +204,7 @@ function ModernDockTabBar({
                 >
                   <AnimatedTabItem
                     iconName={iconName}
+                    iconFamily={iconFamily}
                     label={label}
                     isFocused={isFocused}
                     activeColor={colors.tabBarActive}
@@ -268,29 +267,33 @@ function ModernDockTabBar({
                       styles.heroButtonCircle,
                       {
                         backgroundColor: colors.secondary,
-                        borderColor: colors.tabBarBg,
+                        borderColor: isDark ? 'rgba(255, 255, 255, 0.25)' : '#FFFFFF',
                         shadowColor: colors.secondary,
                       },
                     ]}
                   >
-                    <AppIcon name="plus" size={26} color={colors.textInverse} />
+                    <AppIcon family="feather" name="plus" size={26} color="#FFFFFF" />
                   </View>
                 </TouchableOpacity>
               );
             }
 
-            // Normal tabs (Customers, Reports, Transactions, Settings)
-            let iconName = 'users';
+            // Normal tabs (Ledger, History, Reports, Settings)
+            let iconName = 'book-open-page-variant';
+            let iconFamily: 'feather' | 'material' | 'ionicons' = 'material';
             let label = t.tabs.customers;
 
-            if (route.name === 'reports') {
-              iconName = 'bar-chart-2';
-              label = t.tabs.reports;
-            } else if (route.name === 'transactions') {
-              iconName = 'clock';
+            if (route.name === 'transactions') {
+              iconName = 'swap-horizontal';
+              iconFamily = 'material';
               label = t.tabs.transactions || 'History';
+            } else if (route.name === 'reports') {
+              iconName = 'chart-line';
+              iconFamily = 'material';
+              label = t.tabs.reports;
             } else if (route.name === 'settings') {
-              iconName = 'settings';
+              iconName = 'cog';
+              iconFamily = 'material';
               label = t.tabs.settings;
             }
 
@@ -326,6 +329,7 @@ function ModernDockTabBar({
               >
                 <AnimatedTabItem
                   iconName={iconName}
+                  iconFamily={iconFamily}
                   label={label}
                   isFocused={isFocused}
                   activeColor={colors.tabBarActive}
@@ -367,9 +371,9 @@ function TabLayoutContent() {
         }}
       >
         <Tabs.Screen name="index" />
-        <Tabs.Screen name="reports" />
-        <Tabs.Screen name="quick-entry" />
         <Tabs.Screen name="transactions" />
+        <Tabs.Screen name="quick-entry" />
+        <Tabs.Screen name="reports" />
         <Tabs.Screen name="settings" />
       </Tabs>
     </View>
@@ -396,10 +400,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    width: '94%',
-    maxWidth: 420,
-    height: 66,
-    borderRadius: 33,
+    width: '92%',
+    maxWidth: 400,
+    height: 62,
+    borderRadius: 22,
     borderWidth: 1,
     paddingHorizontal: 4,
     elevation: 18,
@@ -418,16 +422,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iconPill: {
-    width: 48,
-    height: 28,
-    borderRadius: 14,
+  iconContainer: {
+    width: 44,
+    height: 26,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 2,
   },
   tabItemLabel: {
-    fontSize: 10,
+    fontSize: 10.5,
     marginTop: 1,
     letterSpacing: 0.1,
     textAlign: 'center',
@@ -435,17 +438,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 1,
   },
   heroButtonWrapper: {
-    top: -16,
-    width: 54,
-    height: 54,
+    top: -12,
+    width: 48,
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 10,
   },
   heroButtonCircle: {
-    width: 52,
-    height: 52,
-    borderRadius: 18,
+    width: 46,
+    height: 46,
+    borderRadius: 15,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',

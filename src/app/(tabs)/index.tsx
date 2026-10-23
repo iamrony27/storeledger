@@ -10,6 +10,7 @@ import {
   RefreshControl,
   Alert,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -45,6 +46,8 @@ export default function CustomersScreen() {
   const { colors, borderRadius, isDark } = useTheme();
   const { t } = useLanguage();
   const { scrollY, diffClampedScrollY } = useTabBarVisibility();
+  const { width } = useWindowDimensions();
+  const isWide = width >= 768;
   const insets = useSafeAreaInsets();
   const flatListRef = useRef<FlatList>(null);
 
@@ -290,10 +293,13 @@ export default function CustomersScreen() {
     <View style={[styles.safeArea, { backgroundColor: colors.background }]}>
       <StatusBar style="light" />
 
-      {/* Main Content (Smooth 120Hz native driver scroll tracking) */}
+      {/* Main Content (Smooth 120Hz native driver scroll tracking, Adaptive 2-Column Grid on Tablet/Web) */}
       <Animated.FlatList
         ref={flatListRef as any}
         data={filteredCustomers}
+        key={isWide ? 'adaptive-grid-2' : 'adaptive-list-1'}
+        numColumns={isWide ? 2 : 1}
+        columnWrapperStyle={isWide ? { paddingHorizontal: 4 } : undefined}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
@@ -514,11 +520,13 @@ export default function CustomersScreen() {
           </View>
         }
         renderItem={({ item }) => (
-          <CustomerCard
-            customer={item}
-            onPress={() => router.push(`/customer/${item.id}` as any)}
-            onLongPress={() => handleCustomerLongPress(item)}
-          />
+          <View style={isWide ? { flex: 0.5 } : undefined}>
+            <CustomerCard
+              customer={item}
+              onPress={() => router.push(`/customer/${item.id}` as any)}
+              onLongPress={() => handleCustomerLongPress(item)}
+            />
+          </View>
         )}
         ListEmptyComponent={
           <EmptyState

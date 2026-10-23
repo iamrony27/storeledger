@@ -26,14 +26,16 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const systemColorScheme = useColorScheme();
-  const [mode, setMode] = useState<ThemeMode>('light');
+  const [mode, setMode] = useState<ThemeMode>('dark');
 
-  // Load user saved theme preference; defaults to 'light' if none saved
+  // Load user saved theme preference; defaults to 'dark' (Obsidian Dark Mode)
   useEffect(() => {
     AsyncStorage.getItem(THEME_STORAGE_KEY)
       .then((savedMode) => {
         if (savedMode === 'system' || savedMode === 'light' || savedMode === 'dark') {
           setMode(savedMode);
+        } else {
+          setMode('dark');
         }
       })
       .catch(() => {});

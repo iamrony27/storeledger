@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Platform,
   Animated,
+  useWindowDimensions,
 } from 'react-native';
 import { Tabs, usePathname } from 'expo-router';
 import { BottomTabBarProps } from 'expo-router/build/react-navigation/bottom-tabs';
@@ -100,6 +101,9 @@ function ModernDockTabBar({
   const safeInsets = useSafeAreaInsets();
   const [quickTxVisible, setQuickTxVisible] = useState(false);
 
+  const { width } = useWindowDimensions();
+  const isWide = width >= 768;
+
   // Dynamic bottom offset: lifts the floating capsule cleanly above Android gesture navigation line & iOS home indicator
   const rawBottom = Math.max(safeInsets.bottom, insets?.bottom ?? 0);
   const bottomOffset =
@@ -108,6 +112,119 @@ function ModernDockTabBar({
       : Platform.OS === 'android'
       ? 14
       : 20;
+
+  if (isWide) {
+    return (
+      <>
+        <View
+          style={[
+            styles.navRailCapsule,
+            {
+              backgroundColor: colors.tabBarBg,
+              borderRightColor: colors.tabBarBorder,
+            },
+          ]}
+        >
+          {/* Top Logo */}
+          <View style={styles.navRailBrand}>
+            <View
+              style={[
+                styles.navRailLogoSquircle,
+                {
+                  backgroundColor: isDark ? 'rgba(37, 99, 235, 0.22)' : '#EFF6FF',
+                  borderColor: isDark ? 'rgba(96, 165, 250, 0.4)' : '#BFDBFE',
+                },
+              ]}
+            >
+              <AppIcon name="book-open" size={20} color={colors.primary} />
+            </View>
+            <Text style={[styles.navRailBrandTitle, { color: isDark ? '#FFFFFF' : '#0F172A' }]}>
+              GWD
+            </Text>
+          </View>
+
+          {/* Navigation Items */}
+          <View style={styles.navRailItemsList}>
+            {state.routes.map((route, index) => {
+              const isFocused = state.index === index;
+              if (route.name === 'quick-entry') {
+                return (
+                  <TouchableOpacity
+                    key={route.key}
+                    activeOpacity={0.82}
+                    onPress={() => setQuickTxVisible(true)}
+                    style={styles.navRailHeroBtn}
+                    accessibilityRole="button"
+                    accessibilityLabel="Quick Add Transaction"
+                  >
+                    <View
+                      style={[
+                        styles.navRailHeroCircle,
+                        {
+                          backgroundColor: colors.primary,
+                          shadowColor: colors.primary,
+                        },
+                      ]}
+                    >
+                      <AppIcon name="plus" size={22} color="#FFFFFF" />
+                    </View>
+                  </TouchableOpacity>
+                );
+              }
+
+              let iconName = 'users';
+              let label = t.tabs.customers;
+              if (route.name === 'reports') {
+                iconName = 'bar-chart-2';
+                label = t.tabs.reports;
+              } else if (route.name === 'transactions') {
+                iconName = 'clock';
+                label = t.tabs.transactions || 'History';
+              } else if (route.name === 'settings') {
+                iconName = 'settings';
+                label = t.tabs.settings;
+              }
+
+              const onPress = () => {
+                const event = navigation.emit({
+                  type: 'tabPress',
+                  target: route.key,
+                  canPreventDefault: true,
+                });
+                if (!isFocused && !event.defaultPrevented) {
+                  navigation.navigate(route.name);
+                }
+              };
+
+              return (
+                <TouchableOpacity
+                  key={route.key}
+                  onPress={onPress}
+                  style={styles.navRailTabBtn}
+                  accessibilityRole="tab"
+                  accessibilityState={{ selected: isFocused }}
+                >
+                  <AnimatedTabItem
+                    iconName={iconName}
+                    label={label}
+                    isFocused={isFocused}
+                    activeColor={colors.tabBarActive}
+                    inactiveColor={colors.tabBarInactive}
+                    isDark={isDark}
+                  />
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        </View>
+
+        <QuickTransactionModal
+          visible={quickTxVisible}
+          onClose={() => setQuickTxVisible(false)}
+        />
+      </>
+    );
+  }
 
   return (
     <>
@@ -232,6 +349,8 @@ function ModernDockTabBar({
 function TabLayoutContent() {
   const pathname = usePathname();
   const { showTabBar } = useTabBarVisibility();
+  const { width } = useWindowDimensions();
+  const isWide = width >= 768;
 
   // Ensure tab bar is revealed when switching routes
   useEffect(() => {
@@ -239,19 +358,21 @@ function TabLayoutContent() {
   }, [pathname, showTabBar]);
 
   return (
-    <Tabs
-      tabBar={(props) => <ModernDockTabBar {...props} />}
-      screenOptions={{
-        headerShown: false,
-        animation: 'fade',
-      }}
-    >
-      <Tabs.Screen name="index" />
-      <Tabs.Screen name="reports" />
-      <Tabs.Screen name="quick-entry" />
-      <Tabs.Screen name="transactions" />
-      <Tabs.Screen name="settings" />
-    </Tabs>
+    <View style={{ flex: 1, paddingLeft: isWide ? 80 : 0 }}>
+      <Tabs
+        tabBar={(props) => <ModernDockTabBar {...props} />}
+        screenOptions={{
+          headerShown: false,
+          animation: 'fade',
+        }}
+      >
+        <Tabs.Screen name="index" />
+        <Tabs.Screen name="reports" />
+        <Tabs.Screen name="quick-entry" />
+        <Tabs.Screen name="transactions" />
+        <Tabs.Screen name="settings" />
+      </Tabs>
+    </View>
   );
 }
 
@@ -332,5 +453,61 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.45,
     shadowRadius: 14,
+  },
+  navRailCapsule: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 80,
+    borderRightWidth: 1,
+    alignItems: 'center',
+    paddingVertical: 20,
+    zIndex: 1000,
+  },
+  navRailBrand: {
+    alignItems: 'center',
+    marginBottom: 28,
+    gap: 6,
+  },
+  navRailLogoSquircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navRailBrandTitle: {
+    fontSize: 12,
+    fontWeight: '800',
+    letterSpacing: 0.5,
+  },
+  navRailItemsList: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    gap: 16,
+  },
+  navRailTabBtn: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navRailHeroBtn: {
+    marginVertical: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  navRailHeroCircle: {
+    width: 46,
+    height: 46,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 8,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
   },
 });

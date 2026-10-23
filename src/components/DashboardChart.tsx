@@ -252,8 +252,8 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
       style={[
         styles.container,
         {
-          backgroundColor: isDark ? '#131B2E' : colors.surface,
-          borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
           borderRadius: 20,
           padding: spacing.md,
         },
@@ -352,15 +352,15 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
         ]}
       >
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: isDark ? '#F87171' : colors.youWillGet }]} />
-          <Text style={[styles.legendText, { color: isDark ? '#94A3B8' : colors.textSecondary }]}>
+          <View style={[styles.legendDot, { backgroundColor: colors.youWillGet }]} />
+          <Text style={[styles.legendText, { color: colors.textSecondary }]}>
             You Gave (Credit)
           </Text>
         </View>
 
         <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: isDark ? '#10B981' : colors.youWillGive }]} />
-          <Text style={[styles.legendText, { color: isDark ? '#94A3B8' : colors.textSecondary }]}>
+          <View style={[styles.legendDot, { backgroundColor: colors.youWillGive }]} />
+          <Text style={[styles.legendText, { color: colors.textSecondary }]}>
             You Got (Payment)
           </Text>
         </View>
@@ -369,13 +369,13 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
           style={[
             styles.rateBadge,
             {
-              backgroundColor: isDark ? 'rgba(59, 130, 246, 0.15)' : 'rgba(37,99,235,0.08)',
-              borderColor: isDark ? 'rgba(59, 130, 246, 0.3)' : 'transparent',
+              backgroundColor: isDark ? 'rgba(77, 182, 167, 0.16)' : 'rgba(27, 99, 88, 0.08)',
+              borderColor: isDark ? 'rgba(77, 182, 167, 0.3)' : 'transparent',
               borderWidth: isDark ? 1 : 0,
             },
           ]}
         >
-          <Text style={[styles.rateBadgeText, { color: isDark ? '#60A5FA' : colors.primary }]}>
+          <Text style={[styles.rateBadgeText, { color: colors.primary }]}>
             Tap bar to view amount
           </Text>
         </View>
@@ -387,15 +387,15 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
           style={[
             styles.tappedDetailsCard,
             {
-              backgroundColor: isDark ? '#090D16' : colors.background,
-              borderColor: isDark ? 'rgba(59, 130, 246, 0.45)' : colors.primary,
+              backgroundColor: isDark ? colors.surface : colors.background,
+              borderColor: colors.border,
               borderRadius: 14,
             },
           ]}
         >
           <View style={styles.tappedHeaderRow}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <AppIcon name="calendar" size={14} color={isDark ? '#60A5FA' : colors.primary} />
+              <AppIcon name="calendar" size={14} color={colors.primary} />
               <Text style={[styles.tappedDateText, { color: colors.textPrimary }]}>
                 {selectedPoint.fullLabel || selectedPoint.label}
               </Text>
@@ -404,30 +404,30 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
               onPress={() => setSelectedPoint(null)}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <AppIcon name="x" size={16} color={isDark ? '#94A3B8' : colors.textSecondary} />
+              <AppIcon name="x" size={16} color={colors.textSecondary} />
             </TouchableOpacity>
           </View>
 
           <View style={styles.tappedAmountsRow}>
             <View style={styles.tappedCol}>
-              <Text style={[styles.tappedColLabel, { color: isDark ? '#F87171' : colors.youWillGet }]}>
+              <Text style={[styles.tappedColLabel, { color: colors.youWillGet }]}>
                 YOU GAVE
               </Text>
-              <Text style={[styles.tappedColAmount, { color: isDark ? '#F87171' : colors.youWillGet }]}>
+              <Text style={[styles.tappedColAmount, { color: colors.youWillGet }]}>
                 {formatINR(selectedPoint.gavePaise)}
               </Text>
             </View>
             <View
               style={[
                 styles.tappedColDivider,
-                { backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.borderLight },
+                { backgroundColor: colors.border },
               ]}
             />
             <View style={styles.tappedCol}>
-              <Text style={[styles.tappedColLabel, { color: isDark ? '#10B981' : colors.youWillGive }]}>
+              <Text style={[styles.tappedColLabel, { color: colors.youWillGive }]}>
                 YOU GOT
               </Text>
-              <Text style={[styles.tappedColAmount, { color: isDark ? '#10B981' : colors.youWillGive }]}>
+              <Text style={[styles.tappedColAmount, { color: colors.youWillGive }]}>
                 {formatINR(selectedPoint.gotPaise)}
               </Text>
             </View>
@@ -528,14 +528,14 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                         fill={
                           isSelected
                             ? isDark
-                              ? 'rgba(59, 130, 246, 0.2)'
-                              : 'rgba(59, 130, 246, 0.12)'
+                              ? 'rgba(77, 182, 167, 0.2)'
+                              : 'rgba(27, 99, 88, 0.12)'
                             : 'transparent'
                         }
                         rx={4}
                       />
 
-                      {/* Gave (Red) Bar */}
+                      {/* Gave (Terracotta) Bar */}
                       {gaveHeight > 0 && (
                         <Rect
                           x={gaveX}
@@ -543,11 +543,11 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                           width={barWidth}
                           height={gaveHeight}
                           rx={3}
-                          fill={isDark ? '#F87171' : colors.youWillGet}
+                          fill={colors.youWillGet}
                         />
                       )}
 
-                      {/* Got (Green) Bar */}
+                      {/* Got (Sage) Bar */}
                       {gotHeight > 0 && (
                         <Rect
                           x={gotX}
@@ -555,7 +555,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                           width={barWidth}
                           height={gotHeight}
                           rx={3}
-                          fill={isDark ? '#10B981' : colors.youWillGive}
+                          fill={colors.youWillGive}
                         />
                       )}
 
@@ -566,7 +566,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                           y1={paddingTop}
                           x2={xCenter}
                           y2={paddingTop + innerHeight}
-                          stroke={isDark ? '#60A5FA' : colors.primary}
+                          stroke={colors.primary}
                           strokeWidth={1.5}
                         />
                       )}
@@ -577,11 +577,7 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                         y={chartHeight - 6}
                         fill={
                           isSelected
-                            ? isDark
-                              ? '#60A5FA'
-                              : colors.primary
-                            : isDark
-                            ? '#94A3B8'
+                            ? colors.primary
                             : colors.textSecondary
                         }
                         fontSize={activeTab === '30days' ? 9 : 10}
@@ -601,8 +597,8 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
             </ScrollView>
           ) : (
             <View style={styles.emptyActivityBox}>
-              <AppIcon name="calendar" size={24} color={isDark ? '#64748B' : colors.textMuted} />
-              <Text style={[styles.emptyActivityText, { color: isDark ? '#94A3B8' : colors.textSecondary }]}>
+              <AppIcon name="calendar" size={24} color={colors.textMuted} />
+              <Text style={[styles.emptyActivityText, { color: colors.textSecondary }]}>
                 No transaction activity recorded for this period.
               </Text>
             </View>
@@ -623,14 +619,14 @@ export const DashboardChart: React.FC<DashboardChartProps> = ({
                 <View
                   style={[
                     styles.debtorRankBadge,
-                    isDark && {
-                      backgroundColor: 'rgba(59, 130, 246, 0.16)',
-                      borderColor: 'rgba(59, 130, 246, 0.3)',
+                    {
+                      backgroundColor: colors.primaryLight,
+                      borderColor: isDark ? 'rgba(77, 182, 167, 0.3)' : 'rgba(27, 99, 88, 0.25)',
                       borderWidth: 1,
                     },
                   ]}
                 >
-                  <Text style={[styles.debtorRankText, { color: isDark ? '#60A5FA' : colors.primary }]}>
+                  <Text style={[styles.debtorRankText, { color: colors.primary }]}>
                     #{index + 1}
                   </Text>
                 </View>

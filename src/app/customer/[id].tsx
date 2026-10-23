@@ -799,8 +799,8 @@ export default function CustomerDetailScreen() {
             style={[
               styles.sortFilterContainer,
               {
-                backgroundColor: isDark ? '#131B2E' : colors.surface,
-                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
                 borderRadius: borderRadius.md,
               },
             ]}
@@ -884,8 +884,8 @@ export default function CustomerDetailScreen() {
                 style={[
                   styles.directionBtn,
                   {
-                    backgroundColor: isDark ? '#1E293B' : colors.surface,
-                    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
+                    backgroundColor: colors.surfaceElevated,
+                    borderColor: colors.border,
                     borderRadius: borderRadius.sm,
                   },
                 ]}
@@ -1098,8 +1098,8 @@ export default function CustomerDetailScreen() {
                     style={[
                       styles.txCard,
                       {
-                        backgroundColor: isDark ? '#131B2E' : colors.surface,
-                        borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+                        backgroundColor: colors.surface,
+                        borderColor: colors.border,
                         borderRadius: 16,
                       },
                     ]}
@@ -1276,8 +1276,8 @@ export default function CustomerDetailScreen() {
         style={[
           styles.bottomActionBar,
           {
-            backgroundColor: isDark ? '#0B0F19' : colors.surface,
-            borderTopColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
+            backgroundColor: colors.background,
+            borderTopColor: colors.border,
           },
         ]}
       >
@@ -1331,8 +1331,8 @@ export default function CustomerDetailScreen() {
             style={[
               styles.modalSheet,
               {
-                backgroundColor: isDark ? '#131B2E' : colors.surface,
-                borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : colors.border,
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
                 borderTopLeftRadius: borderRadius.xl,
                 borderTopRightRadius: borderRadius.xl,
                 borderBottomLeftRadius: 0,
@@ -1639,8 +1639,8 @@ export default function CustomerDetailScreen() {
             style={[
               styles.modalSheet,
               {
-                backgroundColor: isDark ? '#131B2E' : colors.surface,
-                borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : colors.border,
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
                 borderTopLeftRadius: borderRadius.xl,
                 borderTopRightRadius: borderRadius.xl,
                 borderBottomLeftRadius: 0,

@@ -430,8 +430,8 @@ export default function TransactionsScreen() {
                 style={[
                   styles.directionBtn,
                   {
-                    backgroundColor: isDark ? '#1E293B' : colors.surface,
-                    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
+                    backgroundColor: colors.surfaceElevated,
+                    borderColor: colors.border,
                     borderRadius: borderRadius.sm,
                   },
                 ]}
@@ -480,16 +480,16 @@ export default function TransactionsScreen() {
                       {
                         backgroundColor: isActive
                           ? colors.primary
-                          : (isDark ? '#131B2E' : colors.surface),
+                          : colors.surfaceElevated,
                         borderColor: isActive
                           ? colors.primary
-                          : (isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border),
+                          : colors.border,
                         borderRadius: borderRadius.full,
                       },
                     ]}
                     textStyle={[
                       styles.filterChipText,
-                      { color: isActive ? '#FFFFFF' : (isDark ? '#F8FAFC' : colors.textPrimary) },
+                      { color: isActive ? colors.textInverse : colors.textPrimary },
                     ]}
                   >
                     {f.label}
@@ -547,13 +547,13 @@ export default function TransactionsScreen() {
 
             {/* 3 Metric Summary KPI Cards */}
             <View style={styles.kpiCardsRow}>
-              {/* Card 1: Total You Gave (Credit Given -> RED / Danger) */}
+              {/* Card 1: Total You Gave (Credit Given -> Terracotta / Danger) */}
               <View
                 style={[
                   styles.kpiCard,
                   {
-                    backgroundColor: isDark ? '#131B2E' : colors.surface,
-                    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
                     borderRadius: 18,
                   },
                 ]}
@@ -579,13 +579,13 @@ export default function TransactionsScreen() {
                 </Text>
               </View>
 
-              {/* Card 2: Total You Got (Payment Received -> GREEN / Success) */}
+              {/* Card 2: Total You Got (Payment Received -> Forest Sage / Success) */}
               <View
                 style={[
                   styles.kpiCard,
                   {
-                    backgroundColor: isDark ? '#131B2E' : colors.surface,
-                    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+                    backgroundColor: colors.surface,
+                    borderColor: colors.border,
                     borderRadius: 18,
                   },
                 ]}
@@ -617,8 +617,8 @@ export default function TransactionsScreen() {
               style={[
                 styles.summaryMetaBar,
                 {
-                  backgroundColor: isDark ? '#131B2E' : colors.surface,
-                  borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.borderLight,
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
                   borderRadius: borderRadius.md,
                 },
               ]}
@@ -650,8 +650,8 @@ export default function TransactionsScreen() {
             style={[
               styles.emptyCard,
               {
-                backgroundColor: isDark ? '#131B2E' : colors.surface,
-                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
                 borderRadius: borderRadius.lg,
               },
             ]}
@@ -701,8 +701,8 @@ export default function TransactionsScreen() {
               style={[
                 styles.txCard,
                 {
-                  backgroundColor: isDark ? '#131B2E' : colors.surface,
-                  borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
                   borderRadius: 16,
                 },
               ]}
@@ -910,8 +910,8 @@ export default function TransactionsScreen() {
             style={[
               styles.modalSheet,
               {
-                backgroundColor: isDark ? '#131B2E' : colors.surface,
-                borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : colors.border,
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
                 borderTopLeftRadius: borderRadius.xl,
                 borderTopRightRadius: borderRadius.xl,
                 borderBottomLeftRadius: 0,

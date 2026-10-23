@@ -138,8 +138,8 @@ export default function AddCustomerScreen() {
             style={[
               styles.formCard,
               {
-                backgroundColor: isDark ? '#131B2E' : colors.surface,
-                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
                 borderRadius: 20,
               },
             ]}

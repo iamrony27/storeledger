@@ -323,14 +323,14 @@ export default function CustomersScreen() {
               style={[
                 styles.dashboardHeroCard,
                 {
-                  backgroundColor: isDark ? '#131B2E' : (colors.surfaceElevated || colors.surface),
-                  borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.07)',
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
                 },
               ]}
             >
               <View style={styles.heroTopRow}>
                 <View>
-                  <Text style={[styles.heroSubtitle, { color: isDark ? '#94A3B8' : colors.textSecondary }]}>
+                  <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>
                     TOTAL NET LEDGER POSITION
                   </Text>
                   <Text
@@ -339,8 +339,8 @@ export default function CustomersScreen() {
                       {
                         color:
                           summary.netBalancePaise >= 0
-                            ? (isDark ? '#F87171' : '#DC2626')
-                            : (isDark ? '#34D399' : '#047857'),
+                            ? colors.youWillGet
+                            : colors.youWillGive,
                       },
                     ]}
                   >
@@ -354,12 +354,12 @@ export default function CustomersScreen() {
                     {
                       backgroundColor:
                         summary.netBalancePaise >= 0
-                          ? (isDark ? 'rgba(248, 113, 113, 0.16)' : '#FEF2F2')
-                          : (isDark ? 'rgba(16, 185, 129, 0.16)' : '#ECFDF5'),
+                          ? (isDark ? 'rgba(224, 122, 95, 0.16)' : '#FDF1ED')
+                          : (isDark ? 'rgba(78, 170, 132, 0.16)' : '#EDF6F2'),
                       borderColor:
                         summary.netBalancePaise >= 0
-                          ? (isDark ? 'rgba(248, 113, 113, 0.35)' : '#FCA5A5')
-                          : (isDark ? 'rgba(16, 185, 129, 0.35)' : '#6EE7B7'),
+                          ? (isDark ? 'rgba(224, 122, 95, 0.35)' : '#F5C6BA')
+                          : (isDark ? 'rgba(78, 170, 132, 0.35)' : '#BBE3D1'),
                     },
                   ]}
                 >
@@ -369,8 +369,8 @@ export default function CustomersScreen() {
                       {
                         color:
                           summary.netBalancePaise >= 0
-                            ? (isDark ? '#F87171' : '#DC2626')
-                            : (isDark ? '#34D399' : '#047857'),
+                            ? colors.youWillGet
+                            : colors.youWillGive,
                       },
                     ]}
                   >
@@ -385,16 +385,16 @@ export default function CustomersScreen() {
                   style={[
                     styles.heroMiniPill,
                     {
-                      backgroundColor: isDark ? 'rgba(248, 113, 113, 0.1)' : '#FEF2F2',
-                      borderColor: isDark ? 'rgba(248, 113, 113, 0.25)' : '#FECACA',
+                      backgroundColor: isDark ? 'rgba(224, 122, 95, 0.12)' : '#FDF1ED',
+                      borderColor: isDark ? 'rgba(224, 122, 95, 0.25)' : '#F5C6BA',
                     },
                   ]}
                 >
-                  <AppIcon name="arrow-up-right" size={13} color={isDark ? '#F87171' : '#DC2626'} />
-                  <Text style={[styles.heroMiniPillLabel, { color: isDark ? '#94A3B8' : '#64748B' }]}>
+                  <AppIcon name="arrow-up-right" size={13} color={colors.youWillGet} />
+                  <Text style={[styles.heroMiniPillLabel, { color: colors.textSecondary }]}>
                     Today Gave:
                   </Text>
-                  <Text style={[styles.heroMiniPillValue, { color: isDark ? '#F87171' : '#DC2626' }]}>
+                  <Text style={[styles.heroMiniPillValue, { color: colors.youWillGet }]}>
                     {formatINR(todaySummary.gavePaise)}
                   </Text>
                 </View>
@@ -403,16 +403,16 @@ export default function CustomersScreen() {
                   style={[
                     styles.heroMiniPill,
                     {
-                      backgroundColor: isDark ? 'rgba(16, 185, 129, 0.1)' : '#ECFDF5',
-                      borderColor: isDark ? 'rgba(16, 185, 129, 0.25)' : '#A7F3D0',
+                      backgroundColor: isDark ? 'rgba(78, 170, 132, 0.12)' : '#EDF6F2',
+                      borderColor: isDark ? 'rgba(78, 170, 132, 0.25)' : '#BBE3D1',
                     },
                   ]}
                 >
-                  <AppIcon name="arrow-down-left" size={13} color={isDark ? '#34D399' : '#047857'} />
-                  <Text style={[styles.heroMiniPillLabel, { color: isDark ? '#94A3B8' : '#64748B' }]}>
+                  <AppIcon name="arrow-down-left" size={13} color={colors.youWillGive} />
+                  <Text style={[styles.heroMiniPillLabel, { color: colors.textSecondary }]}>
                     Today Got:
                   </Text>
-                  <Text style={[styles.heroMiniPillValue, { color: isDark ? '#34D399' : '#047857' }]}>
+                  <Text style={[styles.heroMiniPillValue, { color: colors.youWillGive }]}>
                     {formatINR(todaySummary.gotPaise)}
                   </Text>
                 </View>
@@ -447,11 +447,11 @@ export default function CustomersScreen() {
                       styles.filterChip,
                       {
                         backgroundColor: isActive
-                          ? (isDark ? '#2563EB' : colors.primary)
-                          : (isDark ? '#131B2E' : (colors.surfaceElevated || colors.surface)),
+                          ? colors.primary
+                          : colors.surfaceElevated,
                         borderColor: isActive
-                          ? (isDark ? '#3B82F6' : colors.primary)
-                          : (isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border),
+                          ? colors.primary
+                          : colors.border,
                         borderRadius: 20,
                       },
                       isActive && styles.filterChipActiveShadow,
@@ -459,7 +459,7 @@ export default function CustomersScreen() {
                     textStyle={[
                       styles.filterChipText,
                       {
-                        color: isActive ? '#FFFFFF' : (isDark ? '#94A3B8' : colors.textSecondary),
+                        color: isActive ? '#FFFFFF' : colors.textSecondary,
                         fontWeight: isActive ? '700' : '600',
                       },
                     ]}
@@ -473,7 +473,7 @@ export default function CustomersScreen() {
             {/* Sorting Controls and Customer Count */}
             <View style={styles.sortBar}>
               <Text
-                style={[styles.customerCountText, { color: isDark ? '#94A3B8' : colors.textSecondary }]}
+                style={[styles.customerCountText, { color: colors.textSecondary }]}
               >
                 {filteredCustomers.length}{' '}
                 {filteredCustomers.length === 1 ? 'Customer' : 'Customers'}
@@ -495,17 +495,17 @@ export default function CustomersScreen() {
                   style={[
                     styles.sortButton,
                     {
-                      backgroundColor: isDark ? '#131B2E' : colors.surface,
-                      borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
+                      backgroundColor: colors.surface,
+                      borderColor: colors.border,
                       borderRadius: borderRadius.sm,
                     },
                   ]}
                 >
-                  <AppIcon name="sliders" size={13} color={isDark ? '#94A3B8' : colors.textSecondary} />
+                  <AppIcon name="sliders" size={13} color={colors.textSecondary} />
                   <Text
                     style={[
                       styles.sortButtonText,
-                      { color: isDark ? '#F8FAFC' : colors.textPrimary },
+                      { color: colors.textPrimary },
                     ]}
                   >
                     {activeSort === 'RECENT'
@@ -570,7 +570,7 @@ export default function CustomersScreen() {
         style={[
           styles.fabButton,
           {
-            backgroundColor: isDark ? '#2563EB' : colors.primary,
+            backgroundColor: colors.primary,
           },
         ]}
         color="#FFFFFF"
@@ -809,7 +809,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   filterChipActiveShadow: {
-    shadowColor: '#2563EB',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 5,

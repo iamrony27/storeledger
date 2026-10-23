@@ -46,79 +46,77 @@ export interface ColorTheme {
 }
 
 export const lightColors: ColorTheme = {
-  primary: '#2563EB',
-  primaryLight: '#EFF6FF',
-  primaryDark: '#1D4ED8',
-  background: '#F8FAFC',
-  surface: '#FFFFFF',
-  surfaceElevated: '#FFFFFF',
-  border: '#E2E8F0',
-  borderLight: '#F1F5F9',
-  textPrimary: '#0F172A',
-  textSecondary: '#64748B',
-  textMuted: '#94A3B8',
+  primary: '#1B6358', // Deep editorial forest teal
+  primaryLight: '#E6F2F0',
+  primaryDark: '#12443C',
+  background: '#F5F2EB', // Warm natural parchment / linen
+  surface: '#FFFFFF', // Crisp paper white
+  surfaceElevated: '#EAE5DC', // Warm stone container
+  border: '#DDD8CE',
+  borderLight: '#E8E3D8',
+  textPrimary: '#161B18', // Deep forest ink
+  textSecondary: '#5C5950', // Warm charcoal taupe
+  textMuted: '#8C887C', // Soft olive stone
   textInverse: '#FFFFFF',
-  // Financial Semantics (Khatabook & OkCredit standard)
-  // Udhaar / Receivable (Credit given, customer owes money, pending collection) -> RED
-  youWillGet: '#DC2626',
-  youWillGetBg: '#FEF2F2',
-  // Jama / Payable / Advance (Payment collected, merchant owes goods/cash) -> GREEN
-  youWillGive: '#047857',
-  youWillGiveBg: '#ECFDF5',
-  settled: '#64748B',
-  settledBg: '#F1F5F9',
+  // Financial Semantics (Quiet Ledger: calm terracotta & forest sage)
+  youWillGet: '#BA482C', // Terracotta clay (Receivable / Udhaar)
+  youWillGetBg: '#FDF1ED',
+  youWillGive: '#266C52', // Deep calm sage (Payable / Jama)
+  youWillGiveBg: '#EDF6F2',
+  settled: '#6E6A5E',
+  settledBg: '#F0EBE0',
   // Alerts
-  danger: '#EF4444',
-  dangerBg: '#FEF2F2',
-  success: '#10B981',
-  successBg: '#ECFDF5',
-  warning: '#F59E0B',
-  warningBg: '#FFFBEB',
-  badgeBg: '#F1F5F9',
+  danger: '#BA482C',
+  dangerBg: '#FDF1ED',
+  success: '#266C52',
+  successBg: '#EDF6F2',
+  warning: '#A67727', // Warm antique gold
+  warningBg: '#FDF8EC',
+  badgeBg: '#EAE5DC',
   inputBg: '#FFFFFF',
   // Modern Navbar & Header Border
-  tabBarBg: '#0F172A', // Sleek midnight slate floating capsule
+  tabBarBg: '#141A17', // Deep forest ink capsule
   tabBarBorder: 'rgba(255, 255, 255, 0.12)',
-  tabBarActive: '#38BDF8', // Luminous electric sky blue
-  tabBarInactive: '#94A3B8', // High-contrast clean silver slate
+  tabBarActive: '#4DB6A7', // Luminous editorial teal
+  tabBarInactive: '#A39F93', // Warm linen taupe
   headerBorder: '#E2E8F0',
-  headerAccent: 'rgba(37, 99, 235, 0.28)', // Modern primary accent line
+  headerAccent: 'rgba(27, 99, 88, 0.25)',
 };
 
 export const darkColors: ColorTheme = {
-  primary: '#3B82F6',
-  primaryLight: 'rgba(59, 130, 246, 0.15)',
-  primaryDark: '#1D4ED8',
-  background: '#0B0F19',
-  surface: '#1E293B',
-  surfaceElevated: '#27354A',
-  border: '#334155',
-  borderLight: '#1E293B',
-  textPrimary: '#F8FAFC',
-  textSecondary: '#94A3B8',
-  textMuted: '#64748B',
-  textInverse: '#0F172A',
-  // Financial Semantics (Khatabook standard)
-  youWillGet: '#F87171',
-  youWillGetBg: 'rgba(248, 113, 113, 0.15)',
-  youWillGive: '#10B981',
-  youWillGiveBg: 'rgba(16, 185, 129, 0.15)',
-  settled: '#94A3B8',
-  settledBg: 'rgba(148, 163, 184, 0.12)',
+  primary: '#4DB6A7', // Luminous editorial teal
+  primaryLight: 'rgba(77, 182, 167, 0.15)',
+  primaryDark: '#266E63',
+  background: '#0B0E0D', // Deep forest obsidian charcoal
+  surface: '#141A17', // Quiet dark slate card
+  surfaceElevated: '#1A221E', // Raised stone container
+  border: '#232B26',
+  borderLight: '#19211D',
+  textPrimary: '#EDE8DF', // Warm linen ivory
+  textSecondary: '#A39F93', // Muted warm taupe
+  textMuted: '#6E6A60', // Soft olive stone
+  textInverse: '#0B0E0D',
+  // Financial Semantics (Quiet Ledger: calm terracotta & forest sage)
+  youWillGet: '#E07A5F', // Warm Terracotta clay
+  youWillGetBg: 'rgba(224, 122, 95, 0.15)',
+  youWillGive: '#4EAA84', // Grounded forest sage
+  youWillGiveBg: 'rgba(78, 170, 132, 0.15)',
+  settled: '#8E8A7E',
+  settledBg: 'rgba(142, 138, 126, 0.12)',
   // Alerts
-  danger: '#EF4444',
-  dangerBg: 'rgba(239, 68, 68, 0.15)',
-  success: '#10B981',
-  successBg: 'rgba(16, 185, 129, 0.15)',
-  warning: '#FBBF24',
-  warningBg: 'rgba(251, 191, 36, 0.15)',
-  badgeBg: '#1E293B',
-  inputBg: '#1E293B',
+  danger: '#E07A5F',
+  dangerBg: 'rgba(224, 122, 95, 0.15)',
+  success: '#4EAA84',
+  successBg: 'rgba(78, 170, 132, 0.15)',
+  warning: '#D4A359', // Antique bronze / amber
+  warningBg: 'rgba(212, 163, 89, 0.15)',
+  badgeBg: '#1A221E',
+  inputBg: '#141A17',
   // Modern Navbar & Header Border
-  tabBarBg: '#0B1120', // Obsidian navy capsule
-  tabBarBorder: 'rgba(59, 130, 246, 0.28)',
-  tabBarActive: '#60A5FA', // Bright sapphire
-  tabBarInactive: '#64748B', // Muted slate
+  tabBarBg: '#0E1310', // Deep forest charcoal capsule
+  tabBarBorder: 'rgba(237, 232, 223, 0.1)',
+  tabBarActive: '#4DB6A7', // Calm luminous teal
+  tabBarInactive: '#8E8A7E', // Soft warm taupe
   headerBorder: '#334155',
-  headerAccent: 'rgba(59, 130, 246, 0.45)', // Glowing primary accent line
+  headerAccent: 'rgba(77, 182, 167, 0.4)',
 };

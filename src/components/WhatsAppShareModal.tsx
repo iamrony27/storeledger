@@ -113,8 +113,8 @@ export const WhatsAppShareModal: React.FC<WhatsAppShareModalProps> = ({
           style={[
             styles.modalContainer,
             {
-              backgroundColor: isDark ? '#131B2E' : colors.surface,
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
             },
           ]}
         >
@@ -349,7 +349,7 @@ export const WhatsAppShareModal: React.FC<WhatsAppShareModalProps> = ({
               <Text
                 style={[
                   styles.previewText,
-                  { color: isDark ? '#E2E8F0' : '#1E293B' },
+                  { color: colors.textPrimary },
                 ]}
                 selectable
               >

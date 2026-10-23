@@ -275,8 +275,8 @@ export const CloudBackupCard: React.FC = () => {
       style={[
         styles.card,
         {
-          backgroundColor: isDark ? '#131B2E' : colors.surface,
-          borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
           borderRadius: borderRadius.lg,
           padding: spacing.md,
         },
@@ -331,8 +331,8 @@ export const CloudBackupCard: React.FC = () => {
               scheduleConfig.intervalHours === 96
                 ? { backgroundColor: colors.primary }
                 : {
-                    backgroundColor: isDark ? '#1E293B' : colors.surface,
-                    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
+                    backgroundColor: colors.surfaceElevated,
+                    borderColor: colors.border,
                     borderWidth: 1,
                   },
               { borderRadius: borderRadius.sm },
@@ -341,7 +341,7 @@ export const CloudBackupCard: React.FC = () => {
             <Text
               style={[
                 styles.intervalChipText,
-                { color: scheduleConfig.intervalHours === 96 ? '#FFFFFF' : colors.textPrimary },
+                { color: scheduleConfig.intervalHours === 96 ? colors.textInverse : colors.textPrimary },
               ]}
             >
               Every 4 Days (96h)
@@ -355,8 +355,8 @@ export const CloudBackupCard: React.FC = () => {
               scheduleConfig.intervalHours === 120
                 ? { backgroundColor: colors.primary }
                 : {
-                    backgroundColor: isDark ? '#1E293B' : colors.surface,
-                    borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
+                    backgroundColor: colors.surfaceElevated,
+                    borderColor: colors.border,
                     borderWidth: 1,
                   },
               { borderRadius: borderRadius.sm },

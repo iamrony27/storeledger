@@ -142,9 +142,9 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
             height: TOTAL_BAR_HEIGHT,
             paddingTop: FIXED_BAR_HEIGHT,
             transform: [{ translateY: drawerTranslateY }],
-            backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
-            borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#E2E8F0',
-            shadowColor: isDark ? '#000000' : '#0F172A',
+            backgroundColor: colors.surface,
+            borderBottomColor: colors.border,
+            shadowColor: '#000000',
           },
         ]}
       >
@@ -158,8 +158,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
               style={[
                 styles.dueCard,
                 {
-                  backgroundColor: isDark ? '#1C161D' : '#FEF2F2',
-                  borderColor: isDark ? 'rgba(248, 113, 113, 0.35)' : '#FCA5A5',
+                  backgroundColor: isDark ? 'rgba(224, 122, 95, 0.12)' : '#FDF1ED',
+                  borderColor: isDark ? 'rgba(224, 122, 95, 0.3)' : '#F5C6BA',
                 },
               ]}
               accessibilityRole="button"
@@ -169,20 +169,20 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 <View
                   style={[
                     styles.cardIconCircle,
-                    { backgroundColor: isDark ? 'rgba(248, 113, 113, 0.2)' : '#FEE2E2' },
+                    { backgroundColor: isDark ? 'rgba(224, 122, 95, 0.2)' : '#FCE4DD' },
                   ]}
                 >
                   <AppIcon
                     family="feather"
                     name="arrow-down-left"
                     size={13}
-                    color={isDark ? '#F87171' : '#DC2626'}
+                    color={colors.youWillGet}
                   />
                 </View>
                 <Text
                   style={[
                     styles.cardTitle,
-                    { color: isDark ? '#F87171' : '#DC2626' },
+                    { color: colors.youWillGet },
                   ]}
                 >
                   TILL TODAY&apos;S DUE
@@ -192,7 +192,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
               <Text
                 style={[
                   styles.cardAmount,
-                  { color: isDark ? '#F87171' : '#DC2626' },
+                  { color: colors.youWillGet },
                 ]}
                 numberOfLines={1}
                 adjustsFontSizeToFit={true}
@@ -205,7 +205,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 <Text
                   style={[
                     styles.cardSublabel,
-                    { color: isDark ? '#94A3B8' : '#64748B' },
+                    { color: colors.textSecondary },
                   ]}
                 >
                   You&apos;ll Get
@@ -215,8 +215,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                     style={[
                       styles.cardTodayBadge,
                       {
-                        color: isDark ? '#F87171' : '#DC2626',
-                        backgroundColor: isDark ? 'rgba(248, 113, 113, 0.16)' : '#FEE2E2',
+                        color: colors.youWillGet,
+                        backgroundColor: isDark ? 'rgba(224, 122, 95, 0.18)' : '#FCE4DD',
                       },
                     ]}
                   >
@@ -226,7 +226,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   <Text
                     style={[
                       styles.cardTodayBadgeMuted,
-                      { color: isDark ? '#64748B' : '#94A3B8' },
+                      { color: colors.textMuted },
                     ]}
                   >
                     Active dues
@@ -242,8 +242,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
               style={[
                 styles.paidCard,
                 {
-                  backgroundColor: isDark ? '#11221B' : '#ECFDF5',
-                  borderColor: isDark ? 'rgba(16, 185, 129, 0.35)' : '#6EE7B7',
+                  backgroundColor: isDark ? 'rgba(78, 170, 132, 0.12)' : '#EDF6F2',
+                  borderColor: isDark ? 'rgba(78, 170, 132, 0.3)' : '#BBE3D1',
                 },
               ]}
               accessibilityRole="button"
@@ -253,20 +253,20 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 <View
                   style={[
                     styles.cardIconCircle,
-                    { backgroundColor: isDark ? 'rgba(16, 185, 129, 0.2)' : '#D1FAE5' },
+                    { backgroundColor: isDark ? 'rgba(78, 170, 132, 0.2)' : '#D7EFE4' },
                   ]}
                 >
                   <AppIcon
                     family="feather"
                     name="arrow-up-right"
                     size={13}
-                    color={isDark ? '#34D399' : '#047857'}
+                    color={colors.youWillGive}
                   />
                 </View>
                 <Text
                   style={[
                     styles.cardTitle,
-                    { color: isDark ? '#34D399' : '#047857' },
+                    { color: colors.youWillGive },
                   ]}
                 >
                   TOTAL PAID
@@ -276,7 +276,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
               <Text
                 style={[
                   styles.cardAmount,
-                  { color: isDark ? '#34D399' : '#047857' },
+                  { color: colors.youWillGive },
                 ]}
                 numberOfLines={1}
                 adjustsFontSizeToFit={true}
@@ -289,7 +289,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 <Text
                   style={[
                     styles.cardSublabel,
-                    { color: isDark ? '#94A3B8' : '#64748B' },
+                    { color: colors.textSecondary },
                   ]}
                 >
                   Received
@@ -299,8 +299,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                     style={[
                       styles.cardTodayBadge,
                       {
-                        color: isDark ? '#34D399' : '#047857',
-                        backgroundColor: isDark ? 'rgba(16, 185, 129, 0.16)' : '#D1FAE5',
+                        color: colors.youWillGive,
+                        backgroundColor: isDark ? 'rgba(78, 170, 132, 0.18)' : '#D7EFE4',
                       },
                     ]}
                   >
@@ -310,7 +310,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   <Text
                     style={[
                       styles.cardTodayBadgeMuted,
-                      { color: isDark ? '#64748B' : '#94A3B8' },
+                      { color: colors.textMuted },
                     ]}
                   >
                     All collections
@@ -327,8 +327,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 style={[
                   styles.searchInputContainer,
                   {
-                    backgroundColor: isDark ? '#131B2E' : '#F8FAFC',
-                    borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#E2E8F0',
+                    backgroundColor: isDark ? colors.surface : '#FFFFFF',
+                    borderColor: colors.border,
                   },
                 ]}
               >
@@ -336,19 +336,17 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   family="feather"
                   name="search"
                   size={16}
-                  color={isDark ? '#60A5FA' : colors.primary}
+                  color={colors.primary}
                 />
                 <TextInput
                   style={[
                     styles.searchInput,
-                    { color: isDark ? '#F8FAFC' : '#0F172A' },
+                    { color: colors.textPrimary },
                   ]}
                   value={searchQuery}
                   onChangeText={onSearchQueryChange}
                   placeholder={searchPlaceholder}
-                  placeholderTextColor={
-                    isDark ? 'rgba(148, 163, 184, 0.7)' : 'rgba(100, 116, 139, 0.75)'
-                  }
+                  placeholderTextColor={colors.textMuted}
                   returnKeyType="search"
                   autoCorrect={false}
                   autoCapitalize="none"
@@ -367,7 +365,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                       family="feather"
                       name="x"
                       size={14}
-                      color={isDark ? '#94A3B8' : '#64748B'}
+                      color={colors.textSecondary}
                     />
                   </TouchableOpacity>
                 )}
@@ -385,7 +383,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
           {
             height: FIXED_BAR_HEIGHT,
             paddingTop: safeTopPadding,
-            backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
+            backgroundColor: isDark ? colors.background : colors.surface,
           },
         ]}
       >
@@ -413,8 +411,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 style={[
                   styles.appIconSquircle,
                   {
-                    backgroundColor: isDark ? 'rgba(37, 99, 235, 0.2)' : '#EFF6FF',
-                    borderColor: isDark ? 'rgba(96, 165, 250, 0.35)' : '#BFDBFE',
+                    backgroundColor: isDark ? 'rgba(77, 182, 167, 0.16)' : '#E6F2F0',
+                    borderColor: isDark ? 'rgba(77, 182, 167, 0.35)' : '#BDE0DA',
                   },
                 ]}
               >
@@ -422,7 +420,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   family="material"
                   name="book-open-page-variant"
                   size={18}
-                  color={isDark ? '#60A5FA' : '#2563EB'}
+                  color={colors.primary}
                 />
               </View>
               <View style={styles.brandTextGroup}>
@@ -430,7 +428,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   <Text
                     style={[
                       styles.brandTitle,
-                      { color: isDark ? '#F8FAFC' : '#0F172A' },
+                      { color: colors.textPrimary },
                     ]}
                     numberOfLines={1}
                   >
@@ -440,16 +438,16 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                     style={[
                       styles.liveBadge,
                       {
-                        backgroundColor: isDark ? 'rgba(34, 197, 94, 0.18)' : 'rgba(34, 197, 94, 0.12)',
-                        borderColor: isDark ? 'rgba(74, 222, 128, 0.35)' : 'rgba(34, 197, 94, 0.25)',
+                        backgroundColor: isDark ? 'rgba(78, 170, 132, 0.18)' : 'rgba(38, 108, 82, 0.12)',
+                        borderColor: isDark ? 'rgba(78, 170, 132, 0.35)' : 'rgba(38, 108, 82, 0.25)',
                       },
                     ]}
                   >
-                    <View style={styles.livePulseDot} />
+                    <View style={[styles.livePulseDot, { backgroundColor: colors.youWillGive }]} />
                     <Text
                       style={[
                         styles.liveBadgeText,
-                        { color: isDark ? '#4ADE80' : '#16A34A' },
+                        { color: colors.youWillGive },
                       ]}
                     >
                       LIVE
@@ -459,7 +457,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 <Text
                   style={[
                     styles.brandSubtitle,
-                    { color: isDark ? '#94A3B8' : '#64748B' },
+                    { color: colors.textSecondary },
                   ]}
                   numberOfLines={1}
                 >
@@ -474,8 +472,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 style={[
                   styles.datePill,
                   {
-                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#F1F5F9',
-                    borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#E2E8F0',
+                    backgroundColor: isDark ? 'rgba(237, 232, 223, 0.08)' : '#EAE5DC',
+                    borderColor: colors.border,
                   },
                 ]}
               >
@@ -483,12 +481,12 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   family="feather"
                   name="calendar"
                   size={12}
-                  color={isDark ? '#94A3B8' : '#64748B'}
+                  color={colors.textSecondary}
                 />
                 <Text
                   style={[
                     styles.datePillText,
-                    { color: isDark ? '#94A3B8' : '#64748B' },
+                    { color: colors.textSecondary },
                   ]}
                 >
                   {todayFormattedDate}
@@ -522,8 +520,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 style={[
                   styles.collapsedIconSquircle,
                   {
-                    backgroundColor: isDark ? 'rgba(37, 99, 235, 0.2)' : '#EFF6FF',
-                    borderColor: isDark ? 'rgba(96, 165, 250, 0.35)' : '#BFDBFE',
+                    backgroundColor: isDark ? 'rgba(77, 182, 167, 0.16)' : '#E6F2F0',
+                    borderColor: isDark ? 'rgba(77, 182, 167, 0.35)' : '#BDE0DA',
                   },
                 ]}
               >
@@ -531,13 +529,13 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   family="material"
                   name="book-open-page-variant"
                   size={14}
-                  color={isDark ? '#60A5FA' : '#2563EB'}
+                  color={colors.primary}
                 />
               </View>
               <Text
                 style={[
                   styles.collapsedBrandTitle,
-                  { color: isDark ? '#F8FAFC' : '#0F172A' },
+                  { color: colors.textPrimary },
                 ]}
               >
                 GWD
@@ -551,8 +549,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
               style={[
                 styles.collapsedSummaryPill,
                 {
-                  backgroundColor: isDark ? '#131B2E' : '#F1F5F9',
-                  borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#E2E8F0',
+                  backgroundColor: isDark ? colors.surface : '#EDE8DE',
+                  borderColor: colors.border,
                 },
               ]}
               accessibilityRole="button"
@@ -562,7 +560,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 <Text
                   style={[
                     styles.microChipLabel,
-                    { color: isDark ? '#F87171' : '#DC2626' },
+                    { color: colors.youWillGet },
                   ]}
                 >
                   Due:{' '}
@@ -570,7 +568,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 <Text
                   style={[
                     styles.microChipValue,
-                    { color: isDark ? '#F87171' : '#DC2626' },
+                    { color: colors.youWillGet },
                   ]}
                   numberOfLines={1}
                   adjustsFontSizeToFit={true}
@@ -582,7 +580,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
               <Text
                 style={[
                   styles.microDivider,
-                  { color: isDark ? 'rgba(255, 255, 255, 0.25)' : '#CBD5E1' },
+                  { color: colors.border },
                 ]}
               >
                 •
@@ -592,7 +590,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 <Text
                   style={[
                     styles.microChipLabel,
-                    { color: isDark ? '#34D399' : '#047857' },
+                    { color: colors.youWillGive },
                   ]}
                 >
                   Paid:{' '}
@@ -600,7 +598,7 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 <Text
                   style={[
                     styles.microChipValue,
-                    { color: isDark ? '#34D399' : '#047857' },
+                    { color: colors.youWillGive },
                   ]}
                   numberOfLines={1}
                   adjustsFontSizeToFit={true}
@@ -616,8 +614,8 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                 style={[
                   styles.collapsedDatePill,
                   {
-                    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#F1F5F9',
-                    borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : '#E2E8F0',
+                    backgroundColor: isDark ? 'rgba(237, 232, 223, 0.08)' : '#EAE5DC',
+                    borderColor: colors.border,
                   },
                 ]}
               >
@@ -625,12 +623,12 @@ export const CollapsibleExecutiveTopBar: React.FC<CollapsibleExecutiveTopBarProp
                   family="feather"
                   name="calendar"
                   size={11}
-                  color={isDark ? '#94A3B8' : '#64748B'}
+                  color={colors.textSecondary}
                 />
                 <Text
                   style={[
                     styles.collapsedDateText,
-                    { color: isDark ? '#94A3B8' : '#64748B' },
+                    { color: colors.textSecondary },
                   ]}
                 >
                   {todayFormattedDate}

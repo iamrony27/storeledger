@@ -28,23 +28,17 @@ export const AppCard: React.FC<AppCardProps> = ({
 
   const backgroundColor = isFlat
     ? isDark
-      ? 'rgba(255, 255, 255, 0.04)'
-      : 'rgba(15, 23, 42, 0.03)'
+      ? 'rgba(237, 232, 223, 0.04)'
+      : 'rgba(22, 27, 24, 0.03)'
     : isElevated
-    ? isDark
-      ? '#131B2E'
-      : colors.surfaceElevated
-    : isDark
-    ? '#131B2E'
+    ? colors.surfaceElevated
     : colors.surface;
 
   const borderColor = isBordered
-    ? isDark
-      ? 'rgba(255, 255, 255, 0.14)'
-      : 'rgba(15, 23, 42, 0.12)'
+    ? colors.border
     : isDark
-    ? 'rgba(255, 255, 255, 0.08)'
-    : 'rgba(15, 23, 42, 0.06)';
+    ? 'rgba(237, 232, 223, 0.08)'
+    : 'rgba(22, 27, 24, 0.06)';
 
   return (
     <PaperCard

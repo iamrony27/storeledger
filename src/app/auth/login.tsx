@@ -210,10 +210,10 @@ export default function LoginScreen() {
               styles.statusBanner,
               {
                 backgroundColor: isConfigured
-                  ? (isDark ? '#131B2E' : colors.surface)
+                  ? colors.surface
                   : colors.warningBg,
                 borderColor: isConfigured
-                  ? (isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border)
+                  ? colors.border
                   : colors.warning,
                 borderRadius: 14,
                 flexDirection: 'row',
@@ -375,9 +375,9 @@ export default function LoginScreen() {
             style={[
               styles.offlineButton,
               {
-                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
+                borderColor: colors.border,
                 borderRadius: 14,
-                backgroundColor: isDark ? '#131B2E' : colors.surface,
+                backgroundColor: colors.surface,
               },
             ]}
           >
@@ -406,8 +406,8 @@ export default function LoginScreen() {
             style={[
               styles.modalCard,
               {
-                backgroundColor: isDark ? '#131B2E' : colors.surface,
-                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(15, 23, 42, 0.08)',
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
                 borderRadius: 24,
               },
             ]}

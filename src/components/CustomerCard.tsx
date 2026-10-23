@@ -125,21 +125,21 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
       style={[
         styles.cardContainer,
         {
-          borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.07)',
-          backgroundColor: isDark ? '#131B2E' : colors.surface,
+          borderColor: colors.border,
+          backgroundColor: colors.surface,
         },
       ]}
     >
-      {/* M3 Tonal Status Indicator Line */}
+      {/* Quiet Ledger Status Indicator Line */}
       <View
         style={[
           styles.statusIndicatorLine,
           {
             backgroundColor: hasDue
-              ? (isDark ? '#F87171' : '#EF4444')
+              ? colors.youWillGet
               : hasAdvance
-              ? (isDark ? '#10B981' : '#059669')
-              : (isDark ? '#64748B' : '#CBD5E1'),
+              ? colors.youWillGive
+              : colors.border,
           },
         ]}
       />
@@ -154,7 +154,7 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
         accessibilityHint="Tap to view customer ledger details"
         style={styles.leftCol}
       >
-        {/* Squircle Avatar with HeroUI smooth geometry */}
+        {/* Squircle Avatar with Quiet Ledger organic geometry */}
         {customer.avatarUrl ? (
           <Image source={{ uri: customer.avatarUrl }} style={styles.avatarImage as ImageStyle} />
         ) : (
@@ -162,15 +162,15 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
             style={[
               styles.avatarSquircle,
               {
-                backgroundColor: isDark ? '#1E293B' : '#F1F5F9',
-                borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(15, 23, 42, 0.08)',
+                backgroundColor: colors.surfaceElevated,
+                borderColor: colors.border,
               },
             ]}
           >
             <Text
               style={[
                 styles.avatarText,
-                { color: isDark ? '#F8FAFC' : '#0F172A' },
+                { color: colors.textPrimary },
               ]}
             >
               {getInitials(customer.name)}
@@ -183,7 +183,7 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
           <Text
             style={[
               styles.customerName,
-              { color: isDark ? '#FFFFFF' : '#0F172A' },
+              { color: colors.textPrimary },
             ]}
             numberOfLines={1}
           >
@@ -194,12 +194,12 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
               family="feather"
               name="clock"
               size={11}
-              color={isDark ? '#64748B' : '#94A3B8'}
+              color={colors.textMuted}
             />
             <Text
               style={[
                 styles.timeText,
-                { color: isDark ? '#94A3B8' : '#64748B' },
+                { color: colors.textSecondary },
               ]}
               numberOfLines={1}
             >
@@ -222,9 +222,13 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
           <Text
             style={[
               styles.amountText,
-              hasDue && (isDark ? styles.amountDueDark : styles.amountDueLight),
-              hasAdvance && (isDark ? styles.amountAdvanceDark : styles.amountAdvanceLight),
-              isSettled && (isDark ? styles.amountSettledDark : styles.amountSettledLight),
+              {
+                color: hasDue
+                  ? colors.youWillGet
+                  : hasAdvance
+                  ? colors.youWillGive
+                  : colors.textMuted,
+              },
             ]}
             numberOfLines={1}
             adjustsFontSizeToFit={true}
@@ -243,15 +247,15 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
             style={[
               styles.remindPill,
               {
-                backgroundColor: isDark ? 'rgba(34, 197, 94, 0.16)' : 'rgba(34, 197, 94, 0.12)',
-                borderColor: isDark ? 'rgba(34, 197, 94, 0.3)' : 'transparent',
-                borderWidth: isDark ? 1 : 0,
+                backgroundColor: isDark ? 'rgba(78, 170, 132, 0.16)' : 'rgba(38, 108, 82, 0.12)',
+                borderColor: isDark ? 'rgba(78, 170, 132, 0.3)' : 'rgba(38, 108, 82, 0.25)',
+                borderWidth: 1,
               },
             ]}
           >
             <View style={styles.remindRow}>
-              <AppIcon family="material" name="whatsapp" size={12} color={isDark ? '#4ADE80' : '#16A34A'} />
-              <Text style={[styles.remindText, { color: isDark ? '#4ADE80' : '#16A34A' }]}>Remind</Text>
+              <AppIcon family="material" name="whatsapp" size={12} color={colors.youWillGive} />
+              <Text style={[styles.remindText, { color: colors.youWillGive }]}>Remind</Text>
             </View>
           </TouchableOpacity>
         ) : hasAdvance ? (
@@ -259,26 +263,26 @@ export const CustomerCard: React.FC<CustomerCardProps> = ({
             style={[
               styles.advancePill,
               {
-                backgroundColor: isDark ? 'rgba(16, 185, 129, 0.16)' : 'rgba(16, 185, 129, 0.12)',
-                borderColor: isDark ? 'rgba(16, 185, 129, 0.3)' : 'transparent',
-                borderWidth: isDark ? 1 : 0,
+                backgroundColor: isDark ? 'rgba(78, 170, 132, 0.16)' : 'rgba(38, 108, 82, 0.12)',
+                borderColor: isDark ? 'rgba(78, 170, 132, 0.3)' : 'rgba(38, 108, 82, 0.25)',
+                borderWidth: 1,
               },
             ]}
           >
-            <Text style={[styles.advanceLabel, { color: isDark ? '#34D399' : '#059669' }]}>Advance</Text>
+            <Text style={[styles.advanceLabel, { color: colors.youWillGive }]}>Advance</Text>
           </View>
         ) : (
           <View
             style={[
               styles.settledPill,
               {
-                backgroundColor: isDark ? 'rgba(148, 163, 184, 0.14)' : 'rgba(148, 163, 184, 0.12)',
-                borderColor: isDark ? 'rgba(148, 163, 184, 0.25)' : 'transparent',
-                borderWidth: isDark ? 1 : 0,
+                backgroundColor: isDark ? 'rgba(142, 138, 126, 0.14)' : 'rgba(110, 106, 94, 0.1)',
+                borderColor: colors.border,
+                borderWidth: 1,
               },
             ]}
           >
-            <Text style={[styles.settledLabel, { color: isDark ? '#94A3B8' : '#64748B' }]}>Settled</Text>
+            <Text style={[styles.settledLabel, { color: colors.textSecondary }]}>Settled</Text>
           </View>
         )}
       </View>

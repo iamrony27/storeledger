@@ -277,8 +277,8 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
           style={[
             styles.sheet,
             {
-              backgroundColor: isDark ? '#131B2E' : colors.surface,
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(15, 23, 42, 0.08)',
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
               borderTopLeftRadius: 24,
               borderTopRightRadius: 24,
               borderBottomLeftRadius: 0,
@@ -461,8 +461,8 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                           style={[
                             styles.avatarBox,
                             {
-                              backgroundColor: isDark ? '#1E293B' : colors.surface,
-                              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
+                              backgroundColor: colors.surfaceElevated,
+                              borderColor: colors.border,
                               borderRadius: borderRadius.full,
                             },
                           ]}
@@ -523,7 +523,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                   style={[
                     styles.selectedCustCard,
                     {
-                      backgroundColor: isDark ? 'rgba(59, 130, 246, 0.12)' : colors.background,
+                      backgroundColor: isDark ? 'rgba(77, 182, 167, 0.12)' : colors.background,
                       borderColor: colors.primary,
                       borderRadius: borderRadius.md,
                     },
@@ -687,10 +687,10 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                               {
                                 backgroundColor: isSelected
                                   ? colors.primary
-                                  : (isDark ? '#1E293B' : colors.surface),
+                                  : colors.surfaceElevated,
                                 borderColor: isSelected
                                   ? colors.primary
-                                  : (isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border),
+                                  : colors.border,
                                 borderRadius: borderRadius.md,
                               },
                             ]}
@@ -702,8 +702,8 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                                 styles.quickAmtBtnText,
                                 {
                                   color: isSelected
-                                    ? '#FFFFFF'
-                                    : (isDark ? '#F8FAFC' : colors.textPrimary),
+                                    ? colors.textInverse
+                                    : colors.textPrimary,
                                   fontWeight: isSelected ? '800' : '700',
                                 },
                               ]}

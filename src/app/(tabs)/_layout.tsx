@@ -131,14 +131,14 @@ function ModernDockTabBar({
               style={[
                 styles.navRailLogoSquircle,
                 {
-                  backgroundColor: isDark ? 'rgba(37, 99, 235, 0.22)' : '#EFF6FF',
-                  borderColor: isDark ? 'rgba(96, 165, 250, 0.4)' : '#BFDBFE',
+                  backgroundColor: isDark ? 'rgba(77, 182, 167, 0.16)' : '#E6F2F0',
+                  borderColor: isDark ? 'rgba(77, 182, 167, 0.35)' : '#BDE0DA',
                 },
               ]}
             >
               <AppIcon name="book-open" size={20} color={colors.primary} />
             </View>
-            <Text style={[styles.navRailBrandTitle, { color: isDark ? '#FFFFFF' : '#0F172A' }]}>
+            <Text style={[styles.navRailBrandTitle, { color: colors.textPrimary }]}>
               GWD
             </Text>
           </View>

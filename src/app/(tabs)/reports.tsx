@@ -188,8 +188,8 @@ export default function ReportsScreen() {
             style={[
               styles.cashCard,
               {
-                backgroundColor: isDark ? '#12251E' : '#ECFDF5',
-                borderColor: isDark ? 'rgba(16, 185, 129, 0.35)' : '#6EE7B7',
+                backgroundColor: isDark ? 'rgba(78, 170, 132, 0.12)' : '#EDF6F2',
+                borderColor: isDark ? 'rgba(78, 170, 132, 0.3)' : '#BBE3D1',
               },
             ]}
           >
@@ -197,15 +197,15 @@ export default function ReportsScreen() {
               <View
                 style={[
                   styles.cashIconBox,
-                  { backgroundColor: isDark ? 'rgba(16, 185, 129, 0.22)' : '#D1FAE5' },
+                  { backgroundColor: isDark ? 'rgba(78, 170, 132, 0.2)' : '#D7EFE4' },
                 ]}
               >
-                <AppIcon name="arrow-down-left" size={15} color={isDark ? '#34D399' : '#047857'} />
+                <AppIcon name="arrow-down-left" size={15} color={colors.youWillGive} />
               </View>
               <Text
                 style={[
                   styles.cashCardLabel,
-                  { color: isDark ? '#34D399' : '#047857' },
+                  { color: colors.youWillGive },
                 ]}
               >
                 CASH IN
@@ -214,14 +214,14 @@ export default function ReportsScreen() {
             <Text
               style={[
                 styles.cashCardAmount,
-                { color: isDark ? '#34D399' : '#047857' },
+                { color: colors.youWillGive },
               ]}
               numberOfLines={1}
               adjustsFontSizeToFit={true}
             >
               {formatINR(dateFilter === 'ALL' ? summary.totalGotPaise : periodMetrics.gotPaise)}
             </Text>
-            <Text style={[styles.cashCardSubtitle, { color: isDark ? '#94A3B8' : '#64748B' }]}>
+            <Text style={[styles.cashCardSubtitle, { color: colors.textSecondary }]}>
               {dateFilter === 'ALL' ? 'Total Collections' : 'Collected in period'}
             </Text>
           </View>
@@ -231,8 +231,8 @@ export default function ReportsScreen() {
             style={[
               styles.cashCard,
               {
-                backgroundColor: isDark ? '#1F171E' : '#FEF2F2',
-                borderColor: isDark ? 'rgba(248, 113, 113, 0.35)' : '#FCA5A5',
+                backgroundColor: isDark ? 'rgba(224, 122, 95, 0.12)' : '#FDF1ED',
+                borderColor: isDark ? 'rgba(224, 122, 95, 0.3)' : '#F5C6BA',
               },
             ]}
           >
@@ -240,15 +240,15 @@ export default function ReportsScreen() {
               <View
                 style={[
                   styles.cashIconBox,
-                  { backgroundColor: isDark ? 'rgba(248, 113, 113, 0.22)' : '#FEE2E2' },
+                  { backgroundColor: isDark ? 'rgba(224, 122, 95, 0.2)' : '#FCE4DD' },
                 ]}
               >
-                <AppIcon name="arrow-up-right" size={15} color={isDark ? '#F87171' : '#DC2626'} />
+                <AppIcon name="arrow-up-right" size={15} color={colors.youWillGet} />
               </View>
               <Text
                 style={[
                   styles.cashCardLabel,
-                  { color: isDark ? '#F87171' : '#DC2626' },
+                  { color: colors.youWillGet },
                 ]}
               >
                 CASH OUT
@@ -257,14 +257,14 @@ export default function ReportsScreen() {
             <Text
               style={[
                 styles.cashCardAmount,
-                { color: isDark ? '#F87171' : '#DC2626' },
+                { color: colors.youWillGet },
               ]}
               numberOfLines={1}
               adjustsFontSizeToFit={true}
             >
               {formatINR(dateFilter === 'ALL' ? summary.youWillGetPaise : periodMetrics.gavePaise)}
             </Text>
-            <Text style={[styles.cashCardSubtitle, { color: isDark ? '#94A3B8' : '#64748B' }]}>
+            <Text style={[styles.cashCardSubtitle, { color: colors.textSecondary }]}>
               {dateFilter === 'ALL' ? 'Total Outstanding' : 'Disbursed in period'}
             </Text>
           </View>
@@ -275,13 +275,13 @@ export default function ReportsScreen() {
           style={[
             styles.netBannerCard,
             {
-              backgroundColor: isDark ? '#131B2E' : colors.surface,
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(15, 23, 42, 0.08)',
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
             },
           ]}
         >
           <View style={styles.netBannerLeft}>
-            <Text style={[styles.netBannerTitle, { color: isDark ? '#94A3B8' : colors.textSecondary }]}>
+            <Text style={[styles.netBannerTitle, { color: colors.textSecondary }]}>
               NET LEDGER POSITION
             </Text>
             <Text
@@ -290,14 +290,14 @@ export default function ReportsScreen() {
                 {
                   color:
                     summary.netBalancePaise >= 0
-                      ? (isDark ? '#F87171' : '#DC2626')
-                      : (isDark ? '#34D399' : '#047857'),
+                      ? colors.youWillGet
+                      : colors.youWillGive,
                 },
               ]}
             >
               {formatINR(summary.netBalancePaise)}
             </Text>
-            <Text style={[styles.netBannerSub, { color: isDark ? '#64748B' : colors.textMuted }]}>
+            <Text style={[styles.netBannerSub, { color: colors.textMuted }]}>
               {summary.netBalancePaise >= 0 ? 'Net pending collection from debtors' : 'Net surplus in customer advances'}
             </Text>
           </View>
@@ -308,15 +308,15 @@ export default function ReportsScreen() {
               style={[
                 styles.recoveryBadge,
                 {
-                  backgroundColor: isDark ? 'rgba(37, 99, 235, 0.18)' : '#EFF6FF',
-                  borderColor: isDark ? 'rgba(96, 165, 250, 0.4)' : '#BFDBFE',
+                  backgroundColor: isDark ? 'rgba(77, 182, 167, 0.16)' : '#E6F2F0',
+                  borderColor: isDark ? 'rgba(77, 182, 167, 0.35)' : '#BDE0DA',
                 },
               ]}
             >
-              <Text style={[styles.recoveryRateText, { color: isDark ? '#60A5FA' : '#2563EB' }]}>
+              <Text style={[styles.recoveryRateText, { color: colors.primary }]}>
                 {periodMetrics.collectionRate}%
               </Text>
-              <Text style={[styles.recoveryLabel, { color: isDark ? '#94A3B8' : colors.textSecondary }]}>
+              <Text style={[styles.recoveryLabel, { color: colors.textSecondary }]}>
                 Recovery
               </Text>
             </View>
@@ -331,18 +331,18 @@ export default function ReportsScreen() {
           style={[
             styles.rankingContainer,
             {
-              backgroundColor: isDark ? '#131B2E' : colors.surface,
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
             },
           ]}
         >
           {/* Section Header & Sub-Tabs */}
           <View style={styles.rankingHeaderRow}>
             <View>
-              <Text style={[styles.rankingSectionTitle, { color: isDark ? '#F8FAFC' : colors.textPrimary }]}>
+              <Text style={[styles.rankingSectionTitle, { color: colors.textPrimary }]}>
                 Commercial Accounts Ranking
               </Text>
-              <Text style={[styles.rankingSectionSubtitle, { color: isDark ? '#94A3B8' : colors.textSecondary }]}>
+              <Text style={[styles.rankingSectionSubtitle, { color: colors.textSecondary }]}>
                 Highest exposure and credit standing
               </Text>
             </View>
@@ -378,7 +378,7 @@ export default function ReportsScreen() {
                     borderBottomColor:
                       idx === (rankingTab === 'DEBTORS' ? topDebtors : topCreditors).length - 1
                         ? 'transparent'
-                        : (isDark ? 'rgba(255, 255, 255, 0.06)' : colors.borderLight),
+                        : colors.border,
                   },
                 ]}
               >
@@ -388,35 +388,31 @@ export default function ReportsScreen() {
                     style={[
                       styles.accountAvatar,
                       {
-                        backgroundColor: isDark ? '#1E293B' : '#F1F5F9',
-                        borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(15, 23, 42, 0.08)',
+                        backgroundColor: colors.surfaceElevated,
+                        borderColor: colors.border,
                       },
                     ]}
                   >
-                    <Text style={[styles.accountAvatarText, { color: isDark ? '#F8FAFC' : '#0F172A' }]}>
+                    <Text style={[styles.accountAvatarText, { color: colors.textPrimary }]}>
                       {cust.name.slice(0, 2).toUpperCase()}
                     </Text>
                   </View>
 
                   <View style={styles.accountNameGroup}>
                     <Text
-                      style={[styles.accountName, { color: isDark ? '#F8FAFC' : colors.textPrimary }]}
+                      style={[styles.accountName, { color: colors.textPrimary }]}
                       numberOfLines={1}
                     >
                       {cust.name}
                     </Text>
-                    <Text style={[styles.accountPhone, { color: isDark ? '#94A3B8' : colors.textSecondary }]}>
+                    <Text style={[styles.accountPhone, { color: colors.textSecondary }]}>
                       {cust.phone || 'No phone'}
                     </Text>
 
                     {/* Visual Volume Bar via Paper's ProgressBar */}
                     <ProgressBar
                       progress={progressRatio}
-                      color={
-                        isDue
-                          ? (isDark ? '#F87171' : '#EF4444')
-                          : (isDark ? '#34D399' : '#10B981')
-                      }
+                      color={isDue ? colors.youWillGet : colors.youWillGive}
                       style={{ height: 5, borderRadius: 3, marginTop: 4, width: 140 }}
                     />
                   </View>
@@ -428,15 +424,13 @@ export default function ReportsScreen() {
                     style={[
                       styles.accountAmount,
                       {
-                        color: isDue
-                          ? (isDark ? '#F87171' : '#DC2626')
-                          : (isDark ? '#34D399' : '#047857'),
+                        color: isDue ? colors.youWillGet : colors.youWillGive,
                       },
                     ]}
                   >
                     {formatINR(cust.currentBalancePaise)}
                   </Text>
-                  <AppIcon name="chevron-right" size={14} color={isDark ? '#64748B' : '#94A3B8'} />
+                  <AppIcon name="chevron-right" size={14} color={colors.textMuted} />
                 </View>
               </TouchableOpacity>
             );
@@ -486,7 +480,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.1,
   },
   filterActiveGlow: {
-    shadowColor: '#2563EB',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.35,
     shadowRadius: 6,

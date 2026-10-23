@@ -166,10 +166,10 @@ export default function ImportScreen() {
           style={[
             styles.heroCard,
             {
-              backgroundColor: isDark ? '#131B2E' : colors.surface,
+              backgroundColor: colors.surface,
               borderColor: isAlreadyPresent
-                ? (isDark ? 'rgba(72, 108, 47, 0.5)' : colors.success)
-                : (isDark ? 'rgba(239, 105, 5, 0.4)' : colors.primary),
+                ? colors.success
+                : colors.primary,
               borderRadius: 20,
             },
           ]}
@@ -215,9 +215,9 @@ export default function ImportScreen() {
             style={[
               styles.statsGrid,
               {
-                backgroundColor: isDark ? '#0B0F19' : colors.background,
+                backgroundColor: colors.background,
                 borderRadius: 14,
-                borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : colors.border,
+                borderColor: colors.border,
               },
             ]}
           >
@@ -337,8 +337,8 @@ export default function ImportScreen() {
           style={[
             styles.searchContainer,
             {
-              backgroundColor: isDark ? '#131B2E' : colors.surface,
-              borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+              backgroundColor: colors.surface,
+              borderColor: colors.border,
               borderRadius: 14,
             },
           ]}
@@ -381,8 +381,8 @@ export default function ImportScreen() {
               style={[
                 styles.customerCard,
                 {
-                  backgroundColor: isDark ? '#131B2E' : colors.surface,
-                  borderColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.06)',
+                  backgroundColor: colors.surface,
+                  borderColor: colors.border,
                   borderRadius: 16,
                 },
               ]}
@@ -455,8 +455,8 @@ export default function ImportScreen() {
             style={[
               styles.modalCard,
               {
-                backgroundColor: isDark ? '#131B2E' : colors.surface,
-                borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(15, 23, 42, 0.08)',
+                backgroundColor: colors.surface,
+                borderColor: colors.border,
                 borderRadius: 24,
               },
             ]}
@@ -486,10 +486,10 @@ export default function ImportScreen() {
               style={[
                 styles.passwordInputContainer,
                 {
-                  backgroundColor: isDark ? '#0B0F19' : colors.background,
+                  backgroundColor: colors.background,
                   borderColor: passwordError
                     ? colors.danger
-                    : (isDark ? 'rgba(255, 255, 255, 0.12)' : colors.border),
+                    : colors.border,
                   borderRadius: 14,
                 },
               ]}

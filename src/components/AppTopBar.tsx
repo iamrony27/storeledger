@@ -47,28 +47,28 @@ export const TopBarActionButton: React.FC<TopBarActionButtonProps> = ({
         };
       case 'primary':
         return {
-          bg: isDark ? '#2563EB' : colors.primary,
-          border: isDark ? 'rgba(96, 165, 250, 0.4)' : 'rgba(37, 99, 235, 0.3)',
-          color: '#FFFFFF',
+          bg: colors.primary,
+          border: colors.primaryLight,
+          color: colors.textInverse,
         };
       case 'danger':
         return {
-          bg: isDark ? 'rgba(239, 68, 68, 0.2)' : '#FEF2F2',
-          border: isDark ? 'rgba(239, 68, 68, 0.4)' : '#FCA5A5',
+          bg: colors.dangerBg,
+          border: isDark ? 'rgba(224, 122, 95, 0.4)' : '#F5C6BA',
           color: colors.danger,
         };
       case 'ghost':
         return {
           bg: 'transparent',
           border: 'transparent',
-          color: isDark ? '#F8FAFC' : '#0F172A',
+          color: colors.textPrimary,
         };
       case 'default':
       default:
         return {
-          bg: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.05)',
-          border: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(15, 23, 42, 0.08)',
-          color: iconColor || (isDark ? '#F8FAFC' : '#0F172A'),
+          bg: isDark ? 'rgba(237, 232, 223, 0.08)' : 'rgba(22, 27, 24, 0.05)',
+          border: colors.border,
+          color: iconColor || colors.textPrimary,
         };
     }
   };
@@ -98,7 +98,7 @@ export const TopBarActionButton: React.FC<TopBarActionButtonProps> = ({
         color={iconColor || vStyle.color}
       />
       {badge !== undefined && badge !== null && (
-        <View style={[styles.badgePill, { backgroundColor: colors.danger, borderColor: isDark ? '#1E293B' : '#FFFFFF' }]}>
+        <View style={[styles.badgePill, { backgroundColor: colors.danger, borderColor: colors.surface }]}>
           <Text style={styles.badgeText}>{badge}</Text>
         </View>
       )}
@@ -165,9 +165,9 @@ export const AppTopBar: React.FC<AppTopBarProps> = ({
         styles.headerContainer,
         {
           paddingTop: safeTopPadding,
-          backgroundColor: isDark ? '#0B0F19' : '#FFFFFF',
-          borderBottomColor: isDark ? 'rgba(255, 255, 255, 0.08)' : '#E2E8F0',
-          shadowColor: isDark ? '#000000' : '#0F172A',
+          backgroundColor: isDark ? colors.surface : colors.surface,
+          borderBottomColor: colors.border,
+          shadowColor: '#000000',
         },
         style,
       ]}
@@ -185,8 +185,8 @@ export const AppTopBar: React.FC<AppTopBarProps> = ({
               style={[
                 styles.backButton,
                 {
-                  backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(15, 23, 42, 0.05)',
-                  borderColor: isDark ? 'rgba(255, 255, 255, 0.12)' : 'rgba(15, 23, 42, 0.08)',
+                  backgroundColor: isDark ? 'rgba(237, 232, 223, 0.08)' : 'rgba(22, 27, 24, 0.05)',
+                  borderColor: colors.border,
                 },
               ]}
             >
@@ -194,7 +194,7 @@ export const AppTopBar: React.FC<AppTopBarProps> = ({
                 family="feather"
                 name={backIcon}
                 size={18}
-                color={isDark ? '#F8FAFC' : '#0F172A'}
+                color={colors.textPrimary}
               />
             </TouchableOpacity>
           )}
@@ -204,15 +204,15 @@ export const AppTopBar: React.FC<AppTopBarProps> = ({
               style={[
                 styles.avatarSquircle,
                 {
-                  backgroundColor: avatarBg || (isDark ? 'rgba(59, 130, 246, 0.2)' : 'rgba(37, 99, 235, 0.12)'),
-                  borderColor: isDark ? 'rgba(59, 130, 246, 0.4)' : 'rgba(37, 99, 235, 0.3)',
+                  backgroundColor: avatarBg || colors.primaryLight,
+                  borderColor: isDark ? 'rgba(77, 182, 167, 0.35)' : 'rgba(27, 99, 88, 0.25)',
                 },
               ]}
             >
               <Text
                 style={[
                   styles.avatarText,
-                  { color: isDark ? '#60A5FA' : '#2563EB' },
+                  { color: colors.primary },
                 ]}
               >
                 {avatarInitials.slice(0, 2).toUpperCase()}
@@ -223,8 +223,8 @@ export const AppTopBar: React.FC<AppTopBarProps> = ({
               style={[
                 styles.iconSquircle,
                 {
-                  backgroundColor: isDark ? 'rgba(59, 130, 246, 0.2)' : 'rgba(37, 99, 235, 0.12)',
-                  borderColor: isDark ? 'rgba(59, 130, 246, 0.35)' : 'rgba(37, 99, 235, 0.25)',
+                  backgroundColor: colors.primaryLight,
+                  borderColor: isDark ? 'rgba(77, 182, 167, 0.35)' : 'rgba(27, 99, 88, 0.25)',
                 },
               ]}
             >
@@ -232,7 +232,7 @@ export const AppTopBar: React.FC<AppTopBarProps> = ({
                 family={iconFamily}
                 name={iconName}
                 size={18}
-                color={iconColor || (isDark ? '#60A5FA' : '#2563EB')}
+                color={iconColor || colors.primary}
               />
             </View>
           ) : null}
@@ -242,7 +242,7 @@ export const AppTopBar: React.FC<AppTopBarProps> = ({
               <Text
                 style={[
                   styles.title,
-                  { color: isDark ? '#F8FAFC' : '#0F172A' },
+                  { color: colors.textPrimary },
                 ]}
                 numberOfLines={1}
               >
@@ -253,15 +253,15 @@ export const AppTopBar: React.FC<AppTopBarProps> = ({
                   style={[
                     styles.titleBadge,
                     {
-                      backgroundColor: isDark ? 'rgba(37, 99, 235, 0.2)' : 'rgba(37, 99, 235, 0.1)',
-                      borderColor: isDark ? 'rgba(96, 165, 250, 0.35)' : 'rgba(37, 99, 235, 0.25)',
+                      backgroundColor: colors.primaryLight,
+                      borderColor: isDark ? 'rgba(77, 182, 167, 0.35)' : 'rgba(27, 99, 88, 0.25)',
                     },
                   ]}
                 >
                   <Text
                     style={[
                       styles.titleBadgeText,
-                      { color: isDark ? '#60A5FA' : '#2563EB' },
+                      { color: colors.primary },
                     ]}
                   >
                     {badgeText}
@@ -275,7 +275,7 @@ export const AppTopBar: React.FC<AppTopBarProps> = ({
                 <Text
                   style={[
                     styles.subtitle,
-                    { color: isDark ? '#94A3B8' : '#64748B' },
+                    { color: colors.textSecondary },
                   ]}
                   numberOfLines={1}
                 >
@@ -296,7 +296,7 @@ export const AppTopBar: React.FC<AppTopBarProps> = ({
         <View
           style={[
             styles.accentLine,
-            { backgroundColor: isDark ? 'rgba(59, 130, 246, 0.45)' : 'rgba(37, 99, 235, 0.25)' },
+            { backgroundColor: colors.headerAccent },
           ]}
         />
       )}

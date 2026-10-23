@@ -23,7 +23,7 @@ export const SyncIndicator: React.FC<SyncIndicatorProps> = ({
   compact = false,
   showLabel = true,
 }) => {
-  const { isDark } = useTheme();
+  const { colors, isDark } = useTheme();
   const [syncState, setSyncState] = useState<SyncState>(syncEngine.getState());
   const [spinAnim] = useState(() => new Animated.Value(0));
   const [pulseAnim] = useState(() => new Animated.Value(1));
@@ -147,10 +147,10 @@ export const SyncIndicator: React.FC<SyncIndicatorProps> = ({
   const getStatusConfig = () => {
     if (syncState.status === 'syncing') {
       return {
-        bg: isDark ? 'rgba(59, 130, 246, 0.16)' : '#EFF6FF',
-        border: isDark ? 'rgba(59, 130, 246, 0.35)' : '#BFDBFE',
-        textColor: isDark ? '#60A5FA' : '#2563EB',
-        dotColor: '#3B82F6',
+        bg: colors.primaryLight,
+        border: isDark ? 'rgba(77, 182, 167, 0.35)' : 'rgba(27, 99, 88, 0.25)',
+        textColor: colors.primary,
+        dotColor: colors.primary,
         label: 'Syncing',
         isSyncing: true,
       };
@@ -158,10 +158,10 @@ export const SyncIndicator: React.FC<SyncIndicatorProps> = ({
 
     if (syncState.status === 'error') {
       return {
-        bg: isDark ? 'rgba(239, 68, 68, 0.16)' : '#FEF2F2',
-        border: isDark ? 'rgba(239, 68, 68, 0.35)' : '#FECACA',
-        textColor: isDark ? '#F87171' : '#DC2626',
-        dotColor: '#EF4444',
+        bg: colors.dangerBg,
+        border: isDark ? 'rgba(224, 122, 95, 0.35)' : '#F5C6BA',
+        textColor: colors.danger,
+        dotColor: colors.danger,
         label: 'Error',
         icon: 'alert-circle',
         family: 'feather' as const,
@@ -170,22 +170,22 @@ export const SyncIndicator: React.FC<SyncIndicatorProps> = ({
 
     if (syncState.status === 'offline' || syncState.pendingCount > 0) {
       return {
-        bg: isDark ? 'rgba(245, 158, 11, 0.16)' : '#FFFBEB',
-        border: isDark ? 'rgba(245, 158, 11, 0.35)' : '#FDE68A',
-        textColor: isDark ? '#FBBF24' : '#D97706',
-        dotColor: '#F59E0B',
+        bg: colors.warningBg,
+        border: isDark ? 'rgba(212, 163, 89, 0.35)' : 'rgba(166, 119, 39, 0.25)',
+        textColor: colors.warning,
+        dotColor: colors.warning,
         label: syncState.pendingCount > 0 ? `${syncState.pendingCount} Pending` : 'Offline',
         icon: syncState.pendingCount > 0 ? 'clock' : 'cloud-off',
         family: 'feather' as const,
       };
     }
 
-    // Default: Fully Synced (GREEN)
+    // Default: Fully Synced (Forest Sage)
     return {
-      bg: isDark ? 'rgba(16, 185, 129, 0.16)' : '#ECFDF5',
-      border: isDark ? 'rgba(16, 185, 129, 0.35)' : '#A7F3D0',
-      textColor: isDark ? '#34D399' : '#059669',
-      dotColor: '#10B981',
+      bg: colors.successBg,
+      border: isDark ? 'rgba(78, 170, 132, 0.35)' : 'rgba(38, 108, 82, 0.25)',
+      textColor: colors.success,
+      dotColor: colors.success,
       label: 'Synced',
       icon: 'cloud-check',
       family: 'material' as const,

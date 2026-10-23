@@ -87,13 +87,6 @@ export interface Translations {
     totalReceivable: string;
     totalPayable: string;
   };
-  importer: {
-    title: string;
-    subtitle: string;
-    selectPdf: string;
-    previewTitle: string;
-    importButton: string;
-  };
   settings: {
     title: string;
     language: string;
@@ -195,13 +188,6 @@ export const translations: Record<SupportedLanguage, Translations> = {
       totalReceivable: 'Total Receivable',
       totalPayable: 'Total Payable',
     },
-    importer: {
-      title: 'Demo Data Import',
-      subtitle: 'Import Golden Weigh Bridge sample customer accounts',
-      selectPdf: 'Import Mock Dataset',
-      previewTitle: 'Sample Customer Balances Preview',
-      importButton: 'Confirm & Import Customers',
-    },
     settings: {
       title: 'Settings & Profile',
       language: 'Language / ভাষা / भाषा',
@@ -301,13 +287,6 @@ export const translations: Record<SupportedLanguage, Translations> = {
       totalReceivable: 'মোট পাওনা',
       totalPayable: 'মোট দেনা',
     },
-    importer: {
-      title: 'ডেমো ডাটা ইম্পোর্ট',
-      subtitle: 'গোল্ডেন ওয়ে ব্রিজ ডেমো গ্রাহক অ্যাকাউন্ট যুক্ত করুন',
-      selectPdf: 'মক ডাটা ইম্পোর্ট',
-      previewTitle: 'গ্রাহক ব্যালেন্স প্রিভিউ',
-      importButton: 'নিশ্চিত করুন এবং ইম্পোর্ট করুন',
-    },
     settings: {
       title: 'সেটিংস ও প্রোফাইল',
       language: 'ভাষা পরিবর্তন (Language)',
@@ -406,13 +385,6 @@ export const translations: Record<SupportedLanguage, Translations> = {
       shareStatement: 'रिपोर्ट साझा करें',
       totalReceivable: 'कुल लेना है',
       totalPayable: 'कुल देना है',
-    },
-    importer: {
-      title: 'डेमो डेटा इंपोर्ट',
-      subtitle: 'गोल्डन वे ब्रिज सैंपल ग्राहक खाते जोड़ें',
-      selectPdf: 'मॉक डेटा इंपोर्ट करें',
-      previewTitle: 'ग्राहक बैलेंस पूर्वावलोकन',
-      importButton: 'पुष्टि करें और इंपोर्ट करें',
     },
     settings: {
       title: 'सेटिंग्स और प्रोफ़ाइल',

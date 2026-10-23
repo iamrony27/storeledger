@@ -919,7 +919,12 @@ export default function TransactionsScreen() {
                 borderTopRightRadius: borderRadius.xl,
                 borderBottomLeftRadius: 0,
                 borderBottomRightRadius: 0,
-                maxHeight: Dimensions.get('window').height - insets.top - 16,
+                marginBottom: Platform.OS === 'android' ? (keyboardHeight > 0 ? keyboardHeight : 0) : 0,
+                maxHeight:
+                  Dimensions.get('window').height -
+                  (Platform.OS === 'android' && keyboardHeight > 0 ? keyboardHeight : 0) -
+                  insets.top -
+                  16,
                 paddingBottom: Platform.OS === 'android' ? 10 : (insets.bottom || 14),
               },
             ]}

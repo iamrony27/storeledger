@@ -8,7 +8,6 @@ import {
   Linking,
   Alert,
   Share,
-  Platform,
   ActivityIndicator,
   Switch,
 } from 'react-native';

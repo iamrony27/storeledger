@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
   Alert,
@@ -23,7 +22,7 @@ import { createCustomer, getCustomers } from '../../storage/localLedgerRepositor
 import { findDuplicateCustomer } from '../../utils/customerValidation';
 
 export default function AddCustomerScreen() {
-  const { colors, spacing, isDark } = useTheme();
+  const { colors, spacing } = useTheme();
   const { t } = useLanguage();
   const { currencyConfig, useDecimals } = useCurrency();
 

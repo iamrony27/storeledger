@@ -132,7 +132,7 @@ export function formatChartAxisTick(paise: number, symbol: string = '₹'): stri
  * Aggregates transactions into an N-day chronological timeseries (e.g. 7 days or 30 days).
  */
 export function aggregateLastNDays(
-  allTransactions: Array<{ amountPaise: number; type: 'GAVE' | 'GOT'; date: string; isVoided?: boolean }>,
+  allTransactions: { amountPaise: number; type: 'GAVE' | 'GOT'; date: string; isVoided?: boolean }[],
   numDays: number,
   referenceDate: Date = new Date()
 ): ChartDataPoint[] {

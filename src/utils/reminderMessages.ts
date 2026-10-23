@@ -1,6 +1,6 @@
 import { SupportedLanguage } from '../i18n/translations';
 import { LedgerTransaction } from '../types/customer';
-import { formatCurrency, formatINR, SupportedCurrency } from './ledgerMath';
+import { formatCurrency, SupportedCurrency } from './ledgerMath';
 
 export interface LastPaymentInfo {
   amountPaise: number;

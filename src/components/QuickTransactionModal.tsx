@@ -303,10 +303,7 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
               borderBottomRightRadius: 0,
               height: Math.min(720, Dimensions.get('window').height * 0.88),
               maxHeight: Dimensions.get('window').height - insets.top - 16,
-              paddingBottom:
-                (keyboardVisible || keyboardHeight > 0)
-                  ? (keyboardHeight > 0 ? keyboardHeight : 280) + (Platform.OS === 'android' ? 85 : 55)
-                  : (Platform.OS === 'ios' ? 24 : 12),
+              paddingBottom: Platform.OS === 'android' ? 10 : (Platform.OS === 'ios' ? 24 : 12),
             },
           ]}
         >
@@ -863,24 +860,34 @@ export const QuickTransactionModal: React.FC<QuickTransactionModalProps> = ({
                     onChangeText={setDescription}
                   />
                 )}
-
-                {/* Primary Save Button */}
-                <View style={{ marginTop: spacing.md, marginBottom: spacing.xs }}>
-                  <AppButton
-                    title={
-                      txType === 'GAVE'
-                        ? `Save You Gave ${amount ? `₹${amount}` : ''}`
-                        : `Save You Got ${amount ? `₹${amount}` : ''}`
-                    }
-                    onPress={handleSave}
-                    variant={txType === 'GAVE' ? 'danger' : 'success'}
-                    loading={isSubmitting}
-                    size="lg"
-                  />
-                </View>
               </View>
             )}
           </ScrollView>
+
+          {/* Pinned Primary Save Button outside ScrollView */}
+          {selectedCustomer && (
+            <View
+              style={{
+                paddingTop: 10,
+                paddingBottom: Platform.OS === 'android' ? 6 : 4,
+                borderTopWidth: 1,
+                borderTopColor: colors.borderLight,
+                backgroundColor: colors.surface,
+              }}
+            >
+              <AppButton
+                title={
+                  txType === 'GAVE'
+                    ? `Save You Gave ${amount ? `₹${amount}` : ''}`
+                    : `Save You Got ${amount ? `₹${amount}` : ''}`
+                }
+                onPress={handleSave}
+                variant={txType === 'GAVE' ? 'danger' : 'success'}
+                loading={isSubmitting}
+                size="lg"
+              />
+            </View>
+          )}
         </View>
       </KeyboardAvoidingView>
     </Modal>

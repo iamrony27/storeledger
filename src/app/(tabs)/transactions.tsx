@@ -920,10 +920,7 @@ export default function TransactionsScreen() {
                 borderBottomLeftRadius: 0,
                 borderBottomRightRadius: 0,
                 maxHeight: Dimensions.get('window').height - insets.top - 16,
-                paddingBottom:
-                  (keyboardVisible || keyboardHeight > 0)
-                    ? (keyboardHeight > 0 ? keyboardHeight : 280) + (Platform.OS === 'android' ? 85 : 55)
-                    : Math.max(insets.bottom || 0, 16),
+                paddingBottom: Platform.OS === 'android' ? 10 : (insets.bottom || 14),
               },
             ]}
           >
@@ -1099,17 +1096,26 @@ export default function TransactionsScreen() {
                   onChangeText={setEditDesc}
                 />
               )}
-
-              <View style={{ marginTop: 12 }}>
-                <AppButton
-                  title="Save Changes"
-                  onPress={handleSaveEdit}
-                  variant={editType === 'GAVE' ? 'danger' : 'success'}
-                  loading={isSavingTx}
-                  size="lg"
-                />
-              </View>
             </ScrollView>
+
+            {/* Pinned Primary Save Button outside ScrollView */}
+            <View
+              style={{
+                paddingTop: 10,
+                paddingBottom: Platform.OS === 'android' ? 6 : 2,
+                borderTopWidth: 1,
+                borderTopColor: colors.borderLight,
+                backgroundColor: colors.surface,
+              }}
+            >
+              <AppButton
+                title="Save Changes"
+                onPress={handleSaveEdit}
+                variant={editType === 'GAVE' ? 'danger' : 'success'}
+                loading={isSavingTx}
+                size="lg"
+              />
+            </View>
           </View>
         </KeyboardAvoidingView>
       </Modal>

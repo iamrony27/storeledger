@@ -1340,10 +1340,7 @@ export default function CustomerDetailScreen() {
                 borderBottomLeftRadius: 0,
                 borderBottomRightRadius: 0,
                 maxHeight: Dimensions.get('window').height - insets.top - 16,
-                paddingBottom:
-                  (keyboardVisible || keyboardHeight > 0)
-                    ? (keyboardHeight > 0 ? keyboardHeight : 280) + (Platform.OS === 'android' ? 85 : 55)
-                    : Math.max(insets.bottom || 0, 16),
+                paddingBottom: Platform.OS === 'android' ? 10 : (insets.bottom || 14),
               },
             ]}
           >
@@ -1604,24 +1601,32 @@ export default function CustomerDetailScreen() {
                   onChangeText={setTxDesc}
                 />
               )}
-
-              {/* Primary "SAVE YOU GAVE" Button */}
-              <View style={styles.modalBtnRow}>
-                <AppButton
-                  title={
-                    editingTx
-                      ? 'Save Changes'
-                      : modalType === 'GAVE'
-                      ? `Save You Gave ${txAmount ? `₹${txAmount}` : ''}`
-                      : `Save You Got ${txAmount ? `₹${txAmount}` : ''}`
-                  }
-                  onPress={handleSaveTransaction}
-                  variant={modalType === 'GAVE' ? 'danger' : 'success'}
-                  loading={isSubmitting}
-                  size="lg"
-                />
-              </View>
             </ScrollView>
+
+            {/* Pinned Bottom Primary "SAVE" Button (Always Visible Above Keyboard) */}
+            <View
+              style={[
+                styles.modalBtnRow,
+                {
+                  borderTopColor: colors.borderLight,
+                  backgroundColor: colors.surface,
+                },
+              ]}
+            >
+              <AppButton
+                title={
+                  editingTx
+                    ? 'Save Changes'
+                    : modalType === 'GAVE'
+                    ? `Save You Gave ${txAmount ? `₹${txAmount}` : ''}`
+                    : `Save You Got ${txAmount ? `₹${txAmount}` : ''}`
+                }
+                onPress={handleSaveTransaction}
+                variant={modalType === 'GAVE' ? 'danger' : 'success'}
+                loading={isSubmitting}
+                size="md"
+              />
+            </View>
           </View>
         </KeyboardAvoidingView>
       </Modal>
@@ -1648,10 +1653,7 @@ export default function CustomerDetailScreen() {
                 borderBottomLeftRadius: 0,
                 borderBottomRightRadius: 0,
                 maxHeight: Dimensions.get('window').height - insets.top - 16,
-                paddingBottom:
-                  (keyboardVisible || keyboardHeight > 0)
-                    ? (keyboardHeight > 0 ? keyboardHeight : 280) + (Platform.OS === 'android' ? 85 : 55)
-                    : Math.max(insets.bottom || 0, 16),
+                paddingBottom: Platform.OS === 'android' ? 10 : (insets.bottom || 14),
               },
             ]}
           >
@@ -2174,7 +2176,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   modalBtnRow: {
-    marginTop: 10,
+    paddingTop: 8,
+    marginTop: 4,
+    borderTopWidth: 1,
   },
   quickActionRow: {
     flexDirection: 'row',

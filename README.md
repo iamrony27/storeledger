@@ -27,6 +27,8 @@
 
 ---
 
+[![Get it on Orion Store](https://raw.githubusercontent.com/RookieEnough/Orion-Store/refs/heads/main/assets/orion-badge.png)](https://rookieenough.github.io/Orion-Data/redirect.html?id=storeledger)
+
 ## 🌟 Key Features
 
 ### 1. 100% Offline-First Architecture

@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Store Ledger • Modern Business Customer Ledger & Cash Book</title>
+  <meta name="description" content="Modern, 100% offline-first digital customer ledger and khata book for smart business owners. Zero vendor lock-in, multi-currency support, and optional Supabase cloud sync." />
+  <meta name="theme-color" content="#EF6905" />
+
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Store Ledger • Smart Business Customer Ledger" />
+  <meta property="og:description" content="100% offline-first digital customer khata, credit/debit tracking, WhatsApp reminders, and multi-currency support with zero vendor lock-in." />
+  <meta property="og:image" content="./assets/screenshots/orion_screenshot_1_dashboard.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="./assets/favicon.png" />
+  <link rel="apple-touch-icon" href="./assets/icon.png" />
+
+  <!-- Google Fonts: Plus Jakarta Sans & Material Symbols Outlined -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       MATERIAL DESIGN 3 (M3 EXPRESSIVE) DESIGN TOKENS
+       ============================================================ */
+    :root {
+      /* M3 Light Tonal Palette */
+      --md-sys-color-primary: #EF6905;
+      --md-sys-color-on-primary: #FFFFFF;
+      --md-sys-color-primary-container: #FFE5D6;
+      --md-sys-color-on-primary-container: #411700;
+      
+      --md-sys-color-secondary: #006874;
+      --md-sys-color-on-secondary: #FFFFFF;
+      --md-sys-color-secondary-container: #97F0FF;
+      --md-sys-color-on-secondary-container: #001F24;
+
+      --md-sys-color-tertiary: #10B981;
+      --md-sys-color-on-tertiary: #FFFFFF;
+      --md-sys-color-tertiary-container: #D1FAE5;
+      --md-sys-color-on-tertiary-container: #064E3B;
+
+      --md-sys-color-error: #BA1A1A;
+      --md-sys-color-on-error: #FFFFFF;
+      
+      --md-sys-color-surface: #FDF8F6;
+      --md-sys-color-surface-dim: #DED8D6;
+      --md-sys-color-surface-container-lowest: #FFFFFF;
+      --md-sys-color-surface-container-low: #F7F2F0;
+      --md-sys-color-surface-container: #F1ECE9;
+      --md-sys-color-surface-container-high: #EBE6E4;
+      --md-sys-color-surface-container-highest: #E5E0DE;
+      
+      --md-sys-color-on-surface: #1E1B1A;
+      --md-sys-color-on-surface-variant: #52443D;
+      --md-sys-color-outline: #85736B;
+      --md-sys-color-outline-variant: #D7C2B9;
+
+      --md-sys-color-inverse-surface: #332F2E;
+      --md-sys-color-inverse-on-surface: #F8EFEA;
+      --md-sys-color-inverse-primary: #FFB68C;
+
+      /* M3 Elevation Shadows */
+      --md-sys-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+      --md-sys-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(0, 0, 0, 0.06);
+      --md-sys-elevation-3: 0px 4px 12px 3px rgba(0, 0, 0, 0.10), 0px 2px 4px 0px rgba(0, 0, 0, 0.07);
+      --md-sys-elevation-4: 0px 8px 24px 4px rgba(0, 0, 0, 0.12), 0px 4px 8px 0px rgba(0, 0, 0, 0.08);
+
+      /* M3 Shape System */
+      --md-sys-shape-corner-xs: 4px;
+      --md-sys-shape-corner-s: 8px;
+      --md-sys-shape-corner-m: 12px;
+      --md-sys-shape-corner-l: 16px;
+      --md-sys-shape-corner-xl: 28px;
+      --md-sys-shape-corner-full: 9999px;
+
+      --font-family: 'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif;
+    }
+
+    /* M3 Dark Tonal Palette */
+    [data-theme="dark"] {
+      --md-sys-color-primary: #FFB68C;
+      --md-sys-color-on-primary: #522300;
+      --md-sys-color-primary-container: #753300;
+      --md-sys-color-on-primary-container: #FFE5D6;
+
+      --md-sys-color-secondary: #4FD8EB;
+      --md-sys-color-on-secondary: #00363D;
+      --md-sys-color-secondary-container: #004F58;
+      --md-sys-color-on-secondary-container: #97F0FF;
+
+      --md-sys-color-tertiary: #34D399;
+      --md-sys-color-on-tertiary: #064E3B;
+      --md-sys-color-tertiary-container: #065F46;
+      --md-sys-color-on-tertiary-container: #A7F3D0;
+
+      --md-sys-color-error: #FFB4AB;
+      --md-sys-color-on-error: #690005;
+
+      --md-sys-color-surface: #0E1015;
+      --md-sys-color-surface-dim: #090B0F;
+      --md-sys-color-surface-container-lowest: #07090C;
+      --md-sys-color-surface-container-low: #14171E;
+      --md-sys-color-surface-container: #1A1E26;
+      --md-sys-color-surface-container-high: #242934;
+      --md-sys-color-surface-container-highest: #2E3442;
+
+      --md-sys-color-on-surface: #E6E1DF;
+      --md-sys-color-on-surface-variant: #D7C2B9;
+      --md-sys-color-outline: #A08C82;
+      --md-sys-color-outline-variant: #52443D;
+
+      --md-sys-color-inverse-surface: #E6E1DF;
+      --md-sys-color-inverse-on-surface: #1E1B1A;
+      --md-sys-color-inverse-primary: #EF6905;
+
+      --md-sys-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.4), 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+      --md-sys-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.5), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+      --md-sys-elevation-3: 0px 4px 12px 3px rgba(0, 0, 0, 0.6), 0px 2px 4px 0px rgba(0, 0, 0, 0.4);
+      --md-sys-elevation-4: 0px 8px 24px 4px rgba(0, 0, 0, 0.7), 0px 4px 8px 0px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Base Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      line-height: 1.6;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ============================================================
+       MATERIAL 3 COMPONENT STYLES
+       ============================================================ */
+
+    /* Material Symbols */
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      vertical-align: middle;
+      user-select: none;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* M3 Top App Bar */
+    .top-app-bar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background-color: rgba(var(--app-bar-bg, 14, 16, 21), 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+      transition: background-color 0.25s ease;
+    }
+
+    [data-theme="light"] .top-app-bar {
+      --app-bar-bg: 253, 248, 246;
+    }
+
+    .top-app-bar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-logo img {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--md-sys-shape-corner-m);
+      box-shadow: var(--md-sys-elevation-1);
+    }
+
+    .version-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: var(--md-sys-shape-corner-full);
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      letter-spacing: 0.04em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-link {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+      transition: color 0.15s ease;
+    }
+
+    .nav-link:hover {
+      color: var(--md-sys-color-primary);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* M3 Theme Toggle Switch */
+    .theme-toggle-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--md-sys-shape-corner-full);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      background: var(--md-sys-color-surface-container);
+      color: var(--md-sys-color-on-surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--md-sys-color-surface-container-high);
+      transform: scale(1.05);
+    }
+
+    /* M3 Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 12px 24px;
+      border-radius: var(--md-sys-shape-corner-full);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+      text-decoration: none;
+      line-height: 1.2;
+    }
+
+    .btn-primary {
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: var(--md-sys-elevation-2);
+    }
+
+    .btn-primary:hover {
+      box-shadow: var(--md-sys-elevation-3);
+      transform: translateY(-2px);
+      filter: brightness(1.06);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: var(--md-sys-elevation-1);
+    }
+
+    .btn-tonal {
+      background-color: var(--md-sys-color-surface-container-high);
+      color: var(--md-sys-color-on-surface);
+      border: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .btn-tonal:hover {
+      background-color: var(--md-sys-color-surface-container-highest);
+      transform: translateY(-2px);
+    }
+
+    .btn-outlined {
+      background-color: transparent;
+      color: var(--md-sys-color-primary);
+      border: 1.5px solid var(--md-sys-color-primary);
+    }
+
+    .btn-outlined:hover {
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+    }
+
+    .btn-lg {
+      padding: 16px 32px;
+      font-size: 1.05rem;
+    }
+
+    /* ============================================================
+       HERO SECTION
+       ============================================================ */
+    .hero-section {
+      padding: 72px 0 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg-glow {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(239, 105, 5, 0.18) 0%, rgba(16, 185, 129, 0.08) 50%, transparent 75%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: center;
+      gap: 60px;
+    }
+
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .badge-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: var(--md-sys-color-surface-container-high);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      border-radius: var(--md-sys-shape-corner-full);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--md-sys-color-primary);
+      letter-spacing: 0.02em;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, var(--md-sys-color-primary) 0%, #F59E0B 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.2rem;
+      color: var(--md-sys-color-on-surface-variant);
+      line-height: 1.6;
+      max-width: 580px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .store-badge-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 18px;
+      background: var(--md-sys-color-surface-container-low);
+      border: 1px dashed var(--md-sys-color-outline-variant);
+      border-radius: var(--md-sys-shape-corner-l);
+      font-size: 0.85rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .store-badge-card strong {
+      color: var(--md-sys-color-on-surface);
+    }
+
+    /* Device Mockup Frame */
+    .mockup-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .mockup-frame {
+      width: 100%;
+      max-width: 360px;
+      aspect-ratio: 9 / 19.5;
+      background: #000000;
+      border-radius: 44px;
+      padding: 11px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.12);
+      position: relative;
+      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .mockup-frame:hover {
+      transform: translateY(-6px);
+    }
+
+    .mockup-notch {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 22px;
+      background: #000000;
+      border-radius: var(--md-sys-shape-corner-full);
+      z-index: 10;
+    }
+
+    .mockup-screen {
+      width: 100%;
+      height: 100%;
+      border-radius: 34px;
+      overflow: hidden;
+      background: var(--md-sys-color-surface-container-lowest);
+      position: relative;
+    }
+
+    .mockup-screen img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.25s ease-in-out;
+    }
+
+    /* Mockup Tab Selector Pills */
+    .mockup-tabs {
+      display: flex;
+      gap: 8px;
+      margin-top: 20px;
+      background: var(--md-sys-color-surface-container);
+      padding: 6px;
+      border-radius: var(--md-sys-shape-corner-full);
+      border: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .mockup-tab-btn {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border-radius: var(--md-sys-shape-corner-full);
+      border: none;
+      background: transparent;
+      color: var(--md-sys-color-on-surface-variant);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .mockup-tab-btn.active {
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: var(--md-sys-elevation-1);
+    }
+
+    /* ============================================================
+       STATISTICS STRIP
+       ============================================================ */
+    .stats-strip {
+      padding: 32px 0;
+      background: var(--md-sys-color-surface-container-low);
+      border-top: 1px solid var(--md-sys-color-outline-variant);
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+
+    .stat-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--md-sys-color-surface-container);
+      border-radius: var(--md-sys-shape-corner-xl);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      box-shadow: var(--md-sys-elevation-1);
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--md-sys-shape-corner-l);
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+
+    .stat-text h4 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+
+    .stat-text p {
+      font-size: 0.85rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    /* ============================================================
+       FEATURES SECTION (M3 CARDS)
+       ============================================================ */
+    .section {
+      padding: 88px 0;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 56px;
+    }
+
+    .section-tag {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--md-sys-color-primary);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .section-subtitle {
+      font-size: 1.1rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    /* M3 Elevated Card */
+    .m3-card {
+      background-color: var(--md-sys-color-surface-container);
+      border-radius: var(--md-sys-shape-corner-xl);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      padding: 32px;
+      transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      box-shadow: var(--md-sys-elevation-1);
+    }
+
+    .m3-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--md-sys-elevation-3);
+      border-color: var(--md-sys-color-primary);
+    }
+
+    .card-icon-container {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--md-sys-shape-corner-l);
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+
+    .card-icon-container.tertiary {
+      background-color: var(--md-sys-color-tertiary-container);
+      color: var(--md-sys-color-on-tertiary-container);
+    }
+
+    .card-icon-container.secondary {
+      background-color: var(--md-sys-color-secondary-container);
+      color: var(--md-sys-color-on-secondary-container);
+    }
+
+    .card-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .card-description {
+      font-size: 0.98rem;
+      color: var(--md-sys-color-on-surface-variant);
+      line-height: 1.6;
+    }
+
+    .card-badge {
+      margin-top: auto;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: var(--md-sys-shape-corner-full);
+      background-color: var(--md-sys-color-surface-container-high);
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    /* ============================================================
+       SCREENSHOTS GALLERY SECTION
+       ============================================================ */
+    .screenshots-section {
+      background-color: var(--md-sys-color-surface-container-low);
+      border-top: 1px solid var(--md-sys-color-outline-variant);
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    .gallery-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .gallery-image-card {
+      width: 100%;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: var(--md-sys-elevation-3);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      background: #000;
+      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease;
+      cursor: zoom-in;
+    }
+
+    .gallery-image-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: var(--md-sys-elevation-4);
+      border-color: var(--md-sys-color-primary);
+    }
+
+    .gallery-image-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .gallery-caption h4 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .gallery-caption p {
+      font-size: 0.9rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    /* ============================================================
+       SUPABASE & CLOUD SYNC SECTION
+       ============================================================ */
+    .sync-box {
+      background: var(--md-sys-color-surface-container);
+      border-radius: var(--md-sys-shape-corner-xl);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      padding: 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+      box-shadow: var(--md-sys-elevation-2);
+    }
+
+    .sync-steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .sync-step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--md-sys-shape-corner-full);
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      flex-shrink: 0;
+      font-size: 0.95rem;
+    }
+
+    .step-text h5 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .step-text p {
+      font-size: 0.9rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .sync-infographic-card {
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--md-sys-color-outline-variant);
+      box-shadow: var(--md-sys-elevation-2);
+    }
+
+    .sync-infographic-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ============================================================
+       DOWNLOAD & VERIFICATION CARD
+       ============================================================ */
+    .download-card-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .download-hero-card {
+      background: linear-gradient(135deg, var(--md-sys-color-surface-container-high) 0%, var(--md-sys-color-surface-container) 100%);
+      border-radius: 36px;
+      border: 1.5px solid var(--md-sys-color-primary);
+      padding: 48px;
+      box-shadow: var(--md-sys-elevation-3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 28px;
+      position: relative;
+    }
+
+    .download-meta-table {
+      width: 100%;
+      max-width: 650px;
+      background: var(--md-sys-color-surface-container-low);
+      border-radius: var(--md-sys-shape-corner-l);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      overflow: hidden;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .download-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .download-meta-row:last-child {
+      border-bottom: none;
+    }
+
+    .download-meta-label {
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .download-meta-value {
+      font-family: monospace;
+      font-weight: 700;
+      color: var(--md-sys-color-on-surface);
+      word-break: break-all;
+    }
+
+    .checksum-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .copy-btn {
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      border-radius: var(--md-sys-shape-corner-s);
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface-container-high);
+      color: var(--md-sys-color-on-surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-family: inherit;
+    }
+
+    .copy-btn:hover {
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+    }
+
+    /* ============================================================
+       FAQ ACCORDION SECTION
+       ============================================================ */
+    .faq-list {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .faq-item {
+      background: var(--md-sys-color-surface-container);
+      border-radius: var(--md-sys-shape-corner-l);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      overflow: hidden;
+      transition: background-color 0.2s ease;
+    }
+
+    .faq-question {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1.05rem;
+      user-select: none;
+    }
+
+    .faq-question .material-symbols-outlined {
+      transition: transform 0.25s ease;
+      color: var(--md-sys-color-primary);
+    }
+
+    .faq-item.open .faq-question .material-symbols-outlined {
+      transform: rotate(180deg);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0.2, 0, 0, 1), padding 0.3s ease;
+      padding: 0 24px;
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .faq-item.open .faq-answer {
+      max-height: 300px;
+      padding: 0 24px 24px 24px;
+    }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .footer {
+      background: var(--md-sys-color-surface-container-lowest);
+      border-top: 1px solid var(--md-sys-color-outline-variant);
+      padding: 60px 0 32px;
+      margin-top: 40px;
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 24px;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    .footer-logo img {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--md-sys-shape-corner-s);
+    }
+
+    .footer-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .footer-nav a {
+      font-size: 0.9rem;
+      color: var(--md-sys-color-on-surface-variant);
+      transition: color 0.15s ease;
+    }
+
+    .footer-nav a:hover {
+      color: var(--md-sys-color-primary);
+    }
+
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--md-sys-color-outline);
+    }
+
+    /* Lightbox Modal */
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      cursor: zoom-out;
+    }
+
+    .lightbox-modal.active {
+      display: flex;
+    }
+
+    .lightbox-modal img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+    }
+
+    /* ============================================================
+       RESPONSIVE BREAKPOINTS
+       ============================================================ */
+    @media (max-width: 992px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 48px;
+      }
+
+      .hero-content {
+        align-items: center;
+      }
+
+      .hero-title {
+        font-size: 2.8rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .gallery-grid {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+
+      .sync-box {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        padding: 32px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hero-title {
+        font-size: 2.2rem;
+      }
+
+      .hero-subtitle {
+        font-size: 1.05rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .btn-lg {
+        width: 100%;
+      }
+
+      .download-hero-card {
+        padding: 28px 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       M3 TOP APP BAR
+       ============================================================ -->
+  <header class="top-app-bar">
+    <div class="container top-app-bar-inner">
+      <a href="#" class="brand-logo">
+        <img src="./assets/icon.png" alt="Store Ledger Logo" />
+        <span>Store Ledger</span>
+        <span class="version-pill">v2.0.0</span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#features" class="nav-link">Features</a></li>
+          <li><a href="#screenshots" class="nav-link">Screenshots</a></li>
+          <li><a href="#cloud-sync" class="nav-link">Cloud Sync</a></li>
+          <li><a href="#download" class="nav-link">Download</a></li>
+          <li><a href="#faq" class="nav-link">FAQ</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Mode" title="Toggle theme">
+          <span class="material-symbols-outlined" id="themeIcon">light_mode</span>
+        </button>
+        <a href="#download" class="btn btn-primary">
+          <span class="material-symbols-outlined">download</span>
+          <span>Get APK</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       HERO SECTION
+       ============================================================ -->
+  <section class="hero-section">
+    <div class="hero-bg-glow"></div>
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <div class="badge-chip">
+          <span class="material-symbols-outlined" style="font-size: 18px;">verified</span>
+          <span>100% OFFLINE • ZERO VENDOR LOCK-IN • MULTI-CURRENCY</span>
+        </div>
+
+        <h1 class="hero-title">
+          Smart Customer Ledger for <span>Modern Business Owners</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Track customer credit, balance khatas, and daily business collections with flawless integer arithmetic. Works without internet or cloud accounts. Connect your private Supabase backend whenever you choose.
+        </p>
+
+        <div class="hero-actions">
+          <a href="https://github.com/iamrony27/storeledger/releases/download/v2.0.0/StoreLedger-v2.0.0.apk" class="btn btn-primary btn-lg">
+            <span class="material-symbols-outlined">android</span>
+            <span>Download APK (v2.0.0)</span>
+          </a>
+          <a href="https://github.com/iamrony27/storeledger" target="_blank" rel="noopener" class="btn btn-tonal btn-lg">
+            <span class="material-symbols-outlined">code</span>
+            <span>GitHub Repository</span>
+          </a>
+        </div>
+
+        <div class="store-badge-card">
+          <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary);">storefront</span>
+          <div>
+            <strong>Orion Store Ready:</strong> Package ID <code>com.gwd.book</code> • Free & Open Source
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Phone Mockup Showcase -->
+      <div class="mockup-wrapper">
+        <div class="mockup-frame">
+          <div class="mockup-notch"></div>
+          <div class="mockup-screen">
+            <img id="mockupImage" src="./assets/screenshots/orion_screenshot_1_dashboard.png" alt="Store Ledger In-App Preview" />
+          </div>
+        </div>
+
+        <!-- Screenshot Tab Pills -->
+        <div class="mockup-tabs">
+          <button class="mockup-tab-btn active" data-src="./assets/screenshots/orion_screenshot_1_dashboard.png">Dashboard</button>
+          <button class="mockup-tab-btn" data-src="./assets/screenshots/orion_screenshot_2_customer_statement.png">Statement</button>
+          <button class="mockup-tab-btn" data-src="./assets/screenshots/orion_screenshot_3_analytics_reports.png">Analytics</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       STATISTICS STRIP
+       ============================================================ -->
+  <section class="stats-strip">
+    <div class="container stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <span class="material-symbols-outlined">cloud_off</span>
+        </div>
+        <div class="stat-text">
+          <h4>100% Offline</h4>
+          <p>Operates completely on-device</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container);">
+          <span class="material-symbols-outlined">currency_exchange</span>
+        </div>
+        <div class="stat-text">
+          <h4>9 Currencies</h4>
+          <p>INR, USD, EUR, BDT & .00 toggle</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container);">
+          <span class="material-symbols-outlined">database</span>
+        </div>
+        <div class="stat-text">
+          <h4>0 Vendor Lock-In</h4>
+          <p>Bring your own Supabase cloud</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <span class="material-symbols-outlined">security</span>
+        </div>
+        <div class="stat-text">
+          <h4>SHA-256 Backups</h4>
+          <p>Cryptographically verified</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       KEY FEATURES SECTION
+       ============================================================ -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Engineered For Reliability</span>
+        <h2 class="section-title">Everything Your Business Needs In One Elegant App</h2>
+        <p class="section-subtitle">
+          Designed specifically for retailers, distributors, shop owners, and freelancers who demand speed, financial precision, and absolute data privacy.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="m3-card">
+          <div class="card-icon-container">
+            <span class="material-symbols-outlined">wifi_off</span>
+          </div>
+          <h3 class="card-title">100% Offline-First Core</h3>
+          <p class="card-description">
+            Never wait for network connectivity or server spinners. All entries, customers, and balance totals compute instantly on your phone with raw integer paise math to eliminate floating-point drift.
+          </p>
+          <span class="card-badge">Zero Lag</span>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="m3-card">
+          <div class="card-icon-container tertiary">
+            <span class="material-symbols-outlined">payments</span>
+          </div>
+          <h3 class="card-title">Multi-Currency & Decimals</h3>
+          <p class="card-description">
+            Full support for INR (₹), USD ($), EUR (€), GBP (£), BDT (৳), AED, SAR, CAD, and AUD. Toggle fractional decimals (.00) anytime with dynamic numeric keypads and big number autoscaling.
+          </p>
+          <span class="card-badge">9 Global Currencies</span>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="m3-card">
+          <div class="card-icon-container secondary">
+            <span class="material-symbols-outlined">cloud_sync</span>
+          </div>
+          <h3 class="card-title">Bring Your Own Supabase</h3>
+          <p class="card-description">
+            Connect your personal Supabase project by simply entering your Project URL and Anon Key. Strict Row Level Security policies guarantee nobody else can ever read your ledger records.
+          </p>
+          <span class="card-badge">Zero Lock-In</span>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="m3-card">
+          <div class="card-icon-container">
+            <span class="material-symbols-outlined">show_chart</span>
+          </div>
+          <h3 class="card-title">Cash Flow Velocity Splines</h3>
+          <p class="card-description">
+            Visualize your collections vs credit disbursements with smooth cubic Bézier splines. Non-colliding dynamic Y-axis intervals ensure clear, intuitive financial charts across 7-day, 30-day, and monthly views.
+          </p>
+          <span class="card-badge">Visual Intelligence</span>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="m3-card">
+          <div class="card-icon-container tertiary">
+            <span class="material-symbols-outlined">chat</span>
+          </div>
+          <h3 class="card-title">WhatsApp & PDF Reminders</h3>
+          <p class="card-description">
+            Send instant payment reminders via WhatsApp in English and Bengali (বাংলা) with last payment breakdown. Export clean, professional HTML-to-PDF statements for customers and master audits.
+          </p>
+          <span class="card-badge">1-Tap Billing</span>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="m3-card">
+          <div class="card-icon-container secondary">
+            <span class="material-symbols-outlined">enhanced_encryption</span>
+          </div>
+          <h3 class="card-title">Cryptographic Backups</h3>
+          <p class="card-description">
+            Generate SHA-256 cryptographically verified snapshots to local storage, Google Drive, or SD cards. Intelligent UUID deduplication guarantees restores will never generate duplicate accounts.
+          </p>
+          <span class="card-badge">FIPS 180-4 Security</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       APP SCREENSHOTS GALLERY
+       ============================================================ -->
+  <section class="section screenshots-section" id="screenshots">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Visual Walkthrough</span>
+        <h2 class="section-title">Designed with Material 3 Precision</h2>
+        <p class="section-subtitle">
+          Clean dark mode aesthetics, intuitive tactile action buttons, and WCAG AA contrast compliance across every screen.
+        </p>
+      </div>
+
+      <div class="gallery-grid">
+        <!-- Screenshot 1 -->
+        <div class="gallery-item">
+          <div class="gallery-image-card" onclick="openLightbox(this)">
+            <img src="./assets/screenshots/orion_screenshot_1_dashboard.png" alt="Executive Dashboard Screen" />
+          </div>
+          <div class="gallery-caption">
+            <h4>Executive Dashboard</h4>
+            <p>Real-time due totals, customer search, filter chips & quick entry FAB</p>
+          </div>
+        </div>
+
+        <!-- Screenshot 2 -->
+        <div class="gallery-item">
+          <div class="gallery-image-card" onclick="openLightbox(this)">
+            <img src="./assets/screenshots/orion_screenshot_2_customer_statement.png" alt="Customer Statement Screen" />
+          </div>
+          <div class="gallery-caption">
+            <h4>Customer Statement</h4>
+            <p>Hero balance card, 3-column breakdown & split tactile entry buttons</p>
+          </div>
+        </div>
+
+        <!-- Screenshot 3 -->
+        <div class="gallery-item">
+          <div class="gallery-image-card" onclick="openLightbox(this)">
+            <img src="./assets/screenshots/orion_screenshot_3_analytics_reports.png" alt="Reports & Velocity Chart Screen" />
+          </div>
+          <div class="gallery-caption">
+            <h4>Cash Flow Analytics</h4>
+            <p>Smooth Bézier velocity curves, non-colliding axis & exposure ranking</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SUPABASE CLOUD SYNC SECTION
+       ============================================================ -->
+  <section class="section" id="cloud-sync">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Decentralized Cloud Architecture</span>
+        <h2 class="section-title">Connect Your Own Supabase Backend</h2>
+        <p class="section-subtitle">
+          Unlike proprietary accounting apps that hold your data hostage, Store Ledger lets you own your PostgreSQL database entirely with zero monthly vendor fees.
+        </p>
+      </div>
+
+      <div class="sync-box">
+        <div class="sync-steps-list">
+          <div class="sync-step-item">
+            <div class="step-number">1</div>
+            <div class="step-text">
+              <h5>Connect Project Credentials</h5>
+              <p>Enter your private Supabase Project URL and Public Anon Key. Store Ledger never requires or stores database master passwords.</p>
+            </div>
+          </div>
+
+          <div class="sync-step-item">
+            <div class="step-number">2</div>
+            <div class="step-text">
+              <h5>Execute One-Time SQL Schema</h5>
+              <p>Run our idempotent SQL script in your Supabase SQL editor to create isolated tables, indexes, and Row Level Security policies.</p>
+            </div>
+          </div>
+
+          <div class="sync-step-item">
+            <div class="step-number">3</div>
+            <div class="step-text">
+              <h5>Register & Confirm Email</h5>
+              <p>Create your store owner login and confirm your email. Real-time background replication syncs across all your devices automatically.</p>
+            </div>
+          </div>
+
+          <div class="sync-step-item">
+            <div class="step-number">4</div>
+            <div class="step-text">
+              <h5>Safe Disconnect Anytime</h5>
+              <p>Disconnecting Supabase clears your credentials locally while leaving all remote cloud records completely untouched and intact.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="sync-infographic-card">
+          <img src="./assets/store_ledger_cloud_sync_guide.jpg" alt="Cloud Sync 4-Step Diagram" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DOWNLOAD & VERIFICATION SECTION
+       ============================================================ -->
+  <section class="section" id="download">
+    <div class="container download-card-wrapper">
+      <div class="download-hero-card">
+        <div class="badge-chip">
+          <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+          <span>OFFICIAL PRODUCTION BUILD</span>
+        </div>
+
+        <h2 style="font-size: 2.4rem; font-weight: 800; letter-spacing: -0.02em;">
+          Download Store Ledger v2.0.0
+        </h2>
+
+        <p style="color: var(--md-sys-color-on-surface-variant); max-width: 580px;">
+          Install the standalone Android production APK directly on any Android phone (Android 8.0 Oreo to Android 15).
+        </p>
+
+        <a href="https://github.com/iamrony27/storeledger/releases/download/v2.0.0/StoreLedger-v2.0.0.apk" class="btn btn-primary btn-lg" style="font-size: 1.15rem; padding: 18px 40px;">
+          <span class="material-symbols-outlined" style="font-size: 28px;">android</span>
+          <span>Download StoreLedger-v2.0.0.apk (95.5 MB)</span>
+        </a>
+
+        <!-- Checksum & Package Metadata Table -->
+        <div class="download-meta-table">
+          <div class="download-meta-row">
+            <span class="download-meta-label">Android Package ID:</span>
+            <span class="download-meta-value">com.gwd.book</span>
+          </div>
+          <div class="download-meta-row">
+            <span class="download-meta-label">App Version:</span>
+            <span class="download-meta-value">2.0.0 (Build Code: 12)</span>
+          </div>
+          <div class="download-meta-row">
+            <span class="download-meta-label">Expo SDK:</span>
+            <span class="download-meta-value">SDK 57 (React Native 0.81)</span>
+          </div>
+          <div class="download-meta-row">
+            <span class="download-meta-label">SHA-256 Checksum:</span>
+            <div class="checksum-box">
+              <span class="download-meta-value" id="checksumText">5735227a8d3e7ce2f589ded3abf78ae7a1d93afbdea897ac5127df9f01661f9e</span>
+              <button class="copy-btn" onclick="copyChecksum()" title="Copy SHA-256">
+                <span class="material-symbols-outlined" style="font-size: 16px;">content_copy</span>
+                <span id="copyBtnLabel">Copy</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.85rem; color: var(--md-sys-color-on-surface-variant);">
+          Also available on <a href="https://github.com/iamrony27/storeledger/releases/tag/v2.0.0" target="_blank" style="color: var(--md-sys-color-primary); font-weight: 700; text-decoration: underline;">GitHub Releases</a> and compatible with Orion Store.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FAQ SECTION
+       ============================================================ -->
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Common Questions</span>
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        <p class="section-subtitle">Everything you need to know about Store Ledger and data ownership.</p>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>Is Store Ledger really 100% free with no forced subscriptions?</span>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="faq-answer">
+            Yes! Store Ledger is open-source under the MIT license. There are no monthly subscription fees, paywalls, or in-app ads. All offline features work indefinitely without payment.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>Do I need an internet connection to use the app?</span>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="faq-answer">
+            No. Store Ledger is completely offline-first. You can add customers, record credits/debits, view analytics, and generate PDF statements without any internet connection.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>How does the Bring-Your-Own Supabase cloud sync work?</span>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="faq-answer">
+            You create a free Supabase project and provide the Project URL and Anon/Publishable Key. Store Ledger syncs directly to your PostgreSQL database with Row Level Security, ensuring you retain 100% ownership of your records.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>Can I switch currencies or use fractional decimal amounts?</span>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="faq-answer">
+            Yes. Store Ledger supports 9 global currencies (INR, USD, EUR, GBP, BDT, AED, SAR, CAD, AUD). You can toggle decimal (.00) precision on or off anytime. Data is stored in exact minor units (paise/cents) so no precision is ever lost.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>How do I back up my ledger data safely?</span>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="faq-answer">
+            You can create encrypted, SHA-256 verified snapshot backups directly from Settings. Backups can be shared via WhatsApp, Google Drive, email, or saved to your device's external storage.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-logo">
+        <img src="./assets/icon.png" alt="Store Ledger" />
+        <span>Store Ledger</span>
+      </div>
+
+      <ul class="footer-nav">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#screenshots">Screenshots</a></li>
+        <li><a href="#cloud-sync">Cloud Sync</a></li>
+        <li><a href="https://github.com/iamrony27/storeledger/releases/tag/v2.0.0" target="_blank">Release Notes</a></li>
+        <li><a href="https://github.com/iamrony27/storeledger" target="_blank">GitHub</a></li>
+        <li><a href="#download">Download APK</a></li>
+      </ul>
+
+      <p class="footer-copy">
+        &copy; 2026 Store Ledger Project • Built with Material 3 & Expo SDK 57 • Licensed under MIT
+      </p>
+    </div>
+  </footer>
+
+  <!-- Lightbox Modal for Screenshots -->
+  <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox()">
+    <img id="lightboxImg" src="" alt="Zoomed Screenshot" />
+  </div>
+
+  <!-- ============================================================
+       INTERACTION SCRIPTS
+       ============================================================ -->
+  <script>
+    // 1. Dark/Light Theme Switcher
+    const html = document.documentElement;
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeIcon = document.getElementById('themeIcon');
+
+    function setTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('store_ledger_theme', theme);
+      if (theme === 'dark') {
+        themeIcon.textContent = 'light_mode';
+      } else {
+        themeIcon.textContent = 'dark_mode';
+      }
+    }
+
+    // Initialize theme
+    const savedTheme = localStorage.getItem('store_ledger_theme') || 'dark';
+    setTheme(savedTheme);
+
+    themeToggleBtn.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+    // 2. Interactive Mockup Tab Switcher
+    const tabBtns = document.querySelectorAll('.mockup-tab-btn');
+    const mockupImage = document.getElementById('mockupImage');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const targetSrc = btn.getAttribute('data-src');
+        mockupImage.style.opacity = '0';
+        setTimeout(() => {
+          mockupImage.src = targetSrc;
+          mockupImage.style.opacity = '1';
+        }, 150);
+      });
+    });
+
+    // 3. FAQ Accordion Toggle
+    function toggleFaq(el) {
+      const parent = el.parentElement;
+      const isOpen = parent.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(item => item.classList.remove('open'));
+      if (!isOpen) {
+        parent.classList.add('open');
+      }
+    }
+
+    // 4. Copy SHA-256 Checksum
+    function copyChecksum() {
+      const checksum = document.getElementById('checksumText').textContent;
+      navigator.clipboard.writeText(checksum).then(() => {
+        const label = document.getElementById('copyBtnLabel');
+        label.textContent = 'Copied!';
+        setTimeout(() => {
+          label.textContent = 'Copy';
+        }, 2000);
+      });
+    }
+
+    // 5. Screenshot Lightbox
+    const lightboxModal = document.getElementById('lightboxModal');
+    const lightboxImg = document.getElementById('lightboxImg');
+
+    function openLightbox(el) {
+      const img = el.querySelector('img');
+      if (img) {
+        lightboxImg.src = img.src;
+        lightboxModal.classList.add('active');
+      }
+    }
+
+    function closeLightbox() {
+      lightboxModal.classList.remove('active');
+    }
+  </script>
+</body>
+</html>

@@ -32,6 +32,9 @@
   <link rel="icon" type="image/png" href="./assets/favicon.png" />
   <link rel="apple-touch-icon" href="./assets/icon.png" />
 
+  <!-- Preload critical hero assets for instant LCP -->
+  <link rel="preload" as="image" href="./assets/screenshots/orion_screenshot_1_dashboard.png" fetchpriority="high" />
+
   <!-- Google Fonts: Plus Jakarta Sans & Material Symbols Outlined -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -43,6 +46,17 @@
   {
     "@context": "https://schema.org",
     "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://www.storeledger.in/#organization",
+        "name": "Store Ledger",
+        "url": "https://www.storeledger.in/",
+        "logo": "https://www.storeledger.in/assets/icon.png",
+        "sameAs": [
+          "https://github.com/iamrony27/storeledger",
+          "https://rookieenough.github.io/Orion-Data/redirect.html?id=storeledger"
+        ]
+      },
       {
         "@type": "SoftwareApplication",
         "@id": "https://www.storeledger.in/#app",
@@ -1439,7 +1453,7 @@
         <!-- Screenshot 1 -->
         <div class="gallery-item">
           <div class="gallery-image-card" onclick="openLightbox(this)">
-            <img src="./assets/screenshots/orion_screenshot_1_dashboard.png" alt="Executive Dashboard Screen" />
+            <img src="./assets/screenshots/orion_screenshot_1_dashboard.png" alt="Executive Dashboard Screen - Store Ledger" loading="lazy" decoding="async" width="400" height="800" />
           </div>
           <div class="gallery-caption">
             <h4>Executive Dashboard</h4>
@@ -1450,7 +1464,7 @@
         <!-- Screenshot 2 -->
         <div class="gallery-item">
           <div class="gallery-image-card" onclick="openLightbox(this)">
-            <img src="./assets/screenshots/orion_screenshot_2_customer_statement.png" alt="Customer Statement Screen" />
+            <img src="./assets/screenshots/orion_screenshot_2_customer_statement.png" alt="Customer Statement Screen - Store Ledger" loading="lazy" decoding="async" width="400" height="800" />
           </div>
           <div class="gallery-caption">
             <h4>Customer Statement</h4>
@@ -1461,7 +1475,7 @@
         <!-- Screenshot 3 -->
         <div class="gallery-item">
           <div class="gallery-image-card" onclick="openLightbox(this)">
-            <img src="./assets/screenshots/orion_screenshot_3_analytics_reports.png" alt="Reports & Velocity Chart Screen" />
+            <img src="./assets/screenshots/orion_screenshot_3_analytics_reports.png" alt="Reports & Velocity Chart Screen - Store Ledger" loading="lazy" decoding="async" width="400" height="800" />
           </div>
           <div class="gallery-caption">
             <h4>Cash Flow Analytics</h4>
@@ -1521,7 +1535,7 @@
         </div>
 
         <div class="sync-infographic-card">
-          <img src="./assets/store_ledger_cloud_sync_guide.jpg" alt="Cloud Sync 4-Step Diagram" />
+          <img src="./assets/store_ledger_cloud_sync_guide.jpg" alt="Cloud Sync 4-Step Diagram - Store Ledger" loading="lazy" decoding="async" width="800" height="500" />
         </div>
       </div>
     </div>

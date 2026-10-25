@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Store Ledger • Modern Business Customer Ledger &amp; Cash Book</title>
   <meta name="description" content="Modern, 100% offline-first digital customer ledger and khata book for smart business owners. Zero vendor lock-in, multi-currency support, and optional Supabase cloud sync." />
-  <meta name="keywords" content="store ledger, khata book, business ledger, customer ledger, credit debit tracker, offline khata app, udhar khata, business accounting app, free ledger android, digital hisab kitab" />
+  <meta name="keywords" content="store ledger, khatabook alternative, okcredit alternative, khatabook vs store ledger, ok credit alternative, offline khata book, business ledger, customer ledger, credit debit tracker, offline khata app, udhar khata, business accounting app, free ledger android, digital hisab kitab" />
   <meta name="author" content="Store Ledger Team" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <link rel="canonical" href="https://www.storeledger.in/" />
@@ -1130,6 +1130,141 @@
     }
 
     /* ============================================================
+       COMPETITOR COMPARISON TABLE (M3 EXPRESSIVE)
+       ============================================================ */
+    .comparison-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 28px;
+      border: 1px solid var(--md-sys-color-outline-variant);
+      background: var(--md-sys-color-surface-container);
+      box-shadow: var(--md-sys-elevation-2);
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+      vertical-align: middle;
+    }
+
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .comparison-table thead th {
+      background: var(--md-sys-color-surface-container-high);
+      font-weight: 700;
+      color: var(--md-sys-color-on-surface);
+      font-size: 1rem;
+    }
+
+    .feature-col {
+      width: 38%;
+      min-width: 240px;
+    }
+
+    .product-col {
+      width: 20%;
+      min-width: 170px;
+      text-align: center;
+    }
+
+    .feature-title strong {
+      display: block;
+      color: var(--md-sys-color-on-surface);
+      font-size: 0.98rem;
+      margin-bottom: 4px;
+    }
+
+    .feature-title span {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .comparison-table td.highlight-col,
+    .comparison-table th.highlight-col {
+      background: var(--md-sys-color-surface-container-highest);
+      text-align: center;
+      position: relative;
+    }
+
+    .product-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 800;
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      padding: 3px 10px;
+      border-radius: 12px;
+      margin-bottom: 6px;
+      letter-spacing: 0.05em;
+    }
+
+    .product-name {
+      font-family: var(--font-family-display);
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .product-sub {
+      font-size: 0.78rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .status-yes {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--md-sys-color-tertiary);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .status-yes .material-symbols-outlined {
+      font-size: 20px;
+    }
+
+    .status-no {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--md-sys-color-outline);
+      font-size: 0.88rem;
+    }
+
+    .status-no .material-symbols-outlined {
+      font-size: 18px;
+      color: var(--md-sys-color-error);
+    }
+
+    .status-neutral {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 0.88rem;
+    }
+
+    /* ============================================================
        RESPONSIVE BREAKPOINTS
        ============================================================ */
     @media (max-width: 992px) {
@@ -1222,6 +1357,7 @@
           <li><a href="#features" class="nav-link">Features</a></li>
           <li><a href="#screenshots" class="nav-link">Screenshots</a></li>
           <li><a href="#cloud-sync" class="nav-link">Cloud Sync</a></li>
+          <li><a href="#comparison" class="nav-link">Compare</a></li>
           <li><a href="#download" class="nav-link">Download</a></li>
           <li><a href="#faq" class="nav-link">FAQ</a></li>
         </ul>
@@ -1542,6 +1678,168 @@
   </section>
 
   <!-- ============================================================
+       COMPETITOR COMPARISON: STORE LEDGER VS KHATABOOK VS OKCREDIT
+       ============================================================ -->
+  <section class="section" id="comparison">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Direct Head-to-Head</span>
+        <h2 class="section-title">Store Ledger vs. Khatabook vs. OkCredit</h2>
+        <p class="section-subtitle">
+          Why smart business owners choose sovereign data ownership, zero ads, and 100% offline reliability over closed proprietary platforms.
+        </p>
+      </div>
+
+      <div class="comparison-container">
+        <div class="table-responsive">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th class="feature-col">Feature / Capability</th>
+                <th class="product-col highlight-col">
+                  <div class="product-badge">RECOMMENDED</div>
+                  <div class="product-name">Store Ledger</div>
+                  <div class="product-sub">v2.0.0 (Open Source)</div>
+                </th>
+                <th class="product-col">
+                  <div class="product-name">Khatabook</div>
+                  <div class="product-sub">Proprietary Closed</div>
+                </th>
+                <th class="product-col">
+                  <div class="product-name">OkCredit</div>
+                  <div class="product-sub">Proprietary Closed</div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="feature-title">
+                  <strong>100% Offline-First Architecture</strong>
+                  <span>Full bookkeeping capabilities with zero internet or server connection</span>
+                </td>
+                <td class="highlight-col">
+                  <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> Yes (Zero Lag)</span>
+                </td>
+                <td>
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Requires Internet</span>
+                </td>
+                <td>
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Requires Internet</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="feature-title">
+                  <strong>Data Ownership &amp; Cloud Choice</strong>
+                  <span>Who actually holds your private customer debt &amp; payment records?</span>
+                </td>
+                <td class="highlight-col">
+                  <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> You (BYO Supabase)</span>
+                </td>
+                <td>
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Khatabook Servers</span>
+                </td>
+                <td>
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> OkCredit Servers</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="feature-title">
+                  <strong>Zero Advertisements &amp; No Loan Spam</strong>
+                  <span>Clean workspace free from unprompted credit lines and marketing push</span>
+                </td>
+                <td class="highlight-col">
+                  <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> 100% Ad-Free</span>
+                </td>
+                <td>
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Loan &amp; card ads</span>
+                </td>
+                <td>
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Ecosystem upsells</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="feature-title">
+                  <strong>No Mandatory Phone / OTP Sign-In</strong>
+                  <span>Instant access without surrendering your phone number to sales databases</span>
+                </td>
+                <td class="highlight-col">
+                  <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> Instant Start (No OTP)</span>
+                </td>
+                <td>
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Mandatory Phone OTP</span>
+                </td>
+                <td>
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Mandatory Phone OTP</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="feature-title">
+                  <strong>Multi-Currency &amp; Decimal (.00) Support</strong>
+                  <span>Built for global commerce with INR, USD, EUR, GBP, BDT, AED, SAR...</span>
+                </td>
+                <td class="highlight-col">
+                  <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> 9 Currencies + Decimals</span>
+                </td>
+                <td>
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Primarily INR only</span>
+                </td>
+                <td>
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Primarily INR only</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="feature-title">
+                  <strong>Exact Integer Arithmetic</strong>
+                  <span>Minor unit accounting (paise/cents) eliminates rounding drifts</span>
+                </td>
+                <td class="highlight-col">
+                  <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> Strict Integer Math</span>
+                </td>
+                <td>
+                  <span class="status-neutral"><span class="material-symbols-outlined">check</span> Standard rounding</span>
+                </td>
+                <td>
+                  <span class="status-neutral"><span class="material-symbols-outlined">check</span> Standard rounding</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="feature-title">
+                  <strong>Encrypted Snapshots &amp; Backups</strong>
+                  <span>Exportable, cryptographically signed SHA-256 JSON backup snapshots</span>
+                </td>
+                <td class="highlight-col">
+                  <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> SHA-256 Encrypted</span>
+                </td>
+                <td>
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Proprietary lock-in</span>
+                </td>
+                <td>
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Proprietary lock-in</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="feature-title">
+                  <strong>Software Transparency &amp; License</strong>
+                  <span>Fully auditable, verifiable open-source codebase on GitHub</span>
+                </td>
+                <td class="highlight-col">
+                  <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> MIT Open Source</span>
+                </td>
+                <td>
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Closed Source</span>
+                </td>
+                <td>
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Closed Source</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
        DOWNLOAD & VERIFICATION SECTION
        ============================================================ -->
   <section class="section" id="download">
@@ -1682,6 +1980,7 @@
         <li><a href="#features">Features</a></li>
         <li><a href="#screenshots">Screenshots</a></li>
         <li><a href="#cloud-sync">Cloud Sync</a></li>
+        <li><a href="#comparison">Compare</a></li>
         <li><a href="./privacy.html">Privacy Policy</a></li>
         <li><a href="./terms.html">Terms of Service</a></li>
         <li><a href="https://github.com/iamrony27/storeledger/releases/tag/v2.0.0" target="_blank">Release Notes</a></li>

@@ -1307,6 +1307,139 @@
     }
 
     /* ============================================================
+       WHATSAPP CONTACT DEVELOPER STYLING
+       ============================================================ */
+    .whatsapp-fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #25D366;
+      color: #FFFFFF;
+      padding: 12px 20px;
+      border-radius: 32px;
+      text-decoration: none;
+      box-shadow: 0 6px 20px rgba(37, 211, 102, 0.45);
+      transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .whatsapp-fab:hover {
+      background: #20bd5a;
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 8px 26px rgba(37, 211, 102, 0.6);
+      color: #FFFFFF;
+    }
+
+    .whatsapp-fab-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .btn-whatsapp {
+      background: rgba(37, 211, 102, 0.14);
+      color: #25D366;
+      border: 1px solid rgba(37, 211, 102, 0.35);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-whatsapp:hover {
+      background: #25D366;
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.4);
+    }
+
+    .btn-whatsapp-hero {
+      background: rgba(37, 211, 102, 0.12);
+      color: #25D366;
+      border: 1.5px solid rgba(37, 211, 102, 0.4);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: 700;
+      border-radius: 20px;
+      padding: 14px 22px;
+      text-decoration: none;
+      transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .btn-whatsapp-hero:hover {
+      background: #25D366;
+      color: #FFFFFF;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(37, 211, 102, 0.45);
+    }
+
+    /* Comparison Mobile Tabs */
+    .comparison-mobile-tabs {
+      display: none;
+    }
+
+    .comp-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--md-sys-color-on-surface-variant);
+      padding: 8px 14px;
+      border-radius: 16px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .comp-tab-btn.active {
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: 0 2px 8px rgba(91, 142, 255, 0.4);
+    }
+
+    /* Gallery Carousel Dots */
+    .gallery-dots {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .gallery-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--md-sys-color-outline-variant);
+      transition: all 0.25s ease;
+    }
+
+    .gallery-dot.active {
+      width: 22px;
+      border-radius: 8px;
+      background: var(--md-sys-color-primary);
+    }
+
+    @media (min-width: 769px) {
+      .comparison-table .col-khatabook,
+      .comparison-table .col-okcredit {
+        display: table-cell !important;
+      }
+    }
+
+    /* ============================================================
        RESPONSIVE BREAKPOINTS (TABLET & MOBILE)
        ============================================================ */
     @media (max-width: 992px) {
@@ -1332,10 +1465,34 @@
         grid-template-columns: repeat(2, 1fr);
       }
 
+      /* Horizontal scroll carousel for screenshots - eliminates bottom-under-bottom stacking */
       .gallery-grid {
-        grid-template-columns: 1fr;
-        max-width: 360px;
-        margin: 0 auto;
+        display: flex;
+        flex-direction: row;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        gap: 20px;
+        padding: 10px 16px 24px;
+        margin: 0 -16px;
+        max-width: none;
+        scrollbar-width: none;
+      }
+
+      .gallery-grid::-webkit-scrollbar {
+        display: none;
+      }
+
+      .gallery-item {
+        flex: 0 0 76vw;
+        max-width: 280px;
+        min-width: 240px;
+        scroll-snap-align: center;
+        scroll-snap-stop: always;
+      }
+
+      .gallery-dots {
+        display: flex;
       }
 
       .sync-box {
@@ -1488,150 +1645,299 @@
         white-space: nowrap;
       }
 
-      /* Statistics */
+      /* Statistics - Compact 2x2 cards on mobile */
       .stats-strip {
-        padding: 20px 0;
+        padding: 16px 0;
       }
 
       .stats-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
       }
 
       .stat-card {
-        padding: 12px 16px;
-        border-radius: 16px;
-        gap: 12px;
+        padding: 10px 8px !important;
+        border-radius: 14px !important;
+        gap: 8px !important;
+        flex-direction: row;
+        align-items: center;
       }
 
       .stat-icon {
-        width: 42px;
-        height: 42px;
-        font-size: 22px;
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        font-size: 18px !important;
+        border-radius: 8px !important;
       }
 
       .stat-text h4 {
-        font-size: 1.05rem;
+        font-size: 0.84rem !important;
+        margin-bottom: 2px !important;
+        font-weight: 700 !important;
       }
 
       .stat-text p {
-        font-size: 0.82rem;
+        font-size: 0.68rem !important;
+        line-height: 1.25 !important;
       }
 
-      /* Features */
+      /* Features - Compact cards */
       .section {
-        padding: 48px 0;
+        padding: 38px 0;
       }
 
       .section-header {
-        margin-bottom: 28px;
+        margin-bottom: 22px;
       }
 
       .section-tag {
-        font-size: 0.78rem;
+        font-size: 0.74rem;
       }
 
       .section-title {
-        font-size: clamp(1.75rem, 6.5vw, 2.1rem);
+        font-size: clamp(1.6rem, 6vw, 1.95rem);
         line-height: 1.2;
       }
 
       .section-subtitle {
-        font-size: 0.95rem;
+        font-size: 0.88rem;
       }
 
       .features-grid {
         grid-template-columns: 1fr;
-        gap: 16px;
+        gap: 12px !important;
       }
 
       .m3-card {
-        padding: 22px 18px;
-        border-radius: 20px;
-        gap: 12px;
+        padding: 14px 14px !important;
+        border-radius: 16px !important;
+        gap: 8px !important;
+      }
+
+      .card-icon-container {
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
+        font-size: 20px !important;
+        border-radius: 10px !important;
+        margin-bottom: 2px;
       }
 
       .card-title {
-        font-size: 1.25rem;
+        font-size: 1.02rem !important;
+        font-weight: 700;
+        margin-bottom: 2px;
       }
 
       .card-description {
-        font-size: 0.92rem;
+        font-size: 0.82rem !important;
+        line-height: 1.4 !important;
       }
 
-      /* Gallery */
+      .card-badge {
+        font-size: 0.68rem !important;
+        padding: 2px 8px !important;
+        border-radius: 6px !important;
+      }
+
+      /* Gallery - Horizontal Swipe Carousel (never stacks bottom-under-bottom) */
       .gallery-grid {
-        max-width: 290px;
-        gap: 20px;
-        margin: 0 auto;
+        padding: 6px 16px 20px;
+        gap: 14px;
+        max-width: none;
+        margin: 0 -16px;
+      }
+
+      .gallery-item {
+        flex: 0 0 78vw;
+        max-width: 260px;
+        min-width: 220px;
       }
 
       .gallery-caption h4 {
-        font-size: 1.1rem;
+        font-size: 1rem;
+        margin-bottom: 2px;
       }
 
       .gallery-caption p {
-        font-size: 0.85rem;
+        font-size: 0.78rem;
+        line-height: 1.35;
       }
 
-      /* Cloud Sync */
+      /* Cloud Sync - Compact */
       .sync-box {
-        padding: 20px 16px;
-        border-radius: 22px;
-        gap: 24px;
-      }
-
-      .sync-steps-list {
+        padding: 16px 12px;
+        border-radius: 18px;
         gap: 16px;
       }
 
+      .sync-steps-list {
+        gap: 10px;
+      }
+
       .sync-step-item {
-        gap: 12px;
+        padding: 8px 10px;
+        border-radius: 12px;
+        gap: 10px;
+        background: var(--md-sys-color-surface-container-low);
       }
 
       .step-number {
-        width: 32px;
-        height: 32px;
-        font-size: 0.9rem;
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
+        font-size: 0.8rem;
       }
 
       .step-text h5 {
-        font-size: 1rem;
+        font-size: 0.9rem;
+        margin-bottom: 2px;
       }
 
       .step-text p {
-        font-size: 0.86rem;
+        font-size: 0.76rem;
+        line-height: 1.32;
       }
 
       .sync-infographic-card img {
-        border-radius: 14px;
+        border-radius: 12px;
       }
 
-      /* Comparison Table */
+      /* Comparison Table - Responsive Dual-Fit for Mobile */
+      .comparison-mobile-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin: 0 auto 14px;
+        background: var(--md-sys-color-surface-container-high);
+        padding: 4px;
+        border-radius: 20px;
+        border: 1px solid var(--md-sys-color-outline-variant);
+        width: fit-content;
+        max-width: 100%;
+      }
+
+      .comparison-table {
+        table-layout: fixed;
+        width: 100%;
+      }
+
       .comparison-table th, 
       .comparison-table td {
-        padding: 12px 10px;
-        font-size: 0.82rem;
+        padding: 9px 7px;
+        font-size: 0.75rem;
       }
 
-      .feature-col {
-        min-width: 170px;
+      /* Toggle columns based on active tab so comparison fits 100% on mobile without scroll */
+      .comparison-table.view-khatabook .col-okcredit {
+        display: none !important;
+      }
+      .comparison-table.view-okcredit .col-khatabook {
+        display: none !important;
       }
 
-      .product-col {
+      .comparison-table.view-khatabook .feature-col,
+      .comparison-table.view-okcredit .feature-col {
+        width: 44%;
+        min-width: 120px;
+      }
+
+      .comparison-table.view-khatabook .col-storeledger,
+      .comparison-table.view-khatabook .col-khatabook,
+      .comparison-table.view-okcredit .col-storeledger,
+      .comparison-table.view-okcredit .col-okcredit {
+        width: 28%;
+        min-width: 90px;
+        padding: 8px 6px;
+      }
+
+      /* When Full (All 3) is selected, allow horizontal scroll with sticky feature column */
+      .comparison-table.view-all {
+        table-layout: auto;
+        width: max-content;
+        min-width: 100%;
+      }
+
+      .comparison-table.view-all .feature-col {
+        position: sticky;
+        left: 0;
+        z-index: 3;
+        background: var(--md-sys-color-surface-container);
+        box-shadow: 2px 0 6px rgba(0,0,0,0.25);
         min-width: 130px;
       }
 
+      .comparison-table.view-all thead th.feature-col {
+        z-index: 4;
+        background: var(--md-sys-color-surface-container-high);
+      }
+
+      .comparison-table.view-all .product-col {
+        min-width: 105px;
+      }
+
+      .feature-title strong {
+        font-size: 0.8rem;
+        margin-bottom: 2px;
+      }
+
+      .feature-title span {
+        font-size: 0.66rem;
+        line-height: 1.25;
+      }
+
+      .product-badge {
+        font-size: 0.58rem;
+        padding: 2px 6px;
+        border-radius: 8px;
+        margin-bottom: 4px;
+      }
+
       .product-name {
-        font-size: 1rem;
+        font-size: 0.86rem;
       }
 
       .product-sub {
+        font-size: 0.65rem;
+      }
+
+      .status-yes, .status-no, .status-neutral {
         font-size: 0.72rem;
+        gap: 3px;
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .status-yes .material-symbols-outlined,
+      .status-no .material-symbols-outlined,
+      .status-neutral .material-symbols-outlined {
+        font-size: 16px !important;
       }
 
       .table-responsive {
-        border-radius: 20px;
+        border-radius: 16px;
+      }
+
+      /* WhatsApp FAB and button compact adjustments */
+      .whatsapp-fab {
+        bottom: 16px;
+        right: 16px;
+        padding: 12px;
+        border-radius: 50%;
+      }
+
+      .whatsapp-fab-label {
+        display: none;
+      }
+
+      .btn-whatsapp span {
+        display: none;
+      }
+
+      .btn-whatsapp {
+        padding: 8px 10px;
+        border-radius: 50%;
       }
 
       /* Download Card */
@@ -1755,6 +2061,12 @@
         <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Mode" title="Toggle theme">
           <span class="material-symbols-outlined" id="themeIcon">light_mode</span>
         </button>
+        <a href="https://wa.me/919606800800?text=Hi%20Developer%2C%20I%20have%20a%20query%20about%20Store%20Ledger%20App" target="_blank" rel="noopener" class="btn btn-whatsapp" title="Contact Developer on WhatsApp">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.42 0-2.82-.37-4.05-1.08l-.29-.17-3.12.82.83-3.04-.19-.3a8.212 8.212 0 0 1-1.26-4.46c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.58c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.12-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.6.19 1.15.16 1.59.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.11-.23-.17-.48-.3z"/>
+          </svg>
+          <span>WhatsApp</span>
+        </a>
         <a href="#download" class="btn btn-primary">
           <span class="material-symbols-outlined">download</span>
           <span>Get APK</span>
@@ -1790,6 +2102,12 @@
           </a>
           <a href="https://rookieenough.github.io/Orion-Data/redirect.html?id=storeledger" target="_blank" rel="noopener" class="orion-badge-link" title="Get it on Orion Store">
             <img src="https://raw.githubusercontent.com/RookieEnough/Orion-Store/refs/heads/main/assets/orion-badge.png" alt="Get it on Orion Store" class="orion-badge-img" />
+          </a>
+          <a href="https://wa.me/919606800800?text=Hi%20Developer%2C%20I%20have%20a%20query%20about%20Store%20Ledger%20App" target="_blank" rel="noopener" class="btn btn-whatsapp-hero btn-lg" title="Contact Developer on WhatsApp">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.42 0-2.82-.37-4.05-1.08l-.29-.17-3.12.82.83-3.04-.19-.3a8.212 8.212 0 0 1-1.26-4.46c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.58c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.12-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.6.19 1.15.16 1.59.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.11-.23-.17-.48-.3z"/>
+            </svg>
+            <span>Contact Developer</span>
           </a>
           <a href="https://github.com/iamrony27/storeledger" target="_blank" rel="noopener" class="btn btn-tonal btn-lg">
             <span class="material-symbols-outlined">code</span>
@@ -1973,7 +2291,12 @@
         </p>
       </div>
 
-      <div class="gallery-grid">
+      <div class="mobile-scroll-hint">
+        <span class="material-symbols-outlined" style="font-size: 16px;">swipe</span>
+        <span>Swipe horizontally to preview screens</span>
+      </div>
+
+      <div class="gallery-grid" id="galleryGrid">
         <!-- Screenshot 1 -->
         <div class="gallery-item">
           <div class="gallery-image-card" onclick="openLightbox(this)">
@@ -2006,6 +2329,12 @@
             <p>Smooth Bézier velocity curves, non-colliding axis & exposure ranking</p>
           </div>
         </div>
+      </div>
+
+      <div class="gallery-dots">
+        <span class="gallery-dot active"></span>
+        <span class="gallery-dot"></span>
+        <span class="gallery-dot"></span>
       </div>
     </div>
   </section>
@@ -2079,27 +2408,34 @@
       </div>
 
       <div class="comparison-container">
-        <div class="mobile-scroll-hint">
+        <!-- Mobile Dual-View Selector: fits comparison cleanly on mobile screens -->
+        <div class="comparison-mobile-tabs">
+          <button type="button" class="comp-tab-btn active" data-view="khatabook">vs. Khatabook</button>
+          <button type="button" class="comp-tab-btn" data-view="okcredit">vs. OkCredit</button>
+          <button type="button" class="comp-tab-btn" data-view="all">Full Table</button>
+        </div>
+
+        <div class="mobile-scroll-hint" id="compScrollHint" style="display: none;">
           <span class="material-symbols-outlined" style="font-size: 16px;">swipe</span>
-          <span>Swipe horizontally to view full comparison</span>
+          <span>Swipe horizontally to view all competitors</span>
         </div>
         <div class="table-responsive">
-          <table class="comparison-table">
+          <table class="comparison-table view-khatabook" id="comparisonTable">
             <thead>
               <tr>
                 <th class="feature-col">Feature / Capability</th>
-                <th class="product-col highlight-col">
+                <th class="product-col highlight-col col-storeledger">
                   <div class="product-badge">RECOMMENDED</div>
                   <img src="./assets/icon.png" width="38" height="38" alt="Store Ledger Logo" style="border-radius: 10px; display: block; margin: 4px auto 8px;" />
                   <div class="product-name">Store Ledger</div>
                   <div class="product-sub">v2.0.0 (Open Source)</div>
                 </th>
-                <th class="product-col">
+                <th class="product-col col-khatabook">
                   <img src="./assets/competitors/khatabook.png" width="38" height="38" alt="Khatabook Logo" style="border-radius: 10px; display: block; margin: 18px auto 8px;" />
                   <div class="product-name">Khatabook</div>
                   <div class="product-sub">Proprietary Closed</div>
                 </th>
-                <th class="product-col">
+                <th class="product-col col-okcredit">
                   <img src="./assets/competitors/okcredit.png" width="38" height="38" alt="OkCredit Logo" style="border-radius: 10px; display: block; margin: 18px auto 8px;" />
                   <div class="product-name">OkCredit</div>
                   <div class="product-sub">Proprietary Closed</div>
@@ -2112,13 +2448,13 @@
                   <strong>100% Offline-First Architecture</strong>
                   <span>Full bookkeeping capabilities with zero internet or server connection</span>
                 </td>
-                <td class="highlight-col">
+                <td class="highlight-col col-storeledger">
                   <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> Yes (Zero Lag)</span>
                 </td>
-                <td>
+                <td class="col-khatabook">
                   <span class="status-no"><span class="material-symbols-outlined">cancel</span> Requires Internet</span>
                 </td>
-                <td>
+                <td class="col-okcredit">
                   <span class="status-no"><span class="material-symbols-outlined">cancel</span> Requires Internet</span>
                 </td>
               </tr>
@@ -2127,13 +2463,13 @@
                   <strong>Data Ownership &amp; Cloud Choice</strong>
                   <span>Who actually holds your private customer debt &amp; payment records?</span>
                 </td>
-                <td class="highlight-col">
+                <td class="highlight-col col-storeledger">
                   <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> You (BYO Supabase)</span>
                 </td>
-                <td>
+                <td class="col-khatabook">
                   <span class="status-no"><span class="material-symbols-outlined">cancel</span> Khatabook Servers</span>
                 </td>
-                <td>
+                <td class="col-okcredit">
                   <span class="status-no"><span class="material-symbols-outlined">cancel</span> OkCredit Servers</span>
                 </td>
               </tr>
@@ -2142,13 +2478,13 @@
                   <strong>Zero Advertisements &amp; No Loan Spam</strong>
                   <span>Clean workspace free from unprompted credit lines and marketing push</span>
                 </td>
-                <td class="highlight-col">
+                <td class="highlight-col col-storeledger">
                   <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> 100% Ad-Free</span>
                 </td>
-                <td>
+                <td class="col-khatabook">
                   <span class="status-no"><span class="material-symbols-outlined">cancel</span> Loan &amp; card ads</span>
                 </td>
-                <td>
+                <td class="col-okcredit">
                   <span class="status-no"><span class="material-symbols-outlined">cancel</span> Ecosystem upsells</span>
                 </td>
               </tr>
@@ -2157,13 +2493,13 @@
                   <strong>No Mandatory Phone / OTP Sign-In</strong>
                   <span>Instant access without surrendering your phone number to sales databases</span>
                 </td>
-                <td class="highlight-col">
+                <td class="highlight-col col-storeledger">
                   <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> Instant Start (No OTP)</span>
                 </td>
-                <td>
+                <td class="col-khatabook">
                   <span class="status-no"><span class="material-symbols-outlined">cancel</span> Mandatory Phone OTP</span>
                 </td>
-                <td>
+                <td class="col-okcredit">
                   <span class="status-no"><span class="material-symbols-outlined">cancel</span> Mandatory Phone OTP</span>
                 </td>
               </tr>
@@ -2172,13 +2508,13 @@
                   <strong>Multi-Currency &amp; Decimal (.00) Support</strong>
                   <span>Built for global commerce with INR, USD, EUR, GBP, BDT, AED, SAR...</span>
                 </td>
-                <td class="highlight-col">
+                <td class="highlight-col col-storeledger">
                   <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> 9 Currencies + Decimals</span>
                 </td>
-                <td>
+                <td class="col-khatabook">
                   <span class="status-no"><span class="material-symbols-outlined">cancel</span> Primarily INR only</span>
                 </td>
-                <td>
+                <td class="col-okcredit">
                   <span class="status-no"><span class="material-symbols-outlined">cancel</span> Primarily INR only</span>
                 </td>
               </tr>
@@ -2187,13 +2523,13 @@
                   <strong>Exact Integer Arithmetic</strong>
                   <span>Minor unit accounting (paise/cents) eliminates rounding drifts</span>
                 </td>
-                <td class="highlight-col">
+                <td class="highlight-col col-storeledger">
                   <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> Strict Integer Math</span>
                 </td>
-                <td>
+                <td class="col-khatabook">
                   <span class="status-neutral"><span class="material-symbols-outlined">check</span> Standard rounding</span>
                 </td>
-                <td>
+                <td class="col-okcredit">
                   <span class="status-neutral"><span class="material-symbols-outlined">check</span> Standard rounding</span>
                 </td>
               </tr>
@@ -2202,13 +2538,13 @@
                   <strong>Encrypted Snapshots &amp; Backups</strong>
                   <span>Exportable, cryptographically signed SHA-256 JSON backup snapshots</span>
                 </td>
-                <td class="highlight-col">
+                <td class="highlight-col col-storeledger">
                   <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> SHA-256 Encrypted</span>
                 </td>
-                <td>
+                <td class="col-khatabook">
                   <span class="status-no"><span class="material-symbols-outlined">cancel</span> Proprietary lock-in</span>
                 </td>
-                <td>
+                <td class="col-okcredit">
                   <span class="status-no"><span class="material-symbols-outlined">cancel</span> Proprietary lock-in</span>
                 </td>
               </tr>
@@ -2217,13 +2553,13 @@
                   <strong>Software Transparency &amp; License</strong>
                   <span>Fully auditable, verifiable open-source codebase on GitHub</span>
                 </td>
-                <td class="highlight-col">
+                <td class="highlight-col col-storeledger">
                   <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> MIT Open Source</span>
                 </td>
-                <td>
+                <td class="col-khatabook">
                   <span class="status-no"><span class="material-symbols-outlined">cancel</span> Closed Source</span>
                 </td>
-                <td>
+                <td class="col-okcredit">
                   <span class="status-no"><span class="material-symbols-outlined">cancel</span> Closed Source</span>
                 </td>
               </tr>
@@ -2383,6 +2719,7 @@
         <li><a href="#screenshots">Screenshots</a></li>
         <li><a href="#cloud-sync">Cloud Sync</a></li>
         <li><a href="#comparison">Compare</a></li>
+        <li><a href="https://wa.me/919606800800?text=Hi%20Developer%2C%20I%20have%20a%20query%20about%20Store%20Ledger%20App" target="_blank" rel="noopener" style="color: #25D366; font-weight: 700;">WhatsApp Developer</a></li>
         <li><a href="./privacy.html">Privacy Policy</a></li>
         <li><a href="./terms.html">Terms of Service</a></li>
         <li><a href="https://github.com/iamrony27/storeledger/releases/tag/v2.0.0" target="_blank">Release Notes</a></li>
@@ -2400,6 +2737,21 @@
   <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox()">
     <img id="lightboxImg" src="" alt="Zoomed Screenshot" />
   </div>
+
+  <!-- Floating WhatsApp Contact Developer Action Button -->
+  <a href="https://wa.me/919606800800?text=Hi%20Developer%2C%20I%20have%20a%20query%20about%20Store%20Ledger%20App" 
+     target="_blank" 
+     rel="noopener" 
+     class="whatsapp-fab" 
+     aria-label="Contact Developer on WhatsApp" 
+     title="Contact Developer on WhatsApp">
+    <div class="whatsapp-fab-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.42 0-2.82-.37-4.05-1.08l-.29-.17-3.12.82.83-3.04-.19-.3a8.212 8.212 0 0 1-1.26-4.46c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.58c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.12-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.6.19 1.15.16 1.59.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.11-.23-.17-.48-.3z"/>
+      </svg>
+    </div>
+    <span class="whatsapp-fab-label">Contact Developer</span>
+  </a>
 
   <!-- ============================================================
        INTERACTION SCRIPTS
@@ -2482,6 +2834,41 @@
 
     function closeLightbox() {
       lightboxModal.classList.remove('active');
+    }
+
+    // 6. Mobile Comparison View Switcher (Dual View Fit)
+    const compTabBtns = document.querySelectorAll('.comp-tab-btn');
+    const compTable = document.getElementById('comparisonTable');
+    const compScrollHint = document.getElementById('compScrollHint');
+
+    if (compTabBtns && compTable) {
+      compTabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          compTabBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const view = btn.getAttribute('data-view');
+          compTable.classList.remove('view-khatabook', 'view-okcredit', 'view-all');
+          compTable.classList.add('view-' + view);
+          if (compScrollHint) {
+            compScrollHint.style.display = view === 'all' ? 'flex' : 'none';
+          }
+        });
+      });
+    }
+
+    // 7. Screenshot Gallery Swipe Dots Sync
+    const galleryGrid = document.getElementById('galleryGrid');
+    const galleryDots = document.querySelectorAll('.gallery-dot');
+
+    if (galleryGrid && galleryDots.length > 0) {
+      galleryGrid.addEventListener('scroll', () => {
+        const scrollLeft = galleryGrid.scrollLeft;
+        const width = galleryGrid.offsetWidth * 0.72;
+        const activeIdx = Math.min(Math.round(scrollLeft / width), galleryDots.length - 1);
+        galleryDots.forEach((dot, idx) => {
+          dot.classList.toggle('active', idx === activeIdx);
+        });
+      }, { passive: true });
     }
   </script>
 </body>

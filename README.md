@@ -12,6 +12,7 @@
   [![Expo SDK](https://img.shields.io/badge/Expo-SDK_57-000000?style=for-the-badge&logo=expo&logoColor=white)](https://docs.expo.dev/)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
   [![Offline First](https://img.shields.io/badge/Architecture-100%25%20Offline--First-FF6B00?style=for-the-badge)](https://www.storeledger.in/)
+  [![VirusTotal](https://img.shields.io/badge/VirusTotal-100%25_Clean_(0%2F68)-00BCD4?style=for-the-badge&logo=virustotal&logoColor=white)](https://www.virustotal.com/gui/file/5735227a8d3e7ce2f589ded3abf78ae7a1d93afbdea897ac5127df9f01661f9e)
 
   <br />
 
@@ -25,7 +26,7 @@
 
   <br /><br />
 
-  [🌐 Official Website](https://www.storeledger.in/) • [🔒 Privacy Policy](https://www.storeledger.in/privacy.html) • [📜 Terms of Service](https://www.storeledger.in/terms.html) • [🚀 Cloud Sync Guide](./CLOUD_SYNC_ACTIVATION_GUIDE.md) • [📦 Releases](https://github.com/iamrony27/storeledger/releases)
+  [🌐 Official Website](https://www.storeledger.in/) • [🛡️ VirusTotal Report](https://www.virustotal.com/gui/file/5735227a8d3e7ce2f589ded3abf78ae7a1d93afbdea897ac5127df9f01661f9e) • [🔒 Privacy Policy](https://www.storeledger.in/privacy.html) • [📜 Terms of Service](https://www.storeledger.in/terms.html) • [🚀 Cloud Sync Guide](./CLOUD_SYNC_ACTIVATION_GUIDE.md)
 
 </div>
 
@@ -172,6 +173,8 @@ npx expo-doctor
 | **Version** | `2.0.0` (Build Code: `12`) |
 | **Target Architecture** | `arm64-v8a`, `armeabi-v7a`, `x86`, `x86_64` |
 | **Android Compatibility** | Android 8.0 (Oreo / API 26) through Android 15 (API 35) |
+| **SHA-256 Checksum** | `5735227a8d3e7ce2f589ded3abf78ae7a1d93afbdea897ac5127df9f01661f9e` |
+| **Security Audit** | [VirusTotal Scan Report (0/68 Clean)](https://www.virustotal.com/gui/file/5735227a8d3e7ce2f589ded3abf78ae7a1d93afbdea897ac5127df9f01661f9e) • 100% Malware-Free |
 | **Official APK Release** | [StoreLedger-v2.0.0.apk](https://github.com/iamrony27/storeledger/releases/tag/v2.0.0) |
 
 ---

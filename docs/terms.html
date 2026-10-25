@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms of Service • Store Ledger</title>
+  <meta name="description" content="Terms of Service for Store Ledger. Learn about usage terms, software licensing under MIT, and data ownership." />
+  <meta name="author" content="Store Ledger Team" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.storeledger.in/terms.html" />
+  <meta name="theme-color" content="#EF6905" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://www.storeledger.in/terms.html" />
+  <meta property="og:site_name" content="Store Ledger" />
+  <meta property="og:title" content="Terms of Service • Store Ledger" />
+  <meta property="og:description" content="Terms of Service and MIT Open Source License terms for Store Ledger." />
+  <meta property="og:image" content="https://www.storeledger.in/assets/screenshots/orion_screenshot_1_dashboard.png" />
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" href="./assets/favicon.png" />
+  <link rel="apple-touch-icon" href="./assets/icon.png" />
+
+  <!-- Google Fonts: Plus Jakarta Sans & Material Symbols Outlined -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://www.storeledger.in/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Terms of Service",
+            "item": "https://www.storeledger.in/terms.html"
+          }
+        ]
+      },
+      {
+        "@type": "WebPage",
+        "@id": "https://www.storeledger.in/terms.html#webpage",
+        "url": "https://www.storeledger.in/terms.html",
+        "name": "Store Ledger Terms of Service",
+        "description": "Terms of Service and licensing conditions for Store Ledger.",
+        "inLanguage": "en"
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root {
+      --md-sys-color-primary: #EF6905;
+      --md-sys-color-on-primary: #FFFFFF;
+      --md-sys-color-primary-container: #FFE5D6;
+      --md-sys-color-on-primary-container: #411700;
+      
+      --md-sys-color-surface: #FDF8F6;
+      --md-sys-color-surface-dim: #DED8D6;
+      --md-sys-color-surface-container-low: #F7F2F0;
+      --md-sys-color-surface-container: #F1ECE9;
+      --md-sys-color-surface-container-high: #EBE6E4;
+      
+      --md-sys-color-on-surface: #1E1B1A;
+      --md-sys-color-on-surface-variant: #52443D;
+      --md-sys-color-outline: #85736B;
+      --md-sys-color-outline-variant: #D7C2B9;
+
+      --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-family-display: 'Outfit', system-ui, -apple-system, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --md-sys-color-primary: #FFB68C;
+      --md-sys-color-on-primary: #522300;
+      --md-sys-color-primary-container: #763400;
+      --md-sys-color-on-primary-container: #FFE5D6;
+
+      --md-sys-color-surface: #0E1015;
+      --md-sys-color-surface-dim: #090B0F;
+      --md-sys-color-surface-container-low: #14171E;
+      --md-sys-color-surface-container: #1A1E26;
+      --md-sys-color-surface-container-high: #242934;
+
+      --md-sys-color-on-surface: #E6E1DF;
+      --md-sys-color-on-surface-variant: #D7C2B9;
+      --md-sys-color-outline: #A08C82;
+      --md-sys-color-outline-variant: #52443D;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      line-height: 1.7;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: var(--md-sys-color-primary);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .top-app-bar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background: var(--md-sys-color-surface);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+      padding: 16px 0;
+    }
+
+    .top-app-bar-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--md-sys-color-on-surface);
+      font-family: var(--font-family-display);
+      font-weight: 800;
+      font-size: 1.3rem;
+    }
+
+    .brand-logo img {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-tonal {
+      background: var(--md-sys-color-surface-container-high);
+      color: var(--md-sys-color-on-surface);
+      border: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .btn-tonal:hover {
+      background: var(--md-sys-color-outline-variant);
+      text-decoration: none;
+    }
+
+    .theme-toggle-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--md-sys-color-outline-variant);
+      background: var(--md-sys-color-surface-container);
+      color: var(--md-sys-color-on-surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .content-wrapper {
+      padding: 60px 0 100px;
+    }
+
+    .page-header {
+      margin-bottom: 48px;
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+      padding-bottom: 32px;
+    }
+
+    .pill-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      border-radius: 16px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .page-title {
+      font-family: var(--font-family-display);
+      font-size: 2.8rem;
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .page-meta {
+      font-size: 0.95rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .policy-card {
+      background: var(--md-sys-color-surface-container);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      border-radius: 24px;
+      padding: 36px;
+      margin-bottom: 28px;
+    }
+
+    .policy-card h2 {
+      font-family: var(--font-family-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--md-sys-color-primary);
+    }
+
+    .policy-card p {
+      margin-bottom: 16px;
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 1.02rem;
+    }
+
+    .policy-card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .policy-card ul {
+      margin: 12px 0 20px 24px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .policy-card li {
+      margin-bottom: 8px;
+    }
+
+    .code-box {
+      background: var(--md-sys-color-surface-dim);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      padding: 18px;
+      border-radius: 16px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      margin: 16px 0;
+      overflow-x: auto;
+    }
+
+    .footer {
+      background: var(--md-sys-color-surface-dim);
+      border-top: 1px solid var(--md-sys-color-outline-variant);
+      padding: 40px 0;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 600px) {
+      .page-title {
+        font-size: 2.1rem;
+      }
+      .policy-card {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Bar -->
+  <header class="top-app-bar">
+    <div class="container top-app-bar-inner">
+      <a href="./" class="brand-logo">
+        <img src="./assets/icon.png" alt="Store Ledger" />
+        <span>Store Ledger</span>
+      </a>
+
+      <div class="header-actions">
+        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" title="Toggle theme">
+          <span class="material-symbols-outlined" id="themeIcon">light_mode</span>
+        </button>
+        <a href="./" class="btn btn-tonal">
+          <span class="material-symbols-outlined">arrow_back</span>
+          <span>Back to Home</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="content-wrapper">
+    <div class="container">
+      <div class="page-header">
+        <div class="pill-badge">
+          <span class="material-symbols-outlined" style="font-size: 16px;">gavel</span>
+          <span>Legal Agreement</span>
+        </div>
+        <h1 class="page-title">Terms of Service</h1>
+        <p class="page-meta">
+          <strong>Effective Date:</strong> October 25, 2026 &bull; <strong>Product:</strong> Store Ledger (<code>com.gwd.book</code>) &bull; <strong>License:</strong> MIT Open Source
+        </p>
+      </div>
+
+      <!-- Section 1 -->
+      <article class="policy-card">
+        <h2>
+          <span class="material-symbols-outlined">description</span>
+          1. Acceptance of Terms
+        </h2>
+        <p>
+          By downloading, installing, accessing, or using Store Ledger ("the Application"), you agree to be bound by these Terms of Service. If you do not agree to these terms, do not install or use the Application.
+        </p>
+      </article>
+
+      <!-- Section 2 -->
+      <article class="policy-card">
+        <h2>
+          <span class="material-symbols-outlined">code</span>
+          2. Open Source License (MIT)
+        </h2>
+        <p>
+          Store Ledger is free, open-source software distributed under the terms of the permissive <strong>MIT License</strong>:
+        </p>
+        <div class="code-box">
+          Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software...
+        </div>
+        <p>
+          You are free to audit the source code, inspect security parameters, or compile your own builds directly from our official repository on GitHub.
+        </p>
+      </article>
+
+      <!-- Section 3 -->
+      <article class="policy-card">
+        <h2>
+          <span class="material-symbols-outlined">account_balance_wallet</span>
+          3. Nature of Accounting Tool & User Responsibility
+        </h2>
+        <p>
+          Store Ledger is a digital bookkeeping and calculation aid designed for small businesses and shop owners:
+        </p>
+        <ul>
+          <li><strong>Data Accuracy:</strong> While Store Ledger utilizes exact integer math in minor units (paise/cents) to eliminate rounding errors, the user is solely responsible for verifying the correctness of all entered credit amounts, debt sums, and customer details.</li>
+          <li><strong>Tax & Legal Compliance:</strong> Store Ledger does not constitute professional tax, accounting, or legal advice. You remain responsible for complying with your local tax laws, invoicing regulations, and commercial statutory requirements.</li>
+          <li><strong>Data Backups:</strong> Because Store Ledger operates offline-first without centralized servers, you are responsible for maintaining regular backups via our built-in SHA-256 snapshot export feature or your own Supabase cloud sync.</li>
+        </ul>
+      </article>
+
+      <!-- Section 4 -->
+      <article class="policy-card">
+        <h2>
+          <span class="material-symbols-outlined">cloud</span>
+          4. Bring-Your-Own Supabase Backend Terms
+        </h2>
+        <p>
+          When you enable optional Cloud Sync using your own Supabase project:
+        </p>
+        <ul>
+          <li>You are subject to Supabase's independent terms of service and billing tiers.</li>
+          <li>The Store Ledger developers do not manage, maintain, or have access to your Supabase project, database passwords, or stored customer records.</li>
+          <li>We bear no liability for outages, data loss, or security compromises arising from your personal Supabase configuration or third-party cloud infrastructure.</li>
+        </ul>
+      </article>
+
+      <!-- Section 5 -->
+      <article class="policy-card">
+        <h2>
+          <span class="material-symbols-outlined">warning</span>
+          5. Disclaimer of Warranty & Limitation of Liability
+        </h2>
+        <p>
+          THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THE USE OF THE SOFTWARE.
+        </p>
+      </article>
+
+      <!-- Section 6 -->
+      <article class="policy-card">
+        <h2>
+          <span class="material-symbols-outlined">contact_support</span>
+          6. Contact Information
+        </h2>
+        <p>
+          For questions regarding these Terms or Store Ledger source code:
+        </p>
+        <p>
+          <strong>GitHub Issues:</strong> <a href="https://github.com/iamrony27/storeledger/issues" target="_blank" rel="noopener">https://github.com/iamrony27/storeledger/issues</a><br />
+          <strong>Project Home:</strong> <a href="https://www.storeledger.in/">https://www.storeledger.in</a>
+        </p>
+      </article>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="./">Home</a>
+        <a href="./privacy.html">Privacy Policy</a>
+        <a href="./terms.html">Terms of Service</a>
+        <a href="https://github.com/iamrony27/storeledger" target="_blank" rel="noopener">GitHub Source</a>
+        <a href="https://github.com/iamrony27/storeledger/releases" target="_blank" rel="noopener">Releases</a>
+      </div>
+      <p>&copy; 2026 Store Ledger Project • 100% Offline-First Business Ledger • Licensed under MIT</p>
+    </div>
+  </footer>
+
+  <script>
+    const html = document.documentElement;
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeIcon = document.getElementById('themeIcon');
+
+    function setTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('store_ledger_theme', theme);
+      if (theme === 'dark') {
+        themeIcon.textContent = 'light_mode';
+      } else {
+        themeIcon.textContent = 'dark_mode';
+      }
+    }
+
+    const savedTheme = localStorage.getItem('store_ledger_theme') || 'dark';
+    setTheme(savedTheme);
+
+    themeToggleBtn.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+  </script>
+</body>
+</html>

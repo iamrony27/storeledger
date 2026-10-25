@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>404 Page Not Found • Store Ledger</title>
+  <meta name="robots" content="noindex, follow" />
+  <meta name="theme-color" content="#EF6905" />
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" href="./assets/favicon.png" />
+  <link rel="apple-touch-icon" href="./assets/icon.png" />
+
+  <!-- Google Fonts: Plus Jakarta Sans & Material Symbols Outlined -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Outfit:wght@700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+  <style>
+    :root {
+      --md-sys-color-primary: #EF6905;
+      --md-sys-color-on-primary: #FFFFFF;
+      --md-sys-color-primary-container: #FFE5D6;
+      --md-sys-color-on-primary-container: #411700;
+      
+      --md-sys-color-surface: #FDF8F6;
+      --md-sys-color-surface-dim: #DED8D6;
+      --md-sys-color-surface-container: #F1ECE9;
+      --md-sys-color-on-surface: #1E1B1A;
+      --md-sys-color-on-surface-variant: #52443D;
+      --md-sys-color-outline-variant: #D7C2B9;
+
+      --font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-family-display: 'Outfit', system-ui, -apple-system, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --md-sys-color-primary: #FFB68C;
+      --md-sys-color-on-primary: #522300;
+      --md-sys-color-primary-container: #763400;
+      --md-sys-color-on-primary-container: #FFE5D6;
+
+      --md-sys-color-surface: #0E1015;
+      --md-sys-color-surface-dim: #090B0F;
+      --md-sys-color-surface-container: #1A1E26;
+      --md-sys-color-on-surface: #E6E1DF;
+      --md-sys-color-on-surface-variant: #D7C2B9;
+      --md-sys-color-outline-variant: #52443D;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .error-card {
+      background: var(--md-sys-color-surface-container);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      border-radius: 32px;
+      padding: 48px 36px;
+      max-width: 520px;
+      width: 100%;
+    }
+
+    .error-code {
+      font-family: var(--font-family-display);
+      font-size: 5rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--md-sys-color-primary);
+      margin-bottom: 12px;
+    }
+
+    .error-title {
+      font-family: var(--font-family-display);
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .error-desc {
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border-radius: 28px;
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-card">
+    <div class="error-code">404</div>
+    <h1 class="error-title">Page Not Found</h1>
+    <p class="error-desc">
+      The ledger page or file you are looking for doesn't exist or has moved. Return to the main portal to explore features or download the Store Ledger app.
+    </p>
+    <a href="./" class="btn">
+      <span class="material-symbols-outlined">home</span>
+      <span>Back to Store Ledger</span>
+    </a>
+  </div>
+
+  <script>
+    const savedTheme = localStorage.getItem('store_ledger_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  </script>
+</body>
+</html>

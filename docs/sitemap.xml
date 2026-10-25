@@ -22,4 +22,16 @@
       <image:caption>Financial cash flow charts and customer receivable breakdown</image:caption>
     </image:image>
   </url>
+  <url>
+    <loc>https://www.storeledger.in/privacy.html</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.storeledger.in/terms.html</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>

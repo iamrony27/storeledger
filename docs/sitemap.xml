@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <url>
+    <loc>https://www.storeledger.in/</loc>
+    <lastmod>2026-10-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://www.storeledger.in/assets/screenshots/orion_screenshot_1_dashboard.png</image:loc>
+      <image:title>Store Ledger Dashboard Overview</image:title>
+      <image:caption>Modern dark mode business ledger dashboard with customer balances</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.storeledger.in/assets/screenshots/orion_screenshot_2_statement.png</image:loc>
+      <image:title>Customer Statement &amp; Transaction Details</image:title>
+      <image:caption>Clear customer transaction timeline with WhatsApp reminders and PDF export</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://www.storeledger.in/assets/screenshots/orion_screenshot_3_analytics.png</image:loc>
+      <image:title>Business Analytics &amp; Cash Flow Reports</image:title>
+      <image:caption>Financial cash flow charts and customer receivable breakdown</image:caption>
+    </image:image>
+  </url>
+</urlset>

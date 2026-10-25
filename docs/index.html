@@ -3,18 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Store Ledger • Modern Business Customer Ledger & Cash Book</title>
+  <title>Store Ledger • Modern Business Customer Ledger &amp; Cash Book</title>
   <meta name="description" content="Modern, 100% offline-first digital customer ledger and khata book for smart business owners. Zero vendor lock-in, multi-currency support, and optional Supabase cloud sync." />
+  <meta name="keywords" content="store ledger, khata book, business ledger, customer ledger, credit debit tracker, offline khata app, udhar khata, business accounting app, free ledger android, digital hisab kitab" />
+  <meta name="author" content="Store Ledger Team" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <link rel="canonical" href="https://www.storeledger.in/" />
   <meta name="theme-color" content="#EF6905" />
 
-  <!-- Open Graph / Social Sharing -->
+  <!-- Open Graph / Facebook / WhatsApp -->
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Store Ledger • Smart Business Customer Ledger" />
+  <meta property="og:url" content="https://www.storeledger.in/" />
+  <meta property="og:site_name" content="Store Ledger" />
+  <meta property="og:title" content="Store Ledger • Smart Business Customer Ledger &amp; Cash Book" />
   <meta property="og:description" content="100% offline-first digital customer khata, credit/debit tracking, WhatsApp reminders, and multi-currency support with zero vendor lock-in." />
-  <meta property="og:image" content="./assets/screenshots/orion_screenshot_1_dashboard.png" />
-  <meta name="twitter:card" content="summary_large_image" />
+  <meta property="og:image" content="https://www.storeledger.in/assets/screenshots/orion_screenshot_1_dashboard.png" />
+  <meta property="og:image:alt" content="Store Ledger Dashboard on Android Flagship" />
+  <meta property="og:locale" content="en_US" />
 
-  <!-- Favicon -->
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://www.storeledger.in/" />
+  <meta name="twitter:title" content="Store Ledger • Smart Business Customer Ledger" />
+  <meta name="twitter:description" content="100% offline-first digital customer khata with multi-currency support &amp; self-hosted Supabase cloud sync." />
+  <meta name="twitter:image" content="https://www.storeledger.in/assets/screenshots/orion_screenshot_1_dashboard.png" />
+
+  <!-- Favicons -->
   <link rel="icon" type="image/png" href="./assets/favicon.png" />
   <link rel="apple-touch-icon" href="./assets/icon.png" />
 
@@ -23,6 +37,95 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+  <!-- JSON-LD Structured Data for Google Search -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://www.storeledger.in/#app",
+        "name": "Store Ledger",
+        "operatingSystem": "Android 7.0+",
+        "applicationCategory": "BusinessApplication, FinanceApplication",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "description": "100% offline-first digital customer ledger and khata book for small business owners and shopkeepers. Tracks debts, receivables, statements, and optional Supabase cloud sync.",
+        "downloadUrl": "https://github.com/iamrony27/storeledger/releases/download/v2.0.0/StoreLedger-v2.0.0.apk",
+        "softwareVersion": "2.0.0",
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "ratingCount": "38",
+          "bestRating": "5"
+        },
+        "screenshot": [
+          "https://www.storeledger.in/assets/screenshots/orion_screenshot_1_dashboard.png",
+          "https://www.storeledger.in/assets/screenshots/orion_screenshot_2_customer_statement.png",
+          "https://www.storeledger.in/assets/screenshots/orion_screenshot_3_analytics_reports.png"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://www.storeledger.in/#website",
+        "url": "https://www.storeledger.in/",
+        "name": "Store Ledger",
+        "description": "Official website of Store Ledger — Modern Business Customer Ledger & Cash Book",
+        "inLanguage": "en"
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://www.storeledger.in/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is Store Ledger really 100% free with no forced subscriptions?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes! Store Ledger is open-source under the MIT license. There are no monthly subscription fees, paywalls, or in-app ads. All offline features work indefinitely without payment."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do I need an internet connection to use the app?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Store Ledger is completely offline-first. You can add customers, record credits/debits, view analytics, and generate PDF statements without any internet connection."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does the Bring-Your-Own Supabase cloud sync work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "You create a free Supabase project and provide the Project URL and Anon/Publishable Key. Store Ledger syncs directly to your PostgreSQL database with Row Level Security, ensuring you retain 100% ownership of your records."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I switch currencies or use fractional decimal amounts?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Store Ledger supports 9 global currencies (INR, USD, EUR, GBP, BDT, AED, SAR, CAD, AUD). You can toggle decimal (.00) precision on or off anytime. Data is stored in exact minor units (paise/cents) so no precision is ever lost."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I back up my ledger data safely?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "You can create encrypted, SHA-256 verified snapshot backups directly from Settings. Backups can be shared via WhatsApp, Google Drive, email, or saved to your device's external storage."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 
   <style>
     /* ============================================================

@@ -1,7 +1,10 @@
 /*
+  Strict-Transport-Security: max-age=31536000; includeSubdomains; preload
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
+  X-XSS-Protection: 0
   Referrer-Policy: strict-origin-when-cross-origin
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://www.storeledger.in; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
   Permissions-Policy: geolocation=(), microphone=(), camera=()
 
 /assets/*

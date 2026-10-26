@@ -318,15 +318,20 @@
       align-items: center;
       justify-content: space-between;
       height: 72px;
+      gap: 16px;
     }
 
     .brand-logo {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       font-size: 1.25rem;
       font-weight: 800;
       letter-spacing: -0.02em;
+      flex-shrink: 0;
+      white-space: nowrap;
+      text-decoration: none;
+      color: var(--md-sys-color-on-surface);
     }
 
     .brand-logo img {
@@ -334,6 +339,7 @@
       height: 40px;
       border-radius: var(--md-sys-shape-corner-m);
       box-shadow: var(--md-sys-elevation-1);
+      flex-shrink: 0;
     }
 
     .version-pill {
@@ -347,30 +353,116 @@
       background-color: var(--md-sys-color-primary-container);
       color: var(--md-sys-color-on-primary-container);
       letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+
+    .desktop-nav {
+      display: flex;
+      align-items: center;
     }
 
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 32px;
+      gap: clamp(10px, 1.4vw, 22px);
       list-style: none;
+      margin: 0;
+      padding: 0;
     }
 
     .nav-link {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       font-weight: 600;
       color: var(--md-sys-color-on-surface-variant);
-      transition: color 0.15s ease;
+      transition: color 0.15s ease, background-color 0.15s ease;
+      white-space: nowrap;
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: var(--md-sys-shape-corner-full);
     }
 
     .nav-link:hover {
       color: var(--md-sys-color-primary);
+      background-color: var(--md-sys-color-surface-container);
     }
 
     .header-actions {
       display: flex;
       align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .menu-toggle-btn {
+      display: none;
+      width: 42px;
+      height: 42px;
+      border-radius: var(--md-sys-shape-corner-full);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      background: var(--md-sys-color-surface-container);
+      color: var(--md-sys-color-on-surface);
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .menu-toggle-btn:hover {
+      background: var(--md-sys-color-surface-container-high);
+      color: var(--md-sys-color-primary);
+    }
+
+    .mobile-nav-drawer {
+      display: none;
+      background-color: rgba(var(--app-bar-bg, 14, 16, 21), 0.97);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+      padding: 14px 20px 20px;
+      box-shadow: var(--md-sys-elevation-3);
+    }
+
+    .mobile-nav-drawer.active {
+      display: block;
+      animation: slideDownNav 0.2s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    @keyframes slideDownNav {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .mobile-nav-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+    }
+
+    .mobile-nav-link {
+      display: flex;
+      align-items: center;
       gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--md-sys-shape-corner-m);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface);
+      text-decoration: none;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .mobile-nav-link:hover, .mobile-nav-link:active {
+      background-color: var(--md-sys-color-surface-container-high);
+      color: var(--md-sys-color-primary);
+    }
+
+    .mobile-nav-link.highlight-whatsapp {
+      color: #25D366;
+      background-color: rgba(37, 211, 102, 0.08);
+      margin-top: 6px;
     }
 
     /* M3 Theme Toggle Switch */
@@ -1501,8 +1593,12 @@
         padding: 32px;
       }
 
-      .nav-links {
+      .desktop-nav {
         display: none;
+      }
+
+      .menu-toggle-btn {
+        display: flex;
       }
 
       .mobile-scroll-hint {
@@ -1520,6 +1616,10 @@
         padding: 10px 0;
       }
 
+      .top-app-bar-inner {
+        height: 56px;
+      }
+
       .brand-logo img {
         width: 32px;
         height: 32px;
@@ -1527,7 +1627,7 @@
       }
 
       .brand-logo span {
-        font-size: 1.15rem;
+        font-size: 1.1rem;
       }
 
       .version-pill {
@@ -1535,17 +1635,21 @@
       }
 
       .header-actions {
-        gap: 8px;
+        gap: 6px;
       }
 
       .header-actions .btn {
-        padding: 8px 14px;
-        font-size: 0.85rem;
+        padding: 7px 12px;
+        font-size: 0.82rem;
+      }
+
+      .header-actions .btn span:not(.material-symbols-outlined) {
+        display: none;
       }
 
       .theme-toggle-btn {
-        width: 38px;
-        height: 38px;
+        width: 36px;
+        height: 36px;
       }
 
       /* Hero Section */
@@ -2046,7 +2150,7 @@
         <span class="version-pill">v2.0.0</span>
       </a>
 
-      <nav>
+      <nav class="desktop-nav">
         <ul class="nav-links">
           <li><a href="#features" class="nav-link">Features</a></li>
           <li><a href="#screenshots" class="nav-link">Screenshots</a></li>
@@ -2061,17 +2165,27 @@
         <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Mode" title="Toggle theme">
           <span class="material-symbols-outlined" id="themeIcon">light_mode</span>
         </button>
-        <a href="https://wa.me/917074018142?text=Hi%20Developer%2C%20I%20have%20a%20query%20about%20Store%20Ledger%20App" target="_blank" rel="noopener" class="btn btn-whatsapp" title="Contact Developer on WhatsApp">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.42 0-2.82-.37-4.05-1.08l-.29-.17-3.12.82.83-3.04-.19-.3a8.212 8.212 0 0 1-1.26-4.46c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.58c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.12-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.6.19 1.15.16 1.59.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.11-.23-.17-.48-.3z"/>
-          </svg>
-          <span>WhatsApp</span>
-        </a>
         <a href="#download" class="btn btn-primary">
           <span class="material-symbols-outlined">download</span>
           <span>Get APK</span>
         </a>
+        <button class="menu-toggle-btn" id="menuToggleBtn" aria-label="Open navigation menu" title="Menu">
+          <span class="material-symbols-outlined" id="menuIcon">menu</span>
+        </button>
       </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-nav-drawer" id="mobileNavDrawer">
+      <ul class="mobile-nav-links">
+        <li><a href="#features" class="mobile-nav-link"><span class="material-symbols-outlined">auto_awesome</span> Features</a></li>
+        <li><a href="#screenshots" class="mobile-nav-link"><span class="material-symbols-outlined">photo_library</span> Screenshots</a></li>
+        <li><a href="#cloud-sync" class="mobile-nav-link"><span class="material-symbols-outlined">cloud_sync</span> Cloud Sync</a></li>
+        <li><a href="#comparison" class="mobile-nav-link"><span class="material-symbols-outlined">compare_arrows</span> Compare</a></li>
+        <li><a href="#download" class="mobile-nav-link"><span class="material-symbols-outlined">download</span> Download APK</a></li>
+        <li><a href="#faq" class="mobile-nav-link"><span class="material-symbols-outlined">help_outline</span> FAQ</a></li>
+        <li><a href="https://wa.me/917074018142?text=Hi%20Developer%2C%20I%20have%20a%20query%20about%20Store%20Ledger%20App" target="_blank" rel="noopener" class="mobile-nav-link highlight-whatsapp"><span class="material-symbols-outlined">chat</span> WhatsApp Developer</a></li>
+      </ul>
     </div>
   </header>
 
@@ -2780,6 +2894,28 @@
       const current = html.getAttribute('data-theme');
       setTheme(current === 'dark' ? 'light' : 'dark');
     });
+
+    // 1b. Mobile Navigation Drawer Toggle
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    const menuIcon = document.getElementById('menuIcon');
+    const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+
+    if (menuToggleBtn && mobileNavDrawer) {
+      menuToggleBtn.addEventListener('click', () => {
+        const isOpen = mobileNavDrawer.classList.contains('active');
+        mobileNavDrawer.classList.toggle('active');
+        menuIcon.textContent = isOpen ? 'menu' : 'close';
+        menuToggleBtn.setAttribute('aria-label', isOpen ? 'Open navigation menu' : 'Close navigation menu');
+      });
+
+      // Close drawer when a mobile nav link is clicked
+      mobileNavDrawer.querySelectorAll('.mobile-nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+          mobileNavDrawer.classList.remove('active');
+          menuIcon.textContent = 'menu';
+        });
+      });
+    }
 
     // 2. Interactive Mockup Tab Switcher
     const tabBtns = document.querySelectorAll('.mockup-tab-btn');

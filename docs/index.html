@@ -10,6 +10,9 @@
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <link rel="canonical" href="https://www.storeledger.in/" />
   <meta name="theme-color" content="#EF6905" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
 
   <!-- Open Graph / Facebook / WhatsApp -->
   <meta property="og:type" content="website" />
@@ -364,7 +367,8 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: clamp(10px, 1.4vw, 22px);
+      flex-wrap: nowrap;
+      gap: clamp(8px, 1.2vw, 20px);
       list-style: none;
       margin: 0;
       padding: 0;
@@ -375,7 +379,7 @@
       font-weight: 600;
       color: var(--md-sys-color-on-surface-variant);
       transition: color 0.15s ease, background-color 0.15s ease;
-      white-space: nowrap;
+      white-space: nowrap !important;
       text-decoration: none;
       padding: 6px 10px;
       border-radius: var(--md-sys-shape-corner-full);
@@ -1549,6 +1553,16 @@
     /* ============================================================
        RESPONSIVE BREAKPOINTS (TABLET & MOBILE)
        ============================================================ */
+    @media (max-width: 1080px) {
+      .desktop-nav {
+        display: none !important;
+      }
+
+      .menu-toggle-btn {
+        display: flex !important;
+      }
+    }
+
     @media (max-width: 992px) {
       .hero-grid {
         grid-template-columns: 1fr;

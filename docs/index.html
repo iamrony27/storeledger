@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Store Ledger • Modern Business Customer Ledger &amp; Cash Book</title>
-  <meta name="description" content="Modern offline-first digital customer ledger and khata book for smart business owners with optional cloud sync. Zero vendor lock-in, multi-currency support, and private Supabase integration." />
+  <meta name="description" content="Modern offline-first digital customer ledger and khata book for smart business owners with seamless cloud sync. Zero vendor lock-in, multi-currency support, and private Supabase integration." />
   <meta name="keywords" content="store ledger, khatabook alternative, okcredit alternative, khatabook vs store ledger, ok credit alternative, offline khata book, business ledger, customer ledger, credit debit tracker, offline khata app, udhar khata, business accounting app, free ledger android, digital hisab kitab" />
   <meta name="author" content="Store Ledger Team" />
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
@@ -38,10 +38,10 @@
   <!-- Preload critical hero assets for instant LCP -->
   <link rel="preload" as="image" href="./assets/screenshots/orion_screenshot_1_dashboard.png" fetchpriority="high" />
 
-  <!-- Google Fonts: Material Symbols Outlined -->
+  <!-- Google Fonts: Plus Jakarta Sans & Material Symbols Outlined -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
 
   <!-- JSON-LD Structured Data for Google Search -->
@@ -199,7 +199,7 @@
       --md-sys-shape-corner-xl: 28px;
       --md-sys-shape-corner-full: 9999px;
 
-      --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --font-family: 'Plus Jakarta Sans', 'Outfit', system-ui, -apple-system, sans-serif;
     }
 
     /* M3 Dark Tonal Palette */
@@ -349,7 +349,7 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      font-size: 0.82rem;
+      font-size: 0.75rem;
       font-weight: 700;
       padding: 3px 10px;
       border-radius: var(--md-sys-shape-corner-full);
@@ -368,14 +368,14 @@
       display: flex;
       align-items: center;
       flex-wrap: nowrap;
-      gap: clamp(8px, 1.2vw, 20px);
+      gap: clamp(8px, 1.3vw, 22px);
       list-style: none;
       margin: 0;
       padding: 0;
     }
 
     .nav-link {
-      font-size: 0.92rem;
+      font-size: 0.95rem;
       font-weight: 600;
       color: var(--md-sys-color-on-surface-variant);
       transition: color 0.15s ease, background-color 0.15s ease;
@@ -464,7 +464,6 @@
     }
 
     .mobile-nav-link.highlight-whatsapp {
-      text-wrap: pretty;
       color: #25D366;
       background-color: rgba(37, 211, 102, 0.08);
       margin-top: 6px;
@@ -505,7 +504,7 @@
       cursor: pointer;
       transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
       text-decoration: none;
-      line-height: 1.4;
+      line-height: 1.2;
     }
 
     .btn-primary {
@@ -591,7 +590,6 @@
     }
 
     .badge-chip {
-      text-wrap: pretty;
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -614,7 +612,8 @@
 
     .hero-title span {
       background: linear-gradient(135deg, var(--md-sys-color-primary) 0%, #F59E0B 100%);
-      color: var(--md-sys-color-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .hero-subtitle {
@@ -735,7 +734,6 @@
        STATISTICS STRIP
        ============================================================ */
     .stats-strip {
-      text-wrap: pretty;
       padding: 32px 0;
       background: var(--md-sys-color-surface-container-low);
       border-top: 1px solid var(--md-sys-color-outline-variant);
@@ -762,8 +760,6 @@
     .stat-icon {
       width: 48px;
       height: 48px;
-      padding: 10px;
-      box-sizing: border-box;
       border-radius: var(--md-sys-shape-corner-l);
       background: var(--md-sys-color-primary-container);
       color: var(--md-sys-color-on-primary-container);
@@ -774,15 +770,14 @@
       flex-shrink: 0;
     }
 
-    .stat-text .stat-title {
+    .stat-text h4 {
       font-size: 1.15rem;
       font-weight: 800;
       letter-spacing: -0.01em;
-      line-height: 1.4;
+      line-height: 1.2;
     }
 
     .stat-text p {
-      text-wrap: pretty;
       font-size: 0.85rem;
       color: var(--md-sys-color-on-surface-variant);
     }
@@ -813,7 +808,7 @@
     .section-title {
       font-size: 2.5rem;
       font-weight: 800;
-      line-height: 1.4;
+      line-height: 1.2;
       letter-spacing: -0.02em;
       margin-bottom: 16px;
     }
@@ -852,8 +847,6 @@
     .card-icon-container {
       width: 56px;
       height: 56px;
-      box-sizing: border-box;
-      padding: 14px;
       border-radius: var(--md-sys-shape-corner-l);
       background-color: var(--md-sys-color-primary-container);
       color: var(--md-sys-color-on-primary-container);
@@ -948,7 +941,6 @@
     }
 
     .gallery-caption p {
-      text-wrap: pretty;
       font-size: 0.9rem;
       color: var(--md-sys-color-on-surface-variant);
     }
@@ -1001,7 +993,6 @@
     }
 
     .step-text p {
-      text-wrap: pretty;
       font-size: 0.9rem;
       color: var(--md-sys-color-on-surface-variant);
     }
@@ -1084,7 +1075,7 @@
 
     .copy-btn {
       padding: 4px 10px;
-      font-size: 0.82rem;
+      font-size: 0.75rem;
       border-radius: var(--md-sys-shape-corner-s);
       border: 1px solid var(--md-sys-color-outline);
       background: var(--md-sys-color-surface-container-high);
@@ -1246,20 +1237,15 @@
       width: 100%;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
-      border: none;
-      background: transparent;
-      box-shadow: none;
-    }
-
-    .comparison-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
       border-radius: 28px;
       border: 1px solid var(--md-sys-color-outline-variant);
       background: var(--md-sys-color-surface-container);
       box-shadow: var(--md-sys-elevation-2);
-      overflow: hidden;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
       text-align: left;
       font-size: 0.95rem;
     }
@@ -1315,7 +1301,7 @@
 
     .product-badge {
       display: inline-block;
-      font-size: 0.82rem;
+      font-size: 0.7rem;
       font-weight: 800;
       background: var(--md-sys-color-primary);
       color: var(--md-sys-color-on-primary);
@@ -1333,7 +1319,7 @@
     }
 
     .product-sub {
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       color: var(--md-sys-color-on-surface-variant);
     }
 
@@ -1428,21 +1414,21 @@
       align-items: center;
       gap: 10px;
       background: #25D366;
-      color: #072613;
+      color: #FFFFFF;
       padding: 12px 20px;
       border-radius: 32px;
       text-decoration: none;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 6px 20px rgba(37, 211, 102, 0.45);
       transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
       font-weight: 700;
       font-size: 0.92rem;
     }
 
     .whatsapp-fab:hover {
-      background: #1ebc59;
+      background: #20bd5a;
       transform: translateY(-3px) scale(1.03);
-      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.35);
-      color: #072613;
+      box-shadow: 0 8px 26px rgba(37, 211, 102, 0.6);
+      color: #FFFFFF;
     }
 
     .whatsapp-fab-icon {
@@ -1453,7 +1439,6 @@
     }
 
     .btn-whatsapp {
-      text-wrap: pretty;
       background: rgba(37, 211, 102, 0.14);
       color: #25D366;
       border: 1px solid rgba(37, 211, 102, 0.35);
@@ -1470,14 +1455,14 @@
 
     .btn-whatsapp:hover {
       background: #25D366;
-      color: #072613;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px rgba(37, 211, 102, 0.4);
     }
 
     .btn-whatsapp-hero {
       background: rgba(37, 211, 102, 0.12);
       color: #25D366;
-      border: 1.5px solid rgba(0, 0, 0, 0.25);
+      border: 1.5px solid rgba(37, 211, 102, 0.4);
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -1491,9 +1476,9 @@
 
     .btn-whatsapp-hero:hover {
       background: #25D366;
-      color: #072613;
+      color: #FFFFFF;
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 6px 20px rgba(37, 211, 102, 0.45);
     }
 
     /* Comparison Mobile Tabs */
@@ -1517,7 +1502,7 @@
     .comp-tab-btn.active {
       background: var(--md-sys-color-primary);
       color: var(--md-sys-color-on-primary);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 2px 8px rgba(91, 142, 255, 0.4);
     }
 
     /* Gallery Carousel Dots */
@@ -1553,16 +1538,6 @@
     /* ============================================================
        RESPONSIVE BREAKPOINTS (TABLET & MOBILE)
        ============================================================ */
-    @media (max-width: 1080px) {
-      .desktop-nav {
-        display: none !important;
-      }
-
-      .menu-toggle-btn {
-        display: flex !important;
-      }
-    }
-
     @media (max-width: 992px) {
       .hero-grid {
         grid-template-columns: 1fr;
@@ -1622,12 +1597,17 @@
         padding: 32px;
       }
 
-      .desktop-nav {
-        display: none;
+      /* Desktop nav hides at 1080px */
+    }
+
+    @media (max-width: 1080px) {
+      .desktop-nav,
+      .desktop-whatsapp-btn {
+        display: none !important;
       }
 
       .menu-toggle-btn {
-        display: flex;
+        display: flex !important;
       }
 
       .mobile-scroll-hint {
@@ -1645,10 +1625,6 @@
         padding: 10px 0;
       }
 
-      .top-app-bar-inner {
-        height: 56px;
-      }
-
       .brand-logo img {
         width: 32px;
         height: 32px;
@@ -1656,7 +1632,7 @@
       }
 
       .brand-logo span {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
       }
 
       .version-pill {
@@ -1664,21 +1640,17 @@
       }
 
       .header-actions {
-        gap: 6px;
+        gap: 8px;
       }
 
       .header-actions .btn {
-        padding: 7px 12px;
-        font-size: 0.82rem;
-      }
-
-      .header-actions .btn span:not(.material-symbols-outlined) {
-        display: none;
+        padding: 8px 14px;
+        font-size: 0.85rem;
       }
 
       .theme-toggle-btn {
-        width: 36px;
-        height: 36px;
+        width: 38px;
+        height: 38px;
       }
 
       /* Hero Section */
@@ -1691,8 +1663,7 @@
       }
 
       .badge-chip {
-      text-wrap: pretty;
-        font-size: 0.82rem;
+        font-size: 0.72rem;
         padding: 6px 12px;
         text-align: center;
         letter-spacing: 0;
@@ -1701,7 +1672,7 @@
 
       .hero-title {
         font-size: clamp(2rem, 8vw, 2.45rem);
-        line-height: 1.35;
+        line-height: 1.15;
       }
 
       .hero-subtitle {
@@ -1737,7 +1708,7 @@
 
       .store-badge-card {
         width: 100%;
-        font-size: 0.82rem;
+        font-size: 0.78rem;
         padding: 10px 14px;
         text-align: center;
         justify-content: center;
@@ -1781,7 +1752,6 @@
 
       /* Statistics - Compact 2x2 cards on mobile */
       .stats-strip {
-      text-wrap: pretty;
         padding: 16px 0;
       }
 
@@ -1806,15 +1776,14 @@
         border-radius: 8px !important;
       }
 
-      .stat-text .stat-title {
+      .stat-text h4 {
         font-size: 0.84rem !important;
         margin-bottom: 2px !important;
         font-weight: 700 !important;
       }
 
       .stat-text p {
-      text-wrap: pretty;
-        font-size: 0.8rem !important;
+        font-size: 0.68rem !important;
         line-height: 1.25 !important;
       }
 
@@ -1828,12 +1797,12 @@
       }
 
       .section-tag {
-        font-size: 0.82rem;
+        font-size: 0.74rem;
       }
 
       .section-title {
         font-size: clamp(1.6rem, 6vw, 1.95rem);
-        line-height: 1.4;
+        line-height: 1.2;
       }
 
       .section-subtitle {
@@ -1872,7 +1841,7 @@
       }
 
       .card-badge {
-        font-size: 0.8rem !important;
+        font-size: 0.68rem !important;
         padding: 2px 8px !important;
         border-radius: 6px !important;
       }
@@ -1897,8 +1866,7 @@
       }
 
       .gallery-caption p {
-      text-wrap: pretty;
-        font-size: 0.82rem;
+        font-size: 0.78rem;
         line-height: 1.35;
       }
 
@@ -1933,8 +1901,7 @@
       }
 
       .step-text p {
-      text-wrap: pretty;
-        font-size: 0.84rem;
+        font-size: 0.76rem;
         line-height: 1.32;
       }
 
@@ -1964,7 +1931,7 @@
       .comparison-table th, 
       .comparison-table td {
         padding: 9px 7px;
-        font-size: 0.82rem;
+        font-size: 0.75rem;
       }
 
       /* Toggle columns based on active tab so comparison fits 100% on mobile without scroll */
@@ -2021,12 +1988,12 @@
       }
 
       .feature-title span {
-        font-size: 0.82rem;
-        line-height: 1.5;
+        font-size: 0.66rem;
+        line-height: 1.25;
       }
 
       .product-badge {
-        font-size: 0.76rem;
+        font-size: 0.58rem;
         padding: 2px 6px;
         border-radius: 8px;
         margin-bottom: 4px;
@@ -2037,11 +2004,11 @@
       }
 
       .product-sub {
-        font-size: 0.82rem;
+        font-size: 0.65rem;
       }
 
       .status-yes, .status-no, .status-neutral {
-        font-size: 0.82rem;
+        font-size: 0.72rem;
         gap: 3px;
         flex-direction: column;
         text-align: center;
@@ -2074,7 +2041,6 @@
       }
 
       .btn-whatsapp {
-      text-wrap: pretty;
         padding: 8px 10px;
         border-radius: 50%;
       }
@@ -2091,7 +2057,6 @@
       }
 
       .download-hero-card p {
-      text-wrap: pretty;
         font-size: 0.92rem;
       }
 
@@ -2127,7 +2092,7 @@
 
       .download-meta-value {
         word-break: break-all;
-        font-size: 0.84rem;
+        font-size: 0.76rem;
       }
 
       /* FAQ */
@@ -2201,6 +2166,12 @@
         <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Mode" title="Toggle theme">
           <span class="material-symbols-outlined" id="themeIcon">light_mode</span>
         </button>
+        <a href="https://wa.me/917074018142?text=Hi%20Developer%2C%20I%20have%20a%20query%20about%20Store%20Ledger%20App" target="_blank" rel="noopener" class="btn btn-whatsapp desktop-whatsapp-btn" title="Contact Developer on WhatsApp">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.42 0-2.82-.37-4.05-1.08l-.29-.17-3.12.82.83-3.04-.19-.3a8.212 8.212 0 0 1-1.26-4.46c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.58c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.12-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.6.19 1.15.16 1.59.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.11-.23-.17-.48-.3z"/>
+          </svg>
+          <span>WhatsApp</span>
+        </a>
         <a href="#download" class="btn btn-primary">
           <span class="material-symbols-outlined">download</span>
           <span>Get APK</span>
@@ -2302,7 +2273,7 @@
           <span class="material-symbols-outlined">cloud_sync</span>
         </div>
         <div class="stat-text">
-          <div class="stat-title">Offline + Cloud Sync</div>
+          <h4>Offline + Cloud Sync</h4>
           <p>Works offline • Syncs seamlessly</p>
         </div>
       </div>
@@ -2312,7 +2283,7 @@
           <span class="material-symbols-outlined">currency_exchange</span>
         </div>
         <div class="stat-text">
-          <div class="stat-title">9 Currencies</div>
+          <h4>9 Currencies</h4>
           <p>INR, USD, EUR, BDT & .00 toggle</p>
         </div>
       </div>
@@ -2322,7 +2293,7 @@
           <span class="material-symbols-outlined">database</span>
         </div>
         <div class="stat-text">
-          <div class="stat-title">0 Vendor Lock-In</div>
+          <h4>0 Vendor Lock-In</h4>
           <p>Bring your own Supabase cloud</p>
         </div>
       </div>
@@ -2332,7 +2303,7 @@
           <span class="material-symbols-outlined">security</span>
         </div>
         <div class="stat-text">
-          <div class="stat-title">SHA-256 Backups</div>
+          <h4>SHA-256 Backups</h4>
           <p>Cryptographically verified</p>
         </div>
       </div>
@@ -2360,7 +2331,7 @@
           </div>
           <h3 class="card-title">Offline-First &amp; Cloud Ready</h3>
           <p class="card-description">
-            Never wait for network connectivity or server spinners. All entries, customers, and balance totals compute instantly on your phone with raw integer math, and sync smoothly with your private cloud when online.
+            Operates instantly without internet or mobile network. Add customers, log entries, and calculate dues with zero latency. Seamlessly syncs changes to your cloud backend when online.
           </p>
           <span class="card-badge">Zero Lag</span>
         </div>
@@ -2453,7 +2424,7 @@
             <img src="./assets/screenshots/orion_screenshot_1_dashboard.png" alt="Executive Dashboard Screen - Store Ledger" loading="lazy" decoding="async" width="400" height="800" />
           </div>
           <div class="gallery-caption">
-            <h3>Executive Dashboard</h3>
+            <h4>Executive Dashboard</h4>
             <p>Real-time due totals, customer search, filter chips & quick entry FAB</p>
           </div>
         </div>
@@ -2464,7 +2435,7 @@
             <img src="./assets/screenshots/orion_screenshot_2_customer_statement.png" alt="Customer Statement Screen - Store Ledger" loading="lazy" decoding="async" width="400" height="800" />
           </div>
           <div class="gallery-caption">
-            <h3>Customer Statement</h3>
+            <h4>Customer Statement</h4>
             <p>Hero balance card, 3-column breakdown & split tactile entry buttons</p>
           </div>
         </div>
@@ -2475,7 +2446,7 @@
             <img src="./assets/screenshots/orion_screenshot_3_analytics_reports.png" alt="Reports & Velocity Chart Screen - Store Ledger" loading="lazy" decoding="async" width="400" height="800" />
           </div>
           <div class="gallery-caption">
-            <h3>Cash Flow Analytics</h3>
+            <h4>Cash Flow Analytics</h4>
             <p>Smooth Bézier velocity curves, non-colliding axis & exposure ranking</p>
           </div>
         </div>
@@ -2507,7 +2478,7 @@
           <div class="sync-step-item">
             <div class="step-number">1</div>
             <div class="step-text">
-              <h3>Connect Project Credentials</h3>
+              <h5>Connect Project Credentials</h5>
               <p>Enter your private Supabase Project URL and Public Anon Key. Store Ledger never requires or stores database master passwords.</p>
             </div>
           </div>
@@ -2515,7 +2486,7 @@
           <div class="sync-step-item">
             <div class="step-number">2</div>
             <div class="step-text">
-              <h3>Execute One-Time SQL Schema</h3>
+              <h5>Execute One-Time SQL Schema</h5>
               <p>Run our idempotent SQL script in your Supabase SQL editor to create isolated tables, indexes, and Row Level Security policies.</p>
             </div>
           </div>
@@ -2523,7 +2494,7 @@
           <div class="sync-step-item">
             <div class="step-number">3</div>
             <div class="step-text">
-              <h3>Register & Confirm Email</h3>
+              <h5>Register & Confirm Email</h5>
               <p>Create your store owner login and confirm your email. Real-time background replication syncs across all your devices automatically.</p>
             </div>
           </div>
@@ -2531,7 +2502,7 @@
           <div class="sync-step-item">
             <div class="step-number">4</div>
             <div class="step-text">
-              <h3>Safe Disconnect Anytime</h3>
+              <h5>Safe Disconnect Anytime</h5>
               <p>Disconnecting Supabase clears your credentials locally while leaving all remote cloud records completely untouched and intact.</p>
             </div>
           </div>
@@ -2596,7 +2567,7 @@
               <tr>
                 <td class="feature-title">
                   <strong>Offline-First Architecture &amp; Cloud Sync</strong>
-                  <span>Full bookkeeping capabilities offline with optional real-time cloud sync</span>
+                  <span>Full offline bookkeeping with real-time multi-device cloud sync</span>
                 </td>
                 <td class="highlight-col col-storeledger">
                   <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> Yes (Offline + Cloud Sync)</span>
@@ -2885,7 +2856,7 @@
 
   <!-- Lightbox Modal for Screenshots -->
   <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox()">
-    <img id="lightboxImg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E" alt="Zoomed Screenshot" />
+    <img id="lightboxImg" src="" alt="Zoomed Screenshot" />
   </div>
 
   <!-- Floating WhatsApp Contact Developer Action Button -->
@@ -2907,6 +2878,29 @@
        INTERACTION SCRIPTS
        ============================================================ -->
   <script>
+    // Mobile Navigation Drawer Toggle
+    const menuToggleBtn = document.getElementById("menuToggleBtn");
+    const mobileNavDrawer = document.getElementById("mobileNavDrawer");
+    const menuIcon = document.getElementById("menuIcon");
+
+    if (menuToggleBtn && mobileNavDrawer) {
+      menuToggleBtn.addEventListener("click", () => {
+        const isOpen = mobileNavDrawer.classList.toggle("active");
+        if (menuIcon) {
+          menuIcon.textContent = isOpen ? "close" : "menu";
+        }
+      });
+
+      document.querySelectorAll(".mobile-nav-link").forEach(link => {
+        link.addEventListener("click", () => {
+          mobileNavDrawer.classList.remove("active");
+          if (menuIcon) {
+            menuIcon.textContent = "menu";
+          }
+        });
+      });
+    }
+
     // 1. Dark/Light Theme Switcher
     const html = document.documentElement;
     const themeToggleBtn = document.getElementById('themeToggleBtn');
@@ -2930,28 +2924,6 @@
       const current = html.getAttribute('data-theme');
       setTheme(current === 'dark' ? 'light' : 'dark');
     });
-
-    // 1b. Mobile Navigation Drawer Toggle
-    const menuToggleBtn = document.getElementById('menuToggleBtn');
-    const menuIcon = document.getElementById('menuIcon');
-    const mobileNavDrawer = document.getElementById('mobileNavDrawer');
-
-    if (menuToggleBtn && mobileNavDrawer) {
-      menuToggleBtn.addEventListener('click', () => {
-        const isOpen = mobileNavDrawer.classList.contains('active');
-        mobileNavDrawer.classList.toggle('active');
-        menuIcon.textContent = isOpen ? 'menu' : 'close';
-        menuToggleBtn.setAttribute('aria-label', isOpen ? 'Open navigation menu' : 'Close navigation menu');
-      });
-
-      // Close drawer when a mobile nav link is clicked
-      mobileNavDrawer.querySelectorAll('.mobile-nav-link').forEach(link => {
-        link.addEventListener('click', () => {
-          mobileNavDrawer.classList.remove('active');
-          menuIcon.textContent = 'menu';
-        });
-      });
-    }
 
     // 2. Interactive Mockup Tab Switcher
     const tabBtns = document.querySelectorAll('.mockup-tab-btn');

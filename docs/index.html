@@ -1,157 +1,3033 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Store Ledger — Your business, clearly accounted for.</title>
-  <meta name="description" content="Store Ledger is a private, offline-first customer ledger for independent businesses. Track credit, collect dues, and keep your data under your control." />
-  <meta name="keywords" content="customer ledger, khata book, offline ledger, cash book, business accounting app, credit tracker" />
-  <meta name="author" content="Store Ledger" />
-  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <title>Store Ledger • Modern Business Customer Ledger &amp; Cash Book</title>
+  <meta name="description" content="Modern offline-first digital customer ledger and khata book for smart business owners with optional cloud sync. Zero vendor lock-in, multi-currency support, and private Supabase integration." />
+  <meta name="keywords" content="store ledger, khatabook alternative, okcredit alternative, khatabook vs store ledger, ok credit alternative, offline khata book, business ledger, customer ledger, credit debit tracker, offline khata app, udhar khata, business accounting app, free ledger android, digital hisab kitab" />
+  <meta name="author" content="Store Ledger Team" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
   <link rel="canonical" href="https://www.storeledger.in/" />
-  <meta name="theme-color" content="#12231f" />
+  <meta name="theme-color" content="#EF6905" />
+
+  <!-- Open Graph / Facebook / WhatsApp -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://www.storeledger.in/" />
   <meta property="og:site_name" content="Store Ledger" />
-  <meta property="og:title" content="Store Ledger — Your business, clearly accounted for." />
-  <meta property="og:description" content="An offline-first customer ledger built for independent businesses. No ads, no lock-in, and optional private cloud sync." />
+  <meta property="og:title" content="Store Ledger • Smart Business Customer Ledger &amp; Cash Book" />
+  <meta property="og:description" content="Offline-first digital customer khata with seamless cloud sync, credit/debit tracking, WhatsApp reminders, and multi-currency support with zero vendor lock-in." />
   <meta property="og:image" content="https://www.storeledger.in/assets/screenshots/orion_screenshot_1_dashboard.png" />
-  <meta property="og:image:alt" content="Store Ledger dashboard on Android" />
+  <meta property="og:image:alt" content="Store Ledger Dashboard on Android Flagship" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://www.storeledger.in/" />
+  <meta name="twitter:title" content="Store Ledger • Smart Business Customer Ledger" />
+  <meta name="twitter:description" content="Offline-first digital customer khata with multi-currency support &amp; self-hosted Supabase real-time cloud sync." />
+  <meta name="twitter:image" content="https://www.storeledger.in/assets/screenshots/orion_screenshot_1_dashboard.png" />
+
+  <!-- Favicons -->
   <link rel="icon" type="image/png" href="./assets/favicon.png" />
   <link rel="apple-touch-icon" href="./assets/icon.png" />
+
+  <!-- Preload critical hero assets for instant LCP -->
   <link rel="preload" as="image" href="./assets/screenshots/orion_screenshot_1_dashboard.png" fetchpriority="high" />
+
+  <!-- Google Fonts: Material Symbols Outlined -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&display=swap" rel="stylesheet" />
+  
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+
+  <!-- JSON-LD Structured Data for Google Search -->
   <script type="application/ld+json">
-  {"@context":"https://schema.org","@type":"SoftwareApplication","name":"Store Ledger","applicationCategory":"BusinessApplication","operatingSystem":"Android","description":"Offline-first customer ledger and cash book with optional private cloud sync.","url":"https://www.storeledger.in/","downloadUrl":"https://github.com/iamrony27/storeledger/releases/download/v2.0.0/StoreLedger-v2.0.0.apk","license":"https://opensource.org/license/mit"}
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://www.storeledger.in/#organization",
+        "name": "Store Ledger",
+        "url": "https://www.storeledger.in/",
+        "logo": "https://www.storeledger.in/assets/icon.png",
+        "sameAs": [
+          "https://github.com/iamrony27/storeledger",
+          "https://rookieenough.github.io/Orion-Data/redirect.html?id=storeledger"
+        ]
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://www.storeledger.in/#app",
+        "name": "Store Ledger",
+        "operatingSystem": "Android 7.0+",
+        "applicationCategory": "BusinessApplication, FinanceApplication",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "description": "Offline-first digital customer ledger and khata book with real-time cloud sync for small business owners and shopkeepers. Tracks debts, receivables, statements, and optional Supabase cloud sync.",
+        "downloadUrl": "https://github.com/iamrony27/storeledger/releases/download/v2.0.0/StoreLedger-v2.0.0.apk",
+        "softwareVersion": "2.0.0",
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "ratingCount": "38",
+          "bestRating": "5"
+        },
+        "screenshot": [
+          "https://www.storeledger.in/assets/screenshots/orion_screenshot_1_dashboard.png",
+          "https://www.storeledger.in/assets/screenshots/orion_screenshot_2_customer_statement.png",
+          "https://www.storeledger.in/assets/screenshots/orion_screenshot_3_analytics_reports.png"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://www.storeledger.in/#website",
+        "url": "https://www.storeledger.in/",
+        "name": "Store Ledger",
+        "description": "Official website of Store Ledger — Modern Business Customer Ledger & Cash Book",
+        "inLanguage": "en"
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://www.storeledger.in/#faq",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Is Store Ledger really 100% free with no forced subscriptions?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes! Store Ledger is open-source under the MIT license. There are no monthly subscription fees, paywalls, or in-app ads. All offline features work indefinitely without payment."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do I need an internet connection to use the app?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Store Ledger is completely offline-first. You can add customers, record credits/debits, view analytics, and generate PDF statements with zero internet. When internet is available, you can optionally enable cloud sync with your private Supabase backend to keep all devices in sync."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does the Bring-Your-Own Supabase cloud sync work?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "You create a free Supabase project and provide the Project URL and Anon/Publishable Key. Store Ledger syncs directly to your PostgreSQL database with Row Level Security, ensuring you retain 100% ownership of your records."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I switch currencies or use fractional decimal amounts?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Store Ledger supports 9 global currencies (INR, USD, EUR, GBP, BDT, AED, SAR, CAD, AUD). You can toggle decimal (.00) precision on or off anytime. Data is stored in exact minor units (paise/cents) so no precision is ever lost."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I back up my ledger data safely?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "You can create encrypted, SHA-256 verified snapshot backups directly from Settings. Backups can be shared via WhatsApp, Google Drive, email, or saved to your device's external storage."
+            }
+          }
+        ]
+      }
+    ]
+  }
   </script>
+
   <style>
-    :root { --ink:#12231f; --ink-soft:#22423a; --paper:#f5f1e7; --paper-deep:#e6dfcf; --chalk:#fffdf8; --muted:#6c7168; --line:rgba(18,35,31,.14); --lime:#d9f99d; --sun:#f5bf4f; --clay:#dc7252; --mint:#92e0c0; --display:"Fraunces",Georgia,serif; --sans:"DM Sans",sans-serif; --mono:"DM Mono",monospace; --radius:1.5rem; --shadow:0 24px 60px rgba(18,35,31,.13); }
-    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans)} a{color:inherit} img{display:block;max-width:100%} :focus-visible{outline:3px solid var(--sun);outline-offset:4px}
-    .shell{width:min(1160px,calc(100% - 40px));margin:0 auto}.eyebrow{display:inline-flex;align-items:center;gap:.6rem;font-family:var(--mono);font-size:.72rem;font-weight:500;letter-spacing:.11em;text-transform:uppercase}.eyebrow:before{content:"";width:.52rem;height:.52rem;border-radius:50%;background:currentColor;box-shadow:0 0 0 4px color-mix(in srgb,currentColor 16%,transparent)}
-    .site-header{position:absolute;z-index:5;width:100%;top:0;color:var(--chalk)}.nav{min-height:88px;display:flex;align-items:center;justify-content:space-between;gap:1.5rem}.brand{display:inline-flex;align-items:center;gap:.72rem;color:inherit;text-decoration:none;font-weight:700;letter-spacing:-.04em}.brand img{width:35px;height:35px;border-radius:10px;box-shadow:0 5px 16px rgba(0,0,0,.24)}.brand span{font-size:1.05rem}.nav-links{display:flex;align-items:center;gap:1.6rem;list-style:none;margin:0;padding:0}.nav-links a{color:rgba(255,253,248,.77);text-decoration:none;font-size:.9rem;font-weight:600;transition:color .2s ease}.nav-links a:hover{color:var(--chalk)}.nav-download{padding:.65rem 1rem;border:1px solid rgba(255,255,255,.3);border-radius:999px}.nav-download:hover{background:var(--chalk);color:var(--ink)!important}
-    .hero{position:relative;overflow:hidden;isolation:isolate;background:var(--ink);color:var(--chalk);padding:144px 0 76px}.hero:before{content:"";position:absolute;z-index:-2;inset:0;background:radial-gradient(circle at 78% 28%,rgba(111,169,134,.27),transparent 29rem),radial-gradient(circle at 7% 100%,rgba(245,191,79,.15),transparent 25rem)}.hero:after{content:"";position:absolute;z-index:-1;inset:0;opacity:.3;background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(to bottom,black,transparent 88%)}.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;align-items:center;gap:clamp(3rem,7vw,7rem)}.hero-copy{max-width:620px}.hero .eyebrow{color:var(--lime)}h1,h2,h3,p{margin-top:0}h1{margin:1rem 0 1.3rem;font-family:var(--display);max-width:11ch;font-size:clamp(3.3rem,6vw,5.8rem);line-height:.95;letter-spacing:-.07em;font-weight:700}h1 em{color:var(--lime);font-style:normal}.hero-text{max-width:51ch;color:rgba(255,253,248,.72);font-size:1.08rem;line-height:1.65}.hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.85rem;margin:2rem 0 1.8rem}.button{display:inline-flex;align-items:center;justify-content:center;gap:.6rem;min-height:50px;padding:.85rem 1.2rem;border:1px solid transparent;border-radius:999px;font-weight:700;text-decoration:none;transition:transform .2s ease,background .2s ease,color .2s ease,border-color .2s ease}.button:hover{transform:translateY(-2px)}.button-primary{background:var(--lime);color:var(--ink)}.button-primary:hover{background:#edffbd}.button-secondary{border-color:rgba(255,253,248,.3);color:var(--chalk)}.button-secondary:hover{border-color:var(--chalk);background:rgba(255,255,255,.08)}.arrow{font-family:var(--mono);font-size:1.05em}.hero-proof{display:flex;flex-wrap:wrap;gap:1rem 1.4rem;padding:0;margin:0;list-style:none;color:rgba(255,253,248,.62);font-size:.78rem}.hero-proof li{display:flex;align-items:center;gap:.45rem}.hero-proof li:before{content:"✓";color:var(--mint);font-weight:800}
-    .phone-stage{position:relative;display:grid;place-items:center;min-width:0;min-height:555px}.phone-stage:before{content:"";position:absolute;width:min(36rem,130%);aspect-ratio:1;border:1px solid rgba(217,249,157,.34);border-radius:50%}.phone-stage:after{content:"Private by default";position:absolute;right:-2.3rem;bottom:5.3rem;transform:rotate(-90deg);transform-origin:center;color:rgba(255,253,248,.48);font-family:var(--mono);font-size:.66rem;letter-spacing:.16em;text-transform:uppercase}.phone{position:relative;z-index:1;width:min(270px,70vw);padding:10px;border:1px solid rgba(255,255,255,.3);border-radius:37px;background:#09120f;box-shadow:20px 25px 0 rgba(0,0,0,.17),0 38px 80px rgba(0,0,0,.45);transform:rotate(5deg)}.phone img{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:1/2.22;object-fit:cover;border-radius:29px}.ledger-note{position:absolute;z-index:2;left:max(0px,calc(50% - 180px));bottom:2.3rem;width:min(180px,52%);padding:1rem;background:var(--sun);color:var(--ink);box-shadow:8px 8px 0 rgba(0,0,0,.16);transform:rotate(-6deg)}
-    .ticker{overflow:hidden;background:var(--lime);color:var(--ink);border-bottom:1px solid var(--ink)}.ticker-track{display:flex;width:max-content;animation:ticker 30s linear infinite}.ticker span{padding:1rem 1.7rem;font-family:var(--mono);font-size:.73rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap}.ticker b{color:var(--clay);margin-left:2rem}@keyframes ticker{to{transform:translateX(-50%)}}
-    .section{padding:clamp(5rem,10vw,8.5rem) 0}.section-head{max-width:655px;margin-bottom:3rem}.section-head .eyebrow{color:var(--clay)}.section h2{margin:.8rem 0 0;font-family:var(--display);font-size:clamp(2.35rem,4.2vw,4.25rem);line-height:.98;letter-spacing:-.06em}.section-intro{margin:1.25rem 0 0;color:var(--muted);font-size:1.05rem;line-height:1.65}
-    .feature-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:1rem}.feature{min-height:238px;padding:1.55rem;border:1px solid var(--line);border-radius:var(--radius);background:var(--chalk);display:flex;flex-direction:column;justify-content:space-between;transition:transform .25s ease,box-shadow .25s ease}.feature:hover{transform:translateY(-5px);box-shadow:var(--shadow)}.feature:nth-child(1){grid-column:span 5;background:var(--ink);color:var(--chalk)}.feature:nth-child(2){grid-column:span 4;background:var(--paper-deep)}.feature:nth-child(3){grid-column:span 3;background:var(--mint)}.feature:nth-child(4){grid-column:span 3;background:var(--sun)}.feature:nth-child(5){grid-column:span 4}.feature:nth-child(6){grid-column:span 5;background:var(--clay);color:var(--chalk)}.feature-index{color:var(--clay);font-family:var(--mono);font-size:.72rem;letter-spacing:.08em}.feature:nth-child(1) .feature-index,.feature:nth-child(6) .feature-index{color:var(--lime)}.feature h3{margin:.8rem 0 .55rem;font-size:1.18rem;letter-spacing:-.035em}.feature p{margin:0;max-width:33ch;color:color-mix(in srgb,currentColor 68%,transparent);font-size:.9rem;line-height:1.55}.feature-mark{align-self:flex-end;font-family:var(--display);font-size:2.5rem;font-weight:800;line-height:.7;opacity:.7}
-    .report{position:relative;overflow:hidden;background:var(--paper-deep);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}.report:before{content:"";position:absolute;width:36rem;height:36rem;right:-14rem;top:-14rem;border-radius:50%;background:var(--mint);filter:blur(2px);opacity:.52}.report-grid{position:relative;display:grid;grid-template-columns:.9fr 1.1fr;align-items:center;gap:4rem}.report .eyebrow{color:var(--ink-soft)}.statement{padding:1rem;border:1px solid rgba(18,35,31,.18);border-radius:1.7rem;background:var(--chalk);box-shadow:var(--shadow);transform:rotate(2deg)}.statement img{border-radius:1rem}.data-lines{display:grid;gap:1rem;margin-top:2.3rem}.data-line{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:.8rem;padding-bottom:1rem;border-bottom:1px solid var(--line)}.data-n{color:var(--clay);font-family:var(--mono);font-size:.76rem}.data-line strong{font-size:.95rem}.data-line span:last-child{color:var(--muted);font-family:var(--mono);font-size:.7rem;text-transform:uppercase}
-    .screens{background:var(--ink);color:var(--chalk);overflow:hidden}.screens .eyebrow{color:var(--lime)}.screens .section-intro{color:rgba(255,253,248,.65)}.screen-grid{display:grid;grid-template-columns:repeat(3,1fr);align-items:end;gap:clamp(1rem,3vw,3rem);margin-top:3.4rem}.screen-card{position:relative}.screen-card:nth-child(2){transform:translateY(-2.5rem)}.screen-card figure{margin:0;padding:9px;border:1px solid rgba(255,255,255,.26);border-radius:2rem;background:#090f0d;box-shadow:0 24px 45px rgba(0,0,0,.34)}.screen-card img{border-radius:1.55rem}.screen-card figcaption{padding:1rem .3rem 0;color:rgba(255,253,248,.7);font-size:.87rem}.screen-card b{color:var(--chalk)}
-    .ownership{display:grid;grid-template-columns:1fr .88fr;gap:4rem;align-items:center}.ownership-panel{padding:clamp(1.8rem,5vw,3.3rem);border-radius:var(--radius);background:var(--ink);color:var(--chalk)}.ownership-panel .eyebrow{color:var(--mint)}.ownership-panel h2{margin-bottom:1.2rem;font-size:clamp(2.35rem,4vw,3.75rem)}.ownership-panel p{color:rgba(255,253,248,.7);line-height:1.7}.ownership-list{list-style:none;padding:0;margin:1.7rem 0 0;display:grid;gap:.75rem}.ownership-list li{display:flex;gap:.7rem;align-items:flex-start;font-size:.92rem}.ownership-list li:before{content:"↗";color:var(--lime);font-family:var(--mono)}.sync-art{min-height:375px;position:relative;border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(140deg,#d4ede0,#f4bf5e);overflow:hidden}.sync-art img{position:absolute;right:-14%;bottom:-6%;width:108%;mix-blend-mode:multiply}.sync-label{position:absolute;top:1.4rem;left:1.4rem;max-width:17ch;font-family:var(--display);font-size:1.7rem;font-weight:700;line-height:1;letter-spacing:-.05em}
-    .cta{padding:0 0 clamp(5rem,10vw,8rem)}.cta-card{position:relative;overflow:hidden;padding:clamp(2rem,6vw,5rem);border-radius:2rem;background:var(--clay);color:var(--chalk)}.cta-card:after{content:"SL";position:absolute;right:-.08em;bottom:-.28em;color:rgba(18,35,31,.12);font-family:var(--display);font-size:clamp(11rem,27vw,23rem);font-weight:800;line-height:.7;letter-spacing:-.12em}.cta-content{position:relative;z-index:1;max-width:680px}.cta .eyebrow{color:var(--ink)}.cta h2{margin:.9rem 0 1.2rem;font-family:var(--display);font-size:clamp(2.8rem,5vw,5rem);line-height:.94;letter-spacing:-.07em}.cta p{max-width:48ch;color:rgba(255,253,248,.82);line-height:1.65}.cta .button-primary{background:var(--ink);color:var(--chalk)}.cta .button-secondary{color:var(--chalk);border-color:rgba(255,255,255,.45)}
-    .site-footer{padding:0 0 2rem;color:var(--muted)}.footer-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:2rem;padding-top:2rem;border-top:1px solid var(--line)}.footer-note{margin:1rem 0 0;max-width:46ch;font-size:.85rem;line-height:1.55}.footer-links{display:flex;flex-wrap:wrap;align-content:flex-start;justify-content:flex-end;gap:.75rem 1.2rem}.footer-links a{color:var(--ink);font-size:.85rem;font-weight:600;text-decoration:none}.footer-links a:hover{color:var(--clay)}.copyright{margin:2.5rem 0 0;font-family:var(--mono);font-size:.68rem;letter-spacing:.04em}
-    @media(max-width:800px){.nav-links{display:none}.hero{padding-top:125px}.hero-grid,.report-grid,.ownership{grid-template-columns:1fr}.hero-copy{max-width:none}.phone-stage{min-height:435px;margin-top:.5rem}.phone{width:220px}.ledger-note{left:2%;bottom:1rem}.report-grid{gap:3rem}.statement{width:min(315px,85vw);justify-self:center}.feature:nth-child(n){grid-column:span 6}.screen-grid{gap:1.4rem}.screen-card:nth-child(2){transform:none}.sync-art{min-height:310px}}
-    @media(max-width:520px){.shell{width:min(100% - 28px,1160px)}.nav{min-height:72px}.brand img{width:31px;height:31px}h1{font-size:clamp(3.05rem,15vw,4.5rem)}.hero-actions{flex-direction:column;align-items:stretch}.button{width:100%}.phone-stage:after{display:none}.feature-grid{gap:.75rem}.feature:nth-child(n){grid-column:span 12;min-height:205px}.screen-grid{grid-template-columns:1fr;padding:0 12%}.screen-card{margin:0}.footer-grid{grid-template-columns:1fr}.footer-links{justify-content:flex-start}}
-    /* Layout safeguards and progressive breakpoints for compact screens */
-    .hero-grid,.report-grid,.ownership,.feature-grid,.screen-grid{min-width:0}
-    .hero-grid{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)}
-    .hero-copy,.phone-stage,.feature,.screen-card,.statement,.ownership-panel{min-width:0}
-    .phone-stage{overflow:visible}
-    .ledger-note{left:max(0px,calc(50% - 180px));width:min(180px,52%)}
-    .feature-grid{grid-template-columns:repeat(12,minmax(0,1fr))}
-    .report-grid,.ownership{grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)}
-    .ownership{grid-template-columns:minmax(0,1fr) minmax(0,.88fr)}
-    .screen-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
-    .screen-card img{width:100%;height:auto;aspect-ratio:1/2;object-fit:cover}
-    .sync-label{z-index:1}
-    .sync-art img{width:100%;max-width:100%;right:0;bottom:0;object-fit:contain;object-position:right bottom}
-    @media(max-width:900px){
-      .nav-links{display:none}
-      .hero{padding-top:125px}
-      .hero-grid{grid-template-columns:minmax(0,1fr) minmax(250px,.8fr);gap:1.5rem}
-      .hero h1{font-size:clamp(3rem,7vw,4.7rem)}
-      .phone-stage{min-height:450px}
-      .phone{width:min(230px,72%)}
-      .ledger-note{left:0;bottom:1rem}
-      .phone-stage:after{right:-1rem}
-      .report-grid,.ownership{grid-template-columns:minmax(0,1fr)}
-      .hero-copy{max-width:none}
-      .report-grid{gap:3rem}
-      .statement{width:min(315px,85vw);justify-self:center}
-      .feature:nth-child(n){grid-column:span 6}
-      .screen-grid{gap:1.4rem}
-      .screen-card:nth-child(2){transform:none}
-      .ownership{gap:2rem}
-      .sync-art{min-height:310px}
+    /* ============================================================
+       MATERIAL DESIGN 3 (M3 EXPRESSIVE) DESIGN TOKENS
+       ============================================================ */
+    :root {
+      /* M3 Light Tonal Palette */
+      --md-sys-color-primary: #EF6905;
+      --md-sys-color-on-primary: #FFFFFF;
+      --md-sys-color-primary-container: #FFE5D6;
+      --md-sys-color-on-primary-container: #411700;
+      
+      --md-sys-color-secondary: #006874;
+      --md-sys-color-on-secondary: #FFFFFF;
+      --md-sys-color-secondary-container: #97F0FF;
+      --md-sys-color-on-secondary-container: #001F24;
+
+      --md-sys-color-tertiary: #10B981;
+      --md-sys-color-on-tertiary: #FFFFFF;
+      --md-sys-color-tertiary-container: #D1FAE5;
+      --md-sys-color-on-tertiary-container: #064E3B;
+
+      --md-sys-color-error: #BA1A1A;
+      --md-sys-color-on-error: #FFFFFF;
+      
+      --md-sys-color-surface: #FDF8F6;
+      --md-sys-color-surface-dim: #DED8D6;
+      --md-sys-color-surface-container-lowest: #FFFFFF;
+      --md-sys-color-surface-container-low: #F7F2F0;
+      --md-sys-color-surface-container: #F1ECE9;
+      --md-sys-color-surface-container-high: #EBE6E4;
+      --md-sys-color-surface-container-highest: #E5E0DE;
+      
+      --md-sys-color-on-surface: #1E1B1A;
+      --md-sys-color-on-surface-variant: #52443D;
+      --md-sys-color-outline: #85736B;
+      --md-sys-color-outline-variant: #D7C2B9;
+
+      --md-sys-color-inverse-surface: #332F2E;
+      --md-sys-color-inverse-on-surface: #F8EFEA;
+      --md-sys-color-inverse-primary: #FFB68C;
+
+      /* M3 Elevation Shadows */
+      --md-sys-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+      --md-sys-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.08), 0px 1px 2px 0px rgba(0, 0, 0, 0.06);
+      --md-sys-elevation-3: 0px 4px 12px 3px rgba(0, 0, 0, 0.10), 0px 2px 4px 0px rgba(0, 0, 0, 0.07);
+      --md-sys-elevation-4: 0px 8px 24px 4px rgba(0, 0, 0, 0.12), 0px 4px 8px 0px rgba(0, 0, 0, 0.08);
+
+      /* M3 Shape System */
+      --md-sys-shape-corner-xs: 4px;
+      --md-sys-shape-corner-s: 8px;
+      --md-sys-shape-corner-m: 12px;
+      --md-sys-shape-corner-l: 16px;
+      --md-sys-shape-corner-xl: 28px;
+      --md-sys-shape-corner-full: 9999px;
+
+      --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     }
-    @media(max-width:600px){
-      .shell{width:calc(100% - 32px)}
-      .nav{min-height:72px}
-      .brand img{width:31px;height:31px}
-      .hero{padding:116px 0 38px}
-      .hero-grid{grid-template-columns:minmax(0,1fr);gap:.5rem}
-      .hero-copy{max-width:35rem}
-      .hero h1{max-width:11ch;font-size:clamp(2.5rem,10vw,3.65rem);line-height:.98;letter-spacing:-.065em}
-      .hero-text{font-size:1rem}
-      .hero-actions{gap:.65rem;margin:1.45rem 0 1.2rem}
-      .hero-actions .button{width:100%;min-height:52px}
-      .hero-proof{gap:.6rem 1rem;font-size:.72rem}
-      .phone-stage{min-height:310px;margin-top:0}
-      .phone-stage:before{width:min(330px,90vw)}
-      .phone-stage:after{display:none}
-      .phone{width:min(160px,44vw);padding:7px;border-radius:29px;transform:rotate(3deg)}
-      .phone img{border-radius:23px}
-      .ledger-note{left:max(0px,calc(50% - 150px));bottom:1rem;width:min(150px,44%);padding:.8rem}
-      .ledger-note strong{font-size:.78rem}
-      .ticker span{padding:.8rem 1rem;font-size:.65rem}
-      .section{padding:4.5rem 0}
-      .section-head{margin-bottom:2rem}
-      .section h2{font-size:clamp(2.2rem,9vw,3.2rem)}
-      .section-intro{font-size:.98rem}
-      .feature-grid{grid-template-columns:minmax(0,1fr);gap:.75rem}
-      .feature:nth-child(n){grid-column:1;min-height:190px;padding:1.25rem}
-      .feature p{max-width:42ch}
-      .report-grid{gap:2rem}
-      .data-line{grid-template-columns:30px minmax(0,1fr);gap:.45rem .7rem}
-      .data-line span:last-child{grid-column:2;font-size:.63rem}
-      .statement{width:min(280px,80vw);padding:8px}
-      .screen-grid{grid-template-columns:minmax(0,1fr);gap:2rem;padding:0 clamp(18px,13vw,52px)}
-      .screen-card:nth-child(2){transform:none}
-      .screen-card figure{padding:7px;border-radius:1.5rem}
-      .screen-card img{max-height:520px;object-fit:cover;object-position:top;border-radius:1.15rem}
-      .screen-card figcaption{padding-top:.7rem}
-      .ownership-panel{padding:1.5rem}
-      .ownership-panel h2{font-size:clamp(2.1rem,9vw,3rem)}
-      .ownership-list li{font-size:.86rem}
-      .sync-art{min-height:250px}
-      .sync-art img{right:0;bottom:0;width:100%}
-      .sync-label{top:1rem;left:1rem;max-width:15ch;font-size:1.4rem}
-      .cta{padding-bottom:4.5rem}
-      .cta-card{padding:1.6rem 1.3rem;border-radius:1.5rem}
-      .cta h2{font-size:clamp(2.45rem,10vw,3.5rem)}
-      .cta-card:after{font-size:clamp(9rem,40vw,15rem)}
-      .footer-grid{grid-template-columns:minmax(0,1fr);gap:1.5rem}
-      .footer-links{justify-content:flex-start;gap:.8rem 1rem}
-      .footer-links a{min-height:36px;display:inline-flex;align-items:center}
-      .copyright{font-size:.61rem;line-height:1.6;margin-top:1.5rem}
+
+    /* M3 Dark Tonal Palette */
+    [data-theme="dark"] {
+      --md-sys-color-primary: #FFB68C;
+      --md-sys-color-on-primary: #522300;
+      --md-sys-color-primary-container: #753300;
+      --md-sys-color-on-primary-container: #FFE5D6;
+
+      --md-sys-color-secondary: #4FD8EB;
+      --md-sys-color-on-secondary: #00363D;
+      --md-sys-color-secondary-container: #004F58;
+      --md-sys-color-on-secondary-container: #97F0FF;
+
+      --md-sys-color-tertiary: #34D399;
+      --md-sys-color-on-tertiary: #064E3B;
+      --md-sys-color-tertiary-container: #065F46;
+      --md-sys-color-on-tertiary-container: #A7F3D0;
+
+      --md-sys-color-error: #FFB4AB;
+      --md-sys-color-on-error: #690005;
+
+      --md-sys-color-surface: #0E1015;
+      --md-sys-color-surface-dim: #090B0F;
+      --md-sys-color-surface-container-lowest: #07090C;
+      --md-sys-color-surface-container-low: #14171E;
+      --md-sys-color-surface-container: #1A1E26;
+      --md-sys-color-surface-container-high: #242934;
+      --md-sys-color-surface-container-highest: #2E3442;
+
+      --md-sys-color-on-surface: #E6E1DF;
+      --md-sys-color-on-surface-variant: #D7C2B9;
+      --md-sys-color-outline: #A08C82;
+      --md-sys-color-outline-variant: #52443D;
+
+      --md-sys-color-inverse-surface: #E6E1DF;
+      --md-sys-color-inverse-on-surface: #1E1B1A;
+      --md-sys-color-inverse-primary: #EF6905;
+
+      --md-sys-elevation-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.4), 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+      --md-sys-elevation-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.5), 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+      --md-sys-elevation-3: 0px 4px 12px 3px rgba(0, 0, 0, 0.6), 0px 2px 4px 0px rgba(0, 0, 0, 0.4);
+      --md-sys-elevation-4: 0px 8px 24px 4px rgba(0, 0, 0, 0.7), 0px 4px 8px 0px rgba(0, 0, 0, 0.5);
     }
-    @media(max-width:1200px){.hero:before,.hero:after,.phone-stage:before{pointer-events:none}.hero-grid{overflow:visible}}
-    @media(max-width:900px){.hero-grid{grid-template-columns:minmax(0,1fr) minmax(0,.8fr)}.phone-stage:before{width:min(32rem,110%)}.phone-stage:after{right:0}}
-    @media(max-width:600px){.hero-grid{grid-template-columns:minmax(0,1fr)}.hero{overflow:hidden}.phone-stage{overflow:hidden}.phone-stage:before{width:min(310px,84vw)}.phone{width:min(180px,49vw)}.phone img{aspect-ratio:1/2.2}.ledger-note{left:max(0px,calc(50% - 150px));width:min(150px,44%)}.hero{padding-bottom:38px}}
-    @media(max-width:360px){
-      .shell{width:calc(100% - 28px)}
-      .hero h1{font-size:2.55rem}
-      .hero-proof{font-size:.68rem;gap:.5rem .7rem}
-      .data-line strong{font-size:.84rem}
-      .screen-grid{padding:0 8%}
-      .cta .hero-actions .button{font-size:.9rem}
+
+    /* Base Reset */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--md-sys-color-surface);
+      color: var(--md-sys-color-on-surface);
+      line-height: 1.6;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* ============================================================
+       MATERIAL 3 COMPONENT STYLES
+       ============================================================ */
+
+    /* Material Symbols */
+    .material-symbols-outlined {
+      font-family: 'Material Symbols Outlined';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      vertical-align: middle;
+      user-select: none;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* M3 Top App Bar */
+    .top-app-bar {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      background-color: rgba(var(--app-bar-bg, 14, 16, 21), 0.82);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+      transition: background-color 0.25s ease;
+    }
+
+    [data-theme="light"] .top-app-bar {
+      --app-bar-bg: 253, 248, 246;
+    }
+
+    .top-app-bar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+      gap: 16px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      flex-shrink: 0;
+      white-space: nowrap;
+      text-decoration: none;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .brand-logo img {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--md-sys-shape-corner-m);
+      box-shadow: var(--md-sys-elevation-1);
+      flex-shrink: 0;
+    }
+
+    .version-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: var(--md-sys-shape-corner-full);
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+
+    .desktop-nav {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: clamp(10px, 1.4vw, 22px);
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-link {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+      transition: color 0.15s ease, background-color 0.15s ease;
+      white-space: nowrap;
+      text-decoration: none;
+      padding: 6px 10px;
+      border-radius: var(--md-sys-shape-corner-full);
+    }
+
+    .nav-link:hover {
+      color: var(--md-sys-color-primary);
+      background-color: var(--md-sys-color-surface-container);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .menu-toggle-btn {
+      display: none;
+      width: 42px;
+      height: 42px;
+      border-radius: var(--md-sys-shape-corner-full);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      background: var(--md-sys-color-surface-container);
+      color: var(--md-sys-color-on-surface);
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .menu-toggle-btn:hover {
+      background: var(--md-sys-color-surface-container-high);
+      color: var(--md-sys-color-primary);
+    }
+
+    .mobile-nav-drawer {
+      display: none;
+      background-color: rgba(var(--app-bar-bg, 14, 16, 21), 0.97);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+      padding: 14px 20px 20px;
+      box-shadow: var(--md-sys-elevation-3);
+    }
+
+    .mobile-nav-drawer.active {
+      display: block;
+      animation: slideDownNav 0.2s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    @keyframes slideDownNav {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .mobile-nav-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+    }
+
+    .mobile-nav-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: var(--md-sys-shape-corner-m);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface);
+      text-decoration: none;
+      transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .mobile-nav-link:hover, .mobile-nav-link:active {
+      background-color: var(--md-sys-color-surface-container-high);
+      color: var(--md-sys-color-primary);
+    }
+
+    .mobile-nav-link.highlight-whatsapp {
+      text-wrap: pretty;
+      color: #25D366;
+      background-color: rgba(37, 211, 102, 0.08);
+      margin-top: 6px;
+    }
+
+    /* M3 Theme Toggle Switch */
+    .theme-toggle-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--md-sys-shape-corner-full);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      background: var(--md-sys-color-surface-container);
+      color: var(--md-sys-color-on-surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .theme-toggle-btn:hover {
+      background: var(--md-sys-color-surface-container-high);
+      transform: scale(1.05);
+    }
+
+    /* M3 Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 12px 24px;
+      border-radius: var(--md-sys-shape-corner-full);
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+      text-decoration: none;
+      line-height: 1.4;
+    }
+
+    .btn-primary {
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: var(--md-sys-elevation-2);
+    }
+
+    .btn-primary:hover {
+      box-shadow: var(--md-sys-elevation-3);
+      transform: translateY(-2px);
+      filter: brightness(1.06);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: var(--md-sys-elevation-1);
+    }
+
+    .btn-tonal {
+      background-color: var(--md-sys-color-surface-container-high);
+      color: var(--md-sys-color-on-surface);
+      border: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .btn-tonal:hover {
+      background-color: var(--md-sys-color-surface-container-highest);
+      transform: translateY(-2px);
+    }
+
+    .btn-outlined {
+      background-color: transparent;
+      color: var(--md-sys-color-primary);
+      border: 1.5px solid var(--md-sys-color-primary);
+    }
+
+    .btn-outlined:hover {
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+    }
+
+    .btn-lg {
+      padding: 16px 32px;
+      font-size: 1.05rem;
+    }
+
+    /* ============================================================
+       HERO SECTION
+       ============================================================ */
+    .hero-section {
+      padding: 72px 0 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-bg-glow {
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(239, 105, 5, 0.18) 0%, rgba(16, 185, 129, 0.08) 50%, transparent 75%);
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .hero-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: center;
+      gap: 60px;
+    }
+
+    .hero-content {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 20px;
+    }
+
+    .badge-chip {
+      text-wrap: pretty;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: var(--md-sys-color-surface-container-high);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      border-radius: var(--md-sys-shape-corner-full);
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--md-sys-color-primary);
+      letter-spacing: 0.02em;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, var(--md-sys-color-primary) 0%, #F59E0B 100%);
+      color: var(--md-sys-color-primary);
+    }
+
+    .hero-subtitle {
+      font-size: 1.2rem;
+      color: var(--md-sys-color-on-surface-variant);
+      line-height: 1.6;
+      max-width: 580px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 16px;
+      margin-top: 8px;
+    }
+
+    .store-badge-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 18px;
+      background: var(--md-sys-color-surface-container-low);
+      border: 1px dashed var(--md-sys-color-outline-variant);
+      border-radius: var(--md-sys-shape-corner-l);
+      font-size: 0.85rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .store-badge-card strong {
+      color: var(--md-sys-color-on-surface);
+    }
+
+    /* Device Mockup Frame */
+    .mockup-wrapper {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .mockup-frame {
+      width: 100%;
+      max-width: 360px;
+      aspect-ratio: 9 / 19.5;
+      background: #000000;
+      border-radius: 44px;
+      padding: 11px;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.12);
+      position: relative;
+      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .mockup-frame:hover {
+      transform: translateY(-6px);
+    }
+
+    .mockup-notch {
+      position: absolute;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 90px;
+      height: 22px;
+      background: #000000;
+      border-radius: var(--md-sys-shape-corner-full);
+      z-index: 10;
+    }
+
+    .mockup-screen {
+      width: 100%;
+      height: 100%;
+      border-radius: 34px;
+      overflow: hidden;
+      background: var(--md-sys-color-surface-container-lowest);
+      position: relative;
+    }
+
+    .mockup-screen img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: opacity 0.25s ease-in-out;
+    }
+
+    /* Mockup Tab Selector Pills */
+    .mockup-tabs {
+      display: flex;
+      gap: 8px;
+      margin-top: 20px;
+      background: var(--md-sys-color-surface-container);
+      padding: 6px;
+      border-radius: var(--md-sys-shape-corner-full);
+      border: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .mockup-tab-btn {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border-radius: var(--md-sys-shape-corner-full);
+      border: none;
+      background: transparent;
+      color: var(--md-sys-color-on-surface-variant);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .mockup-tab-btn.active {
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: var(--md-sys-elevation-1);
+    }
+
+    /* ============================================================
+       STATISTICS STRIP
+       ============================================================ */
+    .stats-strip {
+      text-wrap: pretty;
+      padding: 32px 0;
+      background: var(--md-sys-color-surface-container-low);
+      border-top: 1px solid var(--md-sys-color-outline-variant);
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+    }
+
+    .stat-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--md-sys-color-surface-container);
+      border-radius: var(--md-sys-shape-corner-xl);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      box-shadow: var(--md-sys-elevation-1);
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      padding: 10px;
+      box-sizing: border-box;
+      border-radius: var(--md-sys-shape-corner-l);
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+
+    .stat-text .stat-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1.4;
+    }
+
+    .stat-text p {
+      text-wrap: pretty;
+      font-size: 0.85rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    /* ============================================================
+       FEATURES SECTION (M3 CARDS)
+       ============================================================ */
+    .section {
+      padding: 88px 0;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 680px;
+      margin: 0 auto 56px;
+    }
+
+    .section-tag {
+      display: inline-block;
+      font-size: 0.85rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--md-sys-color-primary);
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1.4;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .section-subtitle {
+      font-size: 1.1rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    /* M3 Elevated Card */
+    .m3-card {
+      background-color: var(--md-sys-color-surface-container);
+      border-radius: var(--md-sys-shape-corner-xl);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      padding: 32px;
+      transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      box-shadow: var(--md-sys-elevation-1);
+    }
+
+    .m3-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--md-sys-elevation-3);
+      border-color: var(--md-sys-color-primary);
+    }
+
+    .card-icon-container {
+      width: 56px;
+      height: 56px;
+      box-sizing: border-box;
+      padding: 14px;
+      border-radius: var(--md-sys-shape-corner-l);
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+    }
+
+    .card-icon-container.tertiary {
+      background-color: var(--md-sys-color-tertiary-container);
+      color: var(--md-sys-color-on-tertiary-container);
+    }
+
+    .card-icon-container.secondary {
+      background-color: var(--md-sys-color-secondary-container);
+      color: var(--md-sys-color-on-secondary-container);
+    }
+
+    .card-title {
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .card-description {
+      font-size: 0.98rem;
+      color: var(--md-sys-color-on-surface-variant);
+      line-height: 1.6;
+    }
+
+    .card-badge {
+      margin-top: auto;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: var(--md-sys-shape-corner-full);
+      background-color: var(--md-sys-color-surface-container-high);
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    /* ============================================================
+       SCREENSHOTS GALLERY SECTION
+       ============================================================ */
+    .screenshots-section {
+      background-color: var(--md-sys-color-surface-container-low);
+      border-top: 1px solid var(--md-sys-color-outline-variant);
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    .gallery-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .gallery-image-card {
+      width: 100%;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: var(--md-sys-elevation-3);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      background: #000;
+      transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1), box-shadow 0.3s ease;
+      cursor: zoom-in;
+    }
+
+    .gallery-image-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: var(--md-sys-elevation-4);
+      border-color: var(--md-sys-color-primary);
+    }
+
+    .gallery-image-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .gallery-caption h4 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .gallery-caption p {
+      text-wrap: pretty;
+      font-size: 0.9rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    /* ============================================================
+       SUPABASE & CLOUD SYNC SECTION
+       ============================================================ */
+    .sync-box {
+      background: var(--md-sys-color-surface-container);
+      border-radius: var(--md-sys-shape-corner-xl);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      padding: 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+      box-shadow: var(--md-sys-elevation-2);
+    }
+
+    .sync-steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .sync-step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .step-number {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--md-sys-shape-corner-full);
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      flex-shrink: 0;
+      font-size: 0.95rem;
+    }
+
+    .step-text h5 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .step-text p {
+      text-wrap: pretty;
+      font-size: 0.9rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .sync-infographic-card {
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--md-sys-color-outline-variant);
+      box-shadow: var(--md-sys-elevation-2);
+    }
+
+    .sync-infographic-card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ============================================================
+       DOWNLOAD & VERIFICATION CARD
+       ============================================================ */
+    .download-card-wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .download-hero-card {
+      background: linear-gradient(135deg, var(--md-sys-color-surface-container-high) 0%, var(--md-sys-color-surface-container) 100%);
+      border-radius: 36px;
+      border: 1.5px solid var(--md-sys-color-primary);
+      padding: 48px;
+      box-shadow: var(--md-sys-elevation-3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 28px;
+      position: relative;
+    }
+
+    .download-meta-table {
+      width: 100%;
+      max-width: 650px;
+      background: var(--md-sys-color-surface-container-low);
+      border-radius: var(--md-sys-shape-corner-l);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      overflow: hidden;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .download-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 18px;
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    }
+
+    .download-meta-row:last-child {
+      border-bottom: none;
+    }
+
+    .download-meta-label {
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .download-meta-value {
+      font-family: monospace;
+      font-weight: 700;
+      color: var(--md-sys-color-on-surface);
+      word-break: break-all;
+    }
+
+    .checksum-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .copy-btn {
+      padding: 4px 10px;
+      font-size: 0.82rem;
+      border-radius: var(--md-sys-shape-corner-s);
+      border: 1px solid var(--md-sys-color-outline);
+      background: var(--md-sys-color-surface-container-high);
+      color: var(--md-sys-color-on-surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-family: inherit;
+    }
+
+    .copy-btn:hover {
+      background: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+    }
+
+    /* ============================================================
+       FAQ ACCORDION SECTION
+       ============================================================ */
+    .faq-list {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .faq-item {
+      background: var(--md-sys-color-surface-container);
+      border-radius: var(--md-sys-shape-corner-l);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      overflow: hidden;
+      transition: background-color 0.2s ease;
+    }
+
+    .faq-question {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1.05rem;
+      user-select: none;
+    }
+
+    .faq-question .material-symbols-outlined {
+      transition: transform 0.25s ease;
+      color: var(--md-sys-color-primary);
+    }
+
+    .faq-item.open .faq-question .material-symbols-outlined {
+      transform: rotate(180deg);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0.2, 0, 0, 1), padding 0.3s ease;
+      padding: 0 24px;
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    .faq-item.open .faq-answer {
+      max-height: 300px;
+      padding: 0 24px 24px 24px;
+    }
+
+    /* ============================================================
+       FOOTER
+       ============================================================ */
+    .footer {
+      background: var(--md-sys-color-surface-container-lowest);
+      border-top: 1px solid var(--md-sys-color-outline-variant);
+      padding: 60px 0 32px;
+      margin-top: 40px;
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 24px;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.2rem;
+      font-weight: 800;
+    }
+
+    .footer-logo img {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--md-sys-shape-corner-s);
+    }
+
+    .footer-nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 28px;
+      list-style: none;
+    }
+
+    .footer-nav a {
+      font-size: 0.9rem;
+      color: var(--md-sys-color-on-surface-variant);
+      transition: color 0.15s ease;
+    }
+
+    .footer-nav a:hover {
+      color: var(--md-sys-color-primary);
+    }
+
+    .footer-copy {
+      font-size: 0.85rem;
+      color: var(--md-sys-color-outline);
+    }
+
+    /* Lightbox Modal */
+    .lightbox-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      cursor: zoom-out;
+    }
+
+    .lightbox-modal.active {
+      display: flex;
+    }
+
+    .lightbox-modal img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+    }
+
+    /* ============================================================
+       COMPETITOR COMPARISON TABLE (M3 EXPRESSIVE)
+       ============================================================ */
+    .comparison-container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: 28px;
+      border: 1px solid var(--md-sys-color-outline-variant);
+      background: var(--md-sys-color-surface-container);
+      box-shadow: var(--md-sys-elevation-2);
+      overflow: hidden;
+      text-align: left;
+      font-size: 0.95rem;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+      vertical-align: middle;
+    }
+
+    .comparison-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .comparison-table thead th {
+      background: var(--md-sys-color-surface-container-high);
+      font-weight: 700;
+      color: var(--md-sys-color-on-surface);
+      font-size: 1rem;
+    }
+
+    .feature-col {
+      width: 38%;
+      min-width: 240px;
+    }
+
+    .product-col {
+      width: 20%;
+      min-width: 170px;
+      text-align: center;
+    }
+
+    .feature-title strong {
+      display: block;
+      color: var(--md-sys-color-on-surface);
+      font-size: 0.98rem;
+      margin-bottom: 4px;
+    }
+
+    .feature-title span {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .comparison-table td.highlight-col,
+    .comparison-table th.highlight-col {
+      background: var(--md-sys-color-surface-container-highest);
+      text-align: center;
+      position: relative;
+    }
+
+    .product-badge {
+      display: inline-block;
+      font-size: 0.82rem;
+      font-weight: 800;
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      padding: 3px 10px;
+      border-radius: 12px;
+      margin-bottom: 6px;
+      letter-spacing: 0.05em;
+    }
+
+    .product-name {
+      font-family: var(--font-family-display);
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .product-sub {
+      font-size: 0.82rem;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    .status-yes {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--md-sys-color-tertiary);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .status-yes .material-symbols-outlined {
+      font-size: 20px;
+    }
+
+    .status-no {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--md-sys-color-outline);
+      font-size: 0.88rem;
+    }
+
+    .status-no .material-symbols-outlined {
+      font-size: 18px;
+      color: var(--md-sys-color-error);
+    }
+
+    .status-neutral {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 0.88rem;
+    }
+
+    /* ============================================================
+       ORION STORE FULL-SIZE BADGE STYLING
+       ============================================================ */
+    .orion-badge-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1), filter 0.2s ease, box-shadow 0.2s ease;
+      vertical-align: middle;
+      border-radius: 14px;
+    }
+
+    .orion-badge-link:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.08);
+    }
+
+    .orion-badge-img {
+      height: 52px;
+      width: auto;
+      border-radius: 12px;
+      display: block;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    }
+
+    .orion-badge-download {
+      height: 56px;
+    }
+
+    .mobile-scroll-hint {
+      display: none;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--md-sys-color-primary);
+      margin-bottom: 12px;
+      gap: 6px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ============================================================
+       WHATSAPP CONTACT DEVELOPER STYLING
+       ============================================================ */
+    .whatsapp-fab {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #25D366;
+      color: #072613;
+      padding: 12px 20px;
+      border-radius: 32px;
+      text-decoration: none;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .whatsapp-fab:hover {
+      background: #1ebc59;
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 8px 26px rgba(0, 0, 0, 0.35);
+      color: #072613;
+    }
+
+    .whatsapp-fab-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .btn-whatsapp {
+      text-wrap: pretty;
+      background: rgba(37, 211, 102, 0.14);
+      color: #25D366;
+      border: 1px solid rgba(37, 211, 102, 0.35);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-whatsapp:hover {
+      background: #25D366;
+      color: #072613;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    }
+
+    .btn-whatsapp-hero {
+      background: rgba(37, 211, 102, 0.12);
+      color: #25D366;
+      border: 1.5px solid rgba(0, 0, 0, 0.25);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: 700;
+      border-radius: 20px;
+      padding: 14px 22px;
+      text-decoration: none;
+      transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .btn-whatsapp-hero:hover {
+      background: #25D366;
+      color: #072613;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Comparison Mobile Tabs */
+    .comparison-mobile-tabs {
+      display: none;
+    }
+
+    .comp-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--md-sys-color-on-surface-variant);
+      padding: 8px 14px;
+      border-radius: 16px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    .comp-tab-btn.active {
+      background: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Gallery Carousel Dots */
+    .gallery-dots {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .gallery-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--md-sys-color-outline-variant);
+      transition: all 0.25s ease;
+    }
+
+    .gallery-dot.active {
+      width: 22px;
+      border-radius: 8px;
+      background: var(--md-sys-color-primary);
+    }
+
+    @media (min-width: 769px) {
+      .comparison-table .col-khatabook,
+      .comparison-table .col-okcredit {
+        display: table-cell !important;
+      }
+    }
+
+    /* ============================================================
+       RESPONSIVE BREAKPOINTS (TABLET & MOBILE)
+       ============================================================ */
+    @media (max-width: 992px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 48px;
+      }
+
+      .hero-content {
+        align-items: center;
+      }
+
+      .hero-title {
+        font-size: clamp(2.4rem, 5vw, 3rem);
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      /* Horizontal scroll carousel for screenshots - eliminates bottom-under-bottom stacking */
+      .gallery-grid {
+        display: flex;
+        flex-direction: row;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        gap: 20px;
+        padding: 10px 16px 24px;
+        margin: 0 -16px;
+        max-width: none;
+        scrollbar-width: none;
+      }
+
+      .gallery-grid::-webkit-scrollbar {
+        display: none;
+      }
+
+      .gallery-item {
+        flex: 0 0 76vw;
+        max-width: 280px;
+        min-width: 240px;
+        scroll-snap-align: center;
+        scroll-snap-stop: always;
+      }
+
+      .gallery-dots {
+        display: flex;
+      }
+
+      .sync-box {
+        grid-template-columns: 1fr;
+        gap: 32px;
+        padding: 32px;
+      }
+
+      .desktop-nav {
+        display: none;
+      }
+
+      .menu-toggle-btn {
+        display: flex;
+      }
+
+      .mobile-scroll-hint {
+        display: flex;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 0 16px;
+      }
+
+      /* Top App Bar */
+      .top-app-bar {
+        padding: 10px 0;
+      }
+
+      .top-app-bar-inner {
+        height: 56px;
+      }
+
+      .brand-logo img {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+      }
+
+      .brand-logo span {
+        font-size: 1.1rem;
+      }
+
+      .version-pill {
+        display: none;
+      }
+
+      .header-actions {
+        gap: 6px;
+      }
+
+      .header-actions .btn {
+        padding: 7px 12px;
+        font-size: 0.82rem;
+      }
+
+      .header-actions .btn span:not(.material-symbols-outlined) {
+        display: none;
+      }
+
+      .theme-toggle-btn {
+        width: 36px;
+        height: 36px;
+      }
+
+      /* Hero Section */
+      .hero-section {
+        padding: 36px 0 32px;
+      }
+
+      .hero-grid {
+        gap: 32px;
+      }
+
+      .badge-chip {
+      text-wrap: pretty;
+        font-size: 0.82rem;
+        padding: 6px 12px;
+        text-align: center;
+        letter-spacing: 0;
+        white-space: normal;
+      }
+
+      .hero-title {
+        font-size: clamp(2rem, 8vw, 2.45rem);
+        line-height: 1.35;
+      }
+
+      .hero-subtitle {
+        font-size: 0.98rem;
+        line-height: 1.55;
+      }
+
+      .hero-actions {
+        flex-direction: column;
+        width: 100%;
+        gap: 12px;
+        align-items: stretch;
+      }
+
+      .btn-lg {
+        width: 100%;
+        min-height: 52px;
+        font-size: 1rem;
+        padding: 14px 20px;
+        justify-content: center;
+      }
+
+      .orion-badge-link {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .orion-badge-img {
+        height: 52px;
+        max-width: 100%;
+        object-fit: contain;
+      }
+
+      .store-badge-card {
+        width: 100%;
+        font-size: 0.82rem;
+        padding: 10px 14px;
+        text-align: center;
+        justify-content: center;
+      }
+
+      /* Interactive Mockup */
+      .mockup-wrapper {
+        width: 100%;
+      }
+
+      .mockup-frame {
+        max-width: 275px;
+        aspect-ratio: 9 / 19.2;
+        border-radius: 36px;
+        padding: 8px;
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+      }
+
+      .mockup-screen {
+        border-radius: 28px;
+      }
+
+      .mockup-notch {
+        width: 70px;
+        height: 18px;
+        top: 12px;
+      }
+
+      .mockup-tabs {
+        max-width: 100%;
+        overflow-x: auto;
+        padding: 4px;
+        gap: 4px;
+      }
+
+      .mockup-tab-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        white-space: nowrap;
+      }
+
+      /* Statistics - Compact 2x2 cards on mobile */
+      .stats-strip {
+      text-wrap: pretty;
+        padding: 16px 0;
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+      }
+
+      .stat-card {
+        padding: 10px 8px !important;
+        border-radius: 14px !important;
+        gap: 8px !important;
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .stat-icon {
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        font-size: 18px !important;
+        border-radius: 8px !important;
+      }
+
+      .stat-text .stat-title {
+        font-size: 0.84rem !important;
+        margin-bottom: 2px !important;
+        font-weight: 700 !important;
+      }
+
+      .stat-text p {
+      text-wrap: pretty;
+        font-size: 0.8rem !important;
+        line-height: 1.25 !important;
+      }
+
+      /* Features - Compact cards */
+      .section {
+        padding: 38px 0;
+      }
+
+      .section-header {
+        margin-bottom: 22px;
+      }
+
+      .section-tag {
+        font-size: 0.82rem;
+      }
+
+      .section-title {
+        font-size: clamp(1.6rem, 6vw, 1.95rem);
+        line-height: 1.4;
+      }
+
+      .section-subtitle {
+        font-size: 0.88rem;
+      }
+
+      .features-grid {
+        grid-template-columns: 1fr;
+        gap: 12px !important;
+      }
+
+      .m3-card {
+        padding: 14px 14px !important;
+        border-radius: 16px !important;
+        gap: 8px !important;
+      }
+
+      .card-icon-container {
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
+        font-size: 20px !important;
+        border-radius: 10px !important;
+        margin-bottom: 2px;
+      }
+
+      .card-title {
+        font-size: 1.02rem !important;
+        font-weight: 700;
+        margin-bottom: 2px;
+      }
+
+      .card-description {
+        font-size: 0.82rem !important;
+        line-height: 1.4 !important;
+      }
+
+      .card-badge {
+        font-size: 0.8rem !important;
+        padding: 2px 8px !important;
+        border-radius: 6px !important;
+      }
+
+      /* Gallery - Horizontal Swipe Carousel (never stacks bottom-under-bottom) */
+      .gallery-grid {
+        padding: 6px 16px 20px;
+        gap: 14px;
+        max-width: none;
+        margin: 0 -16px;
+      }
+
+      .gallery-item {
+        flex: 0 0 78vw;
+        max-width: 260px;
+        min-width: 220px;
+      }
+
+      .gallery-caption h4 {
+        font-size: 1rem;
+        margin-bottom: 2px;
+      }
+
+      .gallery-caption p {
+      text-wrap: pretty;
+        font-size: 0.82rem;
+        line-height: 1.35;
+      }
+
+      /* Cloud Sync - Compact */
+      .sync-box {
+        padding: 16px 12px;
+        border-radius: 18px;
+        gap: 16px;
+      }
+
+      .sync-steps-list {
+        gap: 10px;
+      }
+
+      .sync-step-item {
+        padding: 8px 10px;
+        border-radius: 12px;
+        gap: 10px;
+        background: var(--md-sys-color-surface-container-low);
+      }
+
+      .step-number {
+        width: 26px;
+        height: 26px;
+        min-width: 26px;
+        font-size: 0.8rem;
+      }
+
+      .step-text h5 {
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+      }
+
+      .step-text p {
+      text-wrap: pretty;
+        font-size: 0.84rem;
+        line-height: 1.32;
+      }
+
+      .sync-infographic-card img {
+        border-radius: 12px;
+      }
+
+      /* Comparison Table - Responsive Dual-Fit for Mobile */
+      .comparison-mobile-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin: 0 auto 14px;
+        background: var(--md-sys-color-surface-container-high);
+        padding: 4px;
+        border-radius: 20px;
+        border: 1px solid var(--md-sys-color-outline-variant);
+        width: fit-content;
+        max-width: 100%;
+      }
+
+      .comparison-table {
+        table-layout: fixed;
+        width: 100%;
+      }
+
+      .comparison-table th, 
+      .comparison-table td {
+        padding: 9px 7px;
+        font-size: 0.82rem;
+      }
+
+      /* Toggle columns based on active tab so comparison fits 100% on mobile without scroll */
+      .comparison-table.view-khatabook .col-okcredit {
+        display: none !important;
+      }
+      .comparison-table.view-okcredit .col-khatabook {
+        display: none !important;
+      }
+
+      .comparison-table.view-khatabook .feature-col,
+      .comparison-table.view-okcredit .feature-col {
+        width: 44%;
+        min-width: 120px;
+      }
+
+      .comparison-table.view-khatabook .col-storeledger,
+      .comparison-table.view-khatabook .col-khatabook,
+      .comparison-table.view-okcredit .col-storeledger,
+      .comparison-table.view-okcredit .col-okcredit {
+        width: 28%;
+        min-width: 90px;
+        padding: 8px 6px;
+      }
+
+      /* When Full (All 3) is selected, allow horizontal scroll with sticky feature column */
+      .comparison-table.view-all {
+        table-layout: auto;
+        width: max-content;
+        min-width: 100%;
+      }
+
+      .comparison-table.view-all .feature-col {
+        position: sticky;
+        left: 0;
+        z-index: 3;
+        background: var(--md-sys-color-surface-container);
+        box-shadow: 2px 0 6px rgba(0,0,0,0.25);
+        min-width: 130px;
+      }
+
+      .comparison-table.view-all thead th.feature-col {
+        z-index: 4;
+        background: var(--md-sys-color-surface-container-high);
+      }
+
+      .comparison-table.view-all .product-col {
+        min-width: 105px;
+      }
+
+      .feature-title strong {
+        font-size: 0.8rem;
+        margin-bottom: 2px;
+      }
+
+      .feature-title span {
+        font-size: 0.82rem;
+        line-height: 1.5;
+      }
+
+      .product-badge {
+        font-size: 0.76rem;
+        padding: 2px 6px;
+        border-radius: 8px;
+        margin-bottom: 4px;
+      }
+
+      .product-name {
+        font-size: 0.86rem;
+      }
+
+      .product-sub {
+        font-size: 0.82rem;
+      }
+
+      .status-yes, .status-no, .status-neutral {
+        font-size: 0.82rem;
+        gap: 3px;
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .status-yes .material-symbols-outlined,
+      .status-no .material-symbols-outlined,
+      .status-neutral .material-symbols-outlined {
+        font-size: 16px !important;
+      }
+
+      .table-responsive {
+        border-radius: 16px;
+      }
+
+      /* WhatsApp FAB and button compact adjustments */
+      .whatsapp-fab {
+        bottom: 16px;
+        right: 16px;
+        padding: 12px;
+        border-radius: 50%;
+      }
+
+      .whatsapp-fab-label {
+        display: none;
+      }
+
+      .btn-whatsapp span {
+        display: none;
+      }
+
+      .btn-whatsapp {
+      text-wrap: pretty;
+        padding: 8px 10px;
+        border-radius: 50%;
+      }
+
+      /* Download Card */
+      .download-hero-card {
+        padding: 28px 16px;
+        border-radius: 24px;
+        gap: 18px;
+      }
+
+      .download-hero-card h2 {
+        font-size: 1.7rem !important;
+      }
+
+      .download-hero-card p {
+      text-wrap: pretty;
+        font-size: 0.92rem;
+      }
+
+      .download-hero-card > div[style*="flex"] {
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 12px !important;
+        align-items: stretch !important;
+      }
+
+      .orion-badge-download {
+        height: 52px;
+        max-width: 100%;
+        object-fit: contain;
+      }
+
+      .download-meta-table {
+        border-radius: 16px;
+        font-size: 0.8rem;
+      }
+
+      .download-meta-row {
+        padding: 10px 12px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+      }
+
+      .checksum-box {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .download-meta-value {
+        word-break: break-all;
+        font-size: 0.84rem;
+      }
+
+      /* FAQ */
+      .faq-list {
+        gap: 10px;
+      }
+
+      .faq-item {
+        border-radius: 16px;
+      }
+
+      .faq-question {
+        padding: 14px 16px;
+        font-size: 0.95rem;
+      }
+
+      .faq-answer {
+        padding: 0 16px 16px;
+        font-size: 0.88rem;
+      }
+
+      /* Footer */
+      .footer {
+        padding: 36px 0 28px;
+      }
+
+      .footer-inner {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+      }
+
+      .footer-nav {
+        gap: 12px 18px;
+        justify-content: center;
+        font-size: 0.85rem;
+      }
+
+      .footer-copy {
+        font-size: 0.8rem;
+        line-height: 1.5;
+      }
+    }
   </style>
 </head>
 <body>
-  <header class="site-header"><nav class="shell nav" aria-label="Main navigation"><a class="brand" href="./" aria-label="Store Ledger home"><img src="./assets/icon.png" alt="" /><span>Store Ledger</span></a><ul class="nav-links"><li><a href="#features">What it does</a></li><li><a href="#screens">In the app</a></li><li><a href="#ownership">Your data</a></li><li><a class="nav-download" href="#download">Get the app ↗</a></li></ul></nav></header>
-  <main>
-    <section class="hero" aria-labelledby="hero-title"><div class="shell hero-grid"><div class="hero-copy"><span class="eyebrow">The clear way to keep score</span><h1 id="hero-title">Every rupee has a place. <em>Every customer, a story.</em></h1><p class="hero-text">Store Ledger is the calm, capable khata for independent businesses: record credit and collections, send statements, and stay in charge of every last record.</p><div class="hero-actions"><a class="button button-primary" href="#download">Download for Android <span class="arrow">↓</span></a><a class="button button-secondary" href="#screens">See the app <span class="arrow">→</span></a></div><ul class="hero-proof" aria-label="Store Ledger highlights"><li>Works offline</li><li>No ads or tracking</li><li>MIT licensed</li></ul></div><div class="phone-stage" aria-label="Store Ledger dashboard preview"><div class="ledger-note"><small>At a glance</small><strong>Know what is due, before it slips away.</strong></div><div class="phone"><img src="./assets/screenshots/orion_screenshot_1_dashboard.png" alt="Store Ledger dashboard showing balance summary, recent transactions, and customer accounts" width="400" height="800" /></div></div></div></section>
-    <div class="ticker" aria-hidden="true"><div class="ticker-track"><span>Offline-first <b>✦</b></span><span>Private by design <b>✦</b></span><span>Built for real shops <b>✦</b></span><span>Optional cloud sync <b>✦</b></span><span>Offline-first <b>✦</b></span><span>Private by design <b>✦</b></span><span>Built for real shops <b>✦</b></span><span>Optional cloud sync <b>✦</b></span></div></div>
-    <section class="section" id="features" aria-labelledby="features-title"><div class="shell"><header class="section-head"><span class="eyebrow">Less chasing. More clarity.</span><h2 id="features-title">Made for the work behind a good business.</h2><p class="section-intro">Not a bloated accounting suite. Just the practical tools that help you remember, follow up, and move on with your day.</p></header><div class="feature-grid"><article class="feature"><span class="feature-index">01 / Always available</span><div><h3>Keep the book even when the network disappears.</h3><p>Your core ledger stays on your device, so the work never waits for a signal.</p></div><span class="feature-mark">↯</span></article><article class="feature"><span class="feature-index">02 / One clear balance</span><div><h3>See who owes what.</h3><p>Gave, got, and outstanding amounts are easy to read at a glance.</p></div><span class="feature-mark">+</span></article><article class="feature"><span class="feature-index">03 / Fast entry</span><div><h3>Record it in seconds.</h3><p>Quick amounts keep busy counters moving.</p></div><span class="feature-mark">→</span></article><article class="feature"><span class="feature-index">04 / Gentle follow-up</span><div><h3>Send a reminder that feels human.</h3><p>Share polished payment messages on WhatsApp.</p></div><span class="feature-mark">◎</span></article><article class="feature"><span class="feature-index">05 / Ready to share</span><div><h3>Statements and receipts, without the spreadsheet.</h3><p>Create clean customer records and PDFs when the conversation needs proof.</p></div><span class="feature-mark">□</span></article><article class="feature"><span class="feature-index">06 / Yours, truly</span><div><h3>No ads. No forced cloud. No vendor-shaped trap.</h3><p>Use it locally or connect your own Supabase project when you choose to sync.</p></div><span class="feature-mark">∞</span></article></div></div></section>
-    <section class="section report" aria-labelledby="statement-title"><div class="shell report-grid"><div><span class="eyebrow">A conversation-ready record</span><h2 id="statement-title">A clear statement makes collecting simpler.</h2><p class="section-intro">Every customer gets a transparent transaction trail. Share the record, send a polite reminder, and keep the relationship as tidy as the balance.</p><div class="data-lines"><div class="data-line"><span class="data-n">01</span><strong>Complete transaction history</strong><span>Always clear</span></div><div class="data-line"><span class="data-n">02</span><strong>Shareable payment receipts</strong><span>One tap</span></div><div class="data-line"><span class="data-n">03</span><strong>PDF customer statements</strong><span>Ready to send</span></div></div></div><div class="statement"><img src="./assets/screenshots/orion_screenshot_2_customer_statement.png" alt="Store Ledger customer statement with a transaction timeline and balance detail" loading="lazy" width="400" height="800" /></div></div></section>
-    <section class="section screens" id="screens" aria-labelledby="screens-title"><div class="shell"><header class="section-head"><span class="eyebrow">Designed for the counter</span><h2 id="screens-title">Serious about the numbers. Easy on the eyes.</h2><p class="section-intro">A focused interface lets you see the health of the business without digging through menus.</p></header><div class="screen-grid"><article class="screen-card"><figure><img src="./assets/screenshots/orion_screenshot_1_dashboard.png" alt="Store Ledger dashboard screen" loading="lazy" width="400" height="800" /><figcaption><b>01 — Today’s ledger</b><br />Balances and activity, in one view.</figcaption></figure></article><article class="screen-card"><figure><img src="./assets/screenshots/orion_screenshot_2_customer_statement.png" alt="Store Ledger customer statement screen" loading="lazy" width="400" height="800" /><figcaption><b>02 — Customer history</b><br />The full story behind every balance.</figcaption></figure></article><article class="screen-card"><figure><img src="./assets/screenshots/orion_screenshot_3_analytics_reports.png" alt="Store Ledger analytics and reports screen" loading="lazy" width="400" height="800" /><figcaption><b>03 — Cash-flow view</b><br />Patterns worth acting on.</figcaption></figure></article></div></div></section>
-    <section class="section" id="ownership" aria-labelledby="ownership-title"><div class="shell ownership"><div class="ownership-panel"><span class="eyebrow">Your ledger. Your rules.</span><h2 id="ownership-title">Privacy is not an upgrade.</h2><p>Store Ledger starts local. If your business needs backup or multiple devices, connect a Supabase project you control—not an account we control.</p><ul class="ownership-list"><li>Your business records remain under your control.</li><li>Optional sync uses your own Supabase infrastructure.</li><li>Open source means the privacy promise is inspectable.</li></ul></div><div class="sync-art" aria-hidden="true"><span class="sync-label">A cloud connection without giving away the keys.</span><img src="./assets/store_ledger_cloud_sync_guide.jpg" alt="" loading="lazy" width="1200" height="750" /></div></div></section>
-    <section class="cta" id="download" aria-labelledby="download-title"><div class="shell"><div class="cta-card"><div class="cta-content"><span class="eyebrow">Start with a cleaner book</span><h2 id="download-title">Make every balance easier to face.</h2><p>Download Store Ledger for Android. It is free, offline-first, and built to stay out of the way while you run the business.</p><div class="hero-actions"><a class="button button-primary" href="https://github.com/iamrony27/storeledger/releases/download/v2.0.0/StoreLedger-v2.0.0.apk">Download APK <span class="arrow">↓</span></a><a class="button button-secondary" href="https://github.com/iamrony27/storeledger/releases/tag/v2.0.0" target="_blank" rel="noopener">View release <span class="arrow">↗</span></a></div></div></div></div></section>
-  </main>
-  <footer class="site-footer"><div class="shell"><div class="footer-grid"><div><a class="brand" href="./"><img src="./assets/icon.png" alt="" /><span>Store Ledger</span></a><p class="footer-note">A private, offline-first customer ledger for independent businesses and shopkeepers.</p></div><nav class="footer-links" aria-label="Footer navigation"><a href="./privacy.html">Privacy</a><a href="./terms.html">Terms</a><a href="https://github.com/iamrony27/storeledger" target="_blank" rel="noopener">Source code ↗</a><a href="https://github.com/iamrony27/storeledger/issues" target="_blank" rel="noopener">Support ↗</a><a href="https://wa.me/917074018142?text=Hi%20Developer%2C%20I%20have%20a%20query%20about%20Store%20Ledger" target="_blank" rel="noopener">WhatsApp ↗</a></nav></div><p class="copyright">© 2026 STORE LEDGER PROJECT · MADE FOR INDEPENDENT BUSINESS.</p></div></footer>
+
+  <!-- ============================================================
+       M3 TOP APP BAR
+       ============================================================ -->
+  <header class="top-app-bar">
+    <div class="container top-app-bar-inner">
+      <a href="#" class="brand-logo">
+        <img src="./assets/icon.png" alt="Store Ledger Logo" />
+        <span>Store Ledger</span>
+        <span class="version-pill">v2.0.0</span>
+      </a>
+
+      <nav class="desktop-nav">
+        <ul class="nav-links">
+          <li><a href="#features" class="nav-link">Features</a></li>
+          <li><a href="#screenshots" class="nav-link">Screenshots</a></li>
+          <li><a href="#cloud-sync" class="nav-link">Cloud Sync</a></li>
+          <li><a href="#comparison" class="nav-link">Compare</a></li>
+          <li><a href="#download" class="nav-link">Download</a></li>
+          <li><a href="#faq" class="nav-link">FAQ</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Dark/Light Mode" title="Toggle theme">
+          <span class="material-symbols-outlined" id="themeIcon">light_mode</span>
+        </button>
+        <a href="#download" class="btn btn-primary">
+          <span class="material-symbols-outlined">download</span>
+          <span>Get APK</span>
+        </a>
+        <button class="menu-toggle-btn" id="menuToggleBtn" aria-label="Open navigation menu" title="Menu">
+          <span class="material-symbols-outlined" id="menuIcon">menu</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-nav-drawer" id="mobileNavDrawer">
+      <ul class="mobile-nav-links">
+        <li><a href="#features" class="mobile-nav-link"><span class="material-symbols-outlined">auto_awesome</span> Features</a></li>
+        <li><a href="#screenshots" class="mobile-nav-link"><span class="material-symbols-outlined">photo_library</span> Screenshots</a></li>
+        <li><a href="#cloud-sync" class="mobile-nav-link"><span class="material-symbols-outlined">cloud_sync</span> Cloud Sync</a></li>
+        <li><a href="#comparison" class="mobile-nav-link"><span class="material-symbols-outlined">compare_arrows</span> Compare</a></li>
+        <li><a href="#download" class="mobile-nav-link"><span class="material-symbols-outlined">download</span> Download APK</a></li>
+        <li><a href="#faq" class="mobile-nav-link"><span class="material-symbols-outlined">help_outline</span> FAQ</a></li>
+        <li><a href="https://wa.me/917074018142?text=Hi%20Developer%2C%20I%20have%20a%20query%20about%20Store%20Ledger%20App" target="_blank" rel="noopener" class="mobile-nav-link highlight-whatsapp"><span class="material-symbols-outlined">chat</span> WhatsApp Developer</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       HERO SECTION
+       ============================================================ -->
+  <section class="hero-section">
+    <div class="hero-bg-glow"></div>
+    <div class="container hero-grid">
+      <div class="hero-content">
+        <div class="badge-chip">
+          <span class="material-symbols-outlined" style="font-size: 18px;">verified</span>
+          <span>OFFLINE-FIRST + CLOUD SYNC • ZERO VENDOR LOCK-IN • MULTI-CURRENCY</span>
+        </div>
+
+        <h1 class="hero-title">
+          Smart Customer Ledger for <span>Modern Business Owners</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Track customer credit, balance khatas, and daily business collections with flawless integer arithmetic. Works seamlessly offline without internet, with real-time cloud sync and backup whenever you choose.
+        </p>
+
+        <div class="hero-actions">
+          <a href="https://github.com/iamrony27/storeledger/releases/download/v2.0.0/StoreLedger-v2.0.0.apk" class="btn btn-primary btn-lg">
+            <span class="material-symbols-outlined">android</span>
+            <span>Download APK (v2.0.0)</span>
+          </a>
+          <a href="https://rookieenough.github.io/Orion-Data/redirect.html?id=storeledger" target="_blank" rel="noopener" class="orion-badge-link" title="Get it on Orion Store">
+            <img src="https://raw.githubusercontent.com/RookieEnough/Orion-Store/refs/heads/main/assets/orion-badge.png" alt="Get it on Orion Store" class="orion-badge-img" />
+          </a>
+          <a href="https://wa.me/917074018142?text=Hi%20Developer%2C%20I%20have%20a%20query%20about%20Store%20Ledger%20App" target="_blank" rel="noopener" class="btn btn-whatsapp-hero btn-lg" title="Contact Developer on WhatsApp">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.42 0-2.82-.37-4.05-1.08l-.29-.17-3.12.82.83-3.04-.19-.3a8.212 8.212 0 0 1-1.26-4.46c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.58c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.12-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.6.19 1.15.16 1.59.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.11-.23-.17-.48-.3z"/>
+            </svg>
+            <span>Contact Developer</span>
+          </a>
+          <a href="https://github.com/iamrony27/storeledger" target="_blank" rel="noopener" class="btn btn-tonal btn-lg">
+            <span class="material-symbols-outlined">code</span>
+            <span>GitHub</span>
+          </a>
+        </div>
+
+        <div class="store-badge-card">
+          <span class="material-symbols-outlined" style="color: var(--md-sys-color-primary);">storefront</span>
+          <div>
+            <strong>Orion Store Ready:</strong> Package ID <code>com.gwd.book</code> • Free & Open Source (No Ads)
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Phone Mockup Showcase -->
+      <div class="mockup-wrapper">
+        <div class="mockup-frame">
+          <div class="mockup-notch"></div>
+          <div class="mockup-screen">
+            <img id="mockupImage" src="./assets/screenshots/orion_screenshot_1_dashboard.png" alt="Store Ledger In-App Preview" />
+          </div>
+        </div>
+
+        <!-- Screenshot Tab Pills -->
+        <div class="mockup-tabs">
+          <button class="mockup-tab-btn active" data-src="./assets/screenshots/orion_screenshot_1_dashboard.png">Dashboard</button>
+          <button class="mockup-tab-btn" data-src="./assets/screenshots/orion_screenshot_2_customer_statement.png">Statement</button>
+          <button class="mockup-tab-btn" data-src="./assets/screenshots/orion_screenshot_3_analytics_reports.png">Analytics</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       STATISTICS STRIP
+       ============================================================ -->
+  <section class="stats-strip">
+    <div class="container stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <span class="material-symbols-outlined">cloud_sync</span>
+        </div>
+        <div class="stat-text">
+          <div class="stat-title">Offline + Cloud Sync</div>
+          <p>Works offline • Syncs seamlessly</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: var(--md-sys-color-tertiary-container); color: var(--md-sys-color-on-tertiary-container);">
+          <span class="material-symbols-outlined">currency_exchange</span>
+        </div>
+        <div class="stat-text">
+          <div class="stat-title">9 Currencies</div>
+          <p>INR, USD, EUR, BDT & .00 toggle</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon" style="background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container);">
+          <span class="material-symbols-outlined">database</span>
+        </div>
+        <div class="stat-text">
+          <div class="stat-title">0 Vendor Lock-In</div>
+          <p>Bring your own Supabase cloud</p>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">
+          <span class="material-symbols-outlined">security</span>
+        </div>
+        <div class="stat-text">
+          <div class="stat-title">SHA-256 Backups</div>
+          <p>Cryptographically verified</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       KEY FEATURES SECTION
+       ============================================================ -->
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Engineered For Reliability</span>
+        <h2 class="section-title">Everything Your Business Needs In One Elegant App</h2>
+        <p class="section-subtitle">
+          Designed specifically for retailers, distributors, shop owners, and freelancers who demand speed, financial precision, and absolute data privacy.
+        </p>
+      </div>
+
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="m3-card">
+          <div class="card-icon-container">
+            <span class="material-symbols-outlined">offline_bolt</span>
+          </div>
+          <h3 class="card-title">Offline-First &amp; Cloud Ready</h3>
+          <p class="card-description">
+            Never wait for network connectivity or server spinners. All entries, customers, and balance totals compute instantly on your phone with raw integer math, and sync smoothly with your private cloud when online.
+          </p>
+          <span class="card-badge">Zero Lag</span>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="m3-card">
+          <div class="card-icon-container tertiary">
+            <span class="material-symbols-outlined">payments</span>
+          </div>
+          <h3 class="card-title">Multi-Currency & Decimals</h3>
+          <p class="card-description">
+            Full support for INR (₹), USD ($), EUR (€), GBP (£), BDT (৳), AED, SAR, CAD, and AUD. Toggle fractional decimals (.00) anytime with dynamic numeric keypads and big number autoscaling.
+          </p>
+          <span class="card-badge">9 Global Currencies</span>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="m3-card">
+          <div class="card-icon-container secondary">
+            <span class="material-symbols-outlined">cloud_sync</span>
+          </div>
+          <h3 class="card-title">Bring Your Own Supabase</h3>
+          <p class="card-description">
+            Connect your personal Supabase project by simply entering your Project URL and Anon Key. Strict Row Level Security policies guarantee nobody else can ever read your ledger records.
+          </p>
+          <span class="card-badge">Zero Lock-In</span>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="m3-card">
+          <div class="card-icon-container">
+            <span class="material-symbols-outlined">show_chart</span>
+          </div>
+          <h3 class="card-title">Cash Flow Velocity Splines</h3>
+          <p class="card-description">
+            Visualize your collections vs credit disbursements with smooth cubic Bézier splines. Non-colliding dynamic Y-axis intervals ensure clear, intuitive financial charts across 7-day, 30-day, and monthly views.
+          </p>
+          <span class="card-badge">Visual Intelligence</span>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="m3-card">
+          <div class="card-icon-container tertiary">
+            <span class="material-symbols-outlined">chat</span>
+          </div>
+          <h3 class="card-title">WhatsApp & PDF Reminders</h3>
+          <p class="card-description">
+            Send instant payment reminders via WhatsApp in English and Bengali (বাংলা) with last payment breakdown. Export clean, professional HTML-to-PDF statements for customers and master audits.
+          </p>
+          <span class="card-badge">1-Tap Billing</span>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="m3-card">
+          <div class="card-icon-container secondary">
+            <span class="material-symbols-outlined">enhanced_encryption</span>
+          </div>
+          <h3 class="card-title">Cryptographic Backups</h3>
+          <p class="card-description">
+            Generate SHA-256 cryptographically verified snapshots to local storage, Google Drive, or SD cards. Intelligent UUID deduplication guarantees restores will never generate duplicate accounts.
+          </p>
+          <span class="card-badge">FIPS 180-4 Security</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       APP SCREENSHOTS GALLERY
+       ============================================================ -->
+  <section class="section screenshots-section" id="screenshots">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Visual Walkthrough</span>
+        <h2 class="section-title">Designed with Material 3 Precision</h2>
+        <p class="section-subtitle">
+          Clean dark mode aesthetics, intuitive tactile action buttons, and WCAG AA contrast compliance across every screen.
+        </p>
+      </div>
+
+      <div class="mobile-scroll-hint">
+        <span class="material-symbols-outlined" style="font-size: 16px;">swipe</span>
+        <span>Swipe horizontally to preview screens</span>
+      </div>
+
+      <div class="gallery-grid" id="galleryGrid">
+        <!-- Screenshot 1 -->
+        <div class="gallery-item">
+          <div class="gallery-image-card" onclick="openLightbox(this)">
+            <img src="./assets/screenshots/orion_screenshot_1_dashboard.png" alt="Executive Dashboard Screen - Store Ledger" loading="lazy" decoding="async" width="400" height="800" />
+          </div>
+          <div class="gallery-caption">
+            <h3>Executive Dashboard</h3>
+            <p>Real-time due totals, customer search, filter chips & quick entry FAB</p>
+          </div>
+        </div>
+
+        <!-- Screenshot 2 -->
+        <div class="gallery-item">
+          <div class="gallery-image-card" onclick="openLightbox(this)">
+            <img src="./assets/screenshots/orion_screenshot_2_customer_statement.png" alt="Customer Statement Screen - Store Ledger" loading="lazy" decoding="async" width="400" height="800" />
+          </div>
+          <div class="gallery-caption">
+            <h3>Customer Statement</h3>
+            <p>Hero balance card, 3-column breakdown & split tactile entry buttons</p>
+          </div>
+        </div>
+
+        <!-- Screenshot 3 -->
+        <div class="gallery-item">
+          <div class="gallery-image-card" onclick="openLightbox(this)">
+            <img src="./assets/screenshots/orion_screenshot_3_analytics_reports.png" alt="Reports & Velocity Chart Screen - Store Ledger" loading="lazy" decoding="async" width="400" height="800" />
+          </div>
+          <div class="gallery-caption">
+            <h3>Cash Flow Analytics</h3>
+            <p>Smooth Bézier velocity curves, non-colliding axis & exposure ranking</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="gallery-dots">
+        <span class="gallery-dot active"></span>
+        <span class="gallery-dot"></span>
+        <span class="gallery-dot"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SUPABASE CLOUD SYNC SECTION
+       ============================================================ -->
+  <section class="section" id="cloud-sync">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Decentralized Cloud Architecture</span>
+        <h2 class="section-title">Connect Your Own Supabase Backend</h2>
+        <p class="section-subtitle">
+          Unlike proprietary accounting apps that hold your data hostage, Store Ledger lets you own your PostgreSQL database entirely with zero monthly vendor fees.
+        </p>
+      </div>
+
+      <div class="sync-box">
+        <div class="sync-steps-list">
+          <div class="sync-step-item">
+            <div class="step-number">1</div>
+            <div class="step-text">
+              <h3>Connect Project Credentials</h3>
+              <p>Enter your private Supabase Project URL and Public Anon Key. Store Ledger never requires or stores database master passwords.</p>
+            </div>
+          </div>
+
+          <div class="sync-step-item">
+            <div class="step-number">2</div>
+            <div class="step-text">
+              <h3>Execute One-Time SQL Schema</h3>
+              <p>Run our idempotent SQL script in your Supabase SQL editor to create isolated tables, indexes, and Row Level Security policies.</p>
+            </div>
+          </div>
+
+          <div class="sync-step-item">
+            <div class="step-number">3</div>
+            <div class="step-text">
+              <h3>Register & Confirm Email</h3>
+              <p>Create your store owner login and confirm your email. Real-time background replication syncs across all your devices automatically.</p>
+            </div>
+          </div>
+
+          <div class="sync-step-item">
+            <div class="step-number">4</div>
+            <div class="step-text">
+              <h3>Safe Disconnect Anytime</h3>
+              <p>Disconnecting Supabase clears your credentials locally while leaving all remote cloud records completely untouched and intact.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="sync-infographic-card">
+          <img src="./assets/store_ledger_cloud_sync_guide.jpg" alt="Cloud Sync 4-Step Diagram - Store Ledger" loading="lazy" decoding="async" width="800" height="500" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       COMPETITOR COMPARISON: STORE LEDGER VS KHATABOOK VS OKCREDIT
+       ============================================================ -->
+  <section class="section" id="comparison">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Direct Head-to-Head</span>
+        <h2 class="section-title">Store Ledger vs. Khatabook vs. OkCredit</h2>
+        <p class="section-subtitle">
+          Why smart business owners choose sovereign data ownership, zero ads, offline-first reliability, and real-time cloud sync over closed proprietary platforms.
+        </p>
+      </div>
+
+      <div class="comparison-container">
+        <!-- Mobile Dual-View Selector: fits comparison cleanly on mobile screens -->
+        <div class="comparison-mobile-tabs">
+          <button type="button" class="comp-tab-btn active" data-view="khatabook">vs. Khatabook</button>
+          <button type="button" class="comp-tab-btn" data-view="okcredit">vs. OkCredit</button>
+          <button type="button" class="comp-tab-btn" data-view="all">Full Table</button>
+        </div>
+
+        <div class="mobile-scroll-hint" id="compScrollHint" style="display: none;">
+          <span class="material-symbols-outlined" style="font-size: 16px;">swipe</span>
+          <span>Swipe horizontally to view all competitors</span>
+        </div>
+        <div class="table-responsive">
+          <table class="comparison-table view-khatabook" id="comparisonTable">
+            <thead>
+              <tr>
+                <th class="feature-col">Feature / Capability</th>
+                <th class="product-col highlight-col col-storeledger">
+                  <div class="product-badge">RECOMMENDED</div>
+                  <img src="./assets/icon.png" width="38" height="38" alt="Store Ledger Logo" style="border-radius: 10px; display: block; margin: 4px auto 8px;" />
+                  <div class="product-name">Store Ledger</div>
+                  <div class="product-sub">v2.0.0 (Open Source)</div>
+                </th>
+                <th class="product-col col-khatabook">
+                  <img src="./assets/competitors/khatabook.png" width="38" height="38" alt="Khatabook Logo" style="border-radius: 10px; display: block; margin: 18px auto 8px;" />
+                  <div class="product-name">Khatabook</div>
+                  <div class="product-sub">Proprietary Closed</div>
+                </th>
+                <th class="product-col col-okcredit">
+                  <img src="./assets/competitors/okcredit.png" width="38" height="38" alt="OkCredit Logo" style="border-radius: 10px; display: block; margin: 18px auto 8px;" />
+                  <div class="product-name">OkCredit</div>
+                  <div class="product-sub">Proprietary Closed</div>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="feature-title">
+                  <strong>Offline-First Architecture &amp; Cloud Sync</strong>
+                  <span>Full bookkeeping capabilities offline with optional real-time cloud sync</span>
+                </td>
+                <td class="highlight-col col-storeledger">
+                  <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> Yes (Offline + Cloud Sync)</span>
+                </td>
+                <td class="col-khatabook">
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Requires Internet</span>
+                </td>
+                <td class="col-okcredit">
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Requires Internet</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="feature-title">
+                  <strong>Data Ownership &amp; Cloud Choice</strong>
+                  <span>Who actually holds your private customer debt &amp; payment records?</span>
+                </td>
+                <td class="highlight-col col-storeledger">
+                  <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> You (BYO Supabase)</span>
+                </td>
+                <td class="col-khatabook">
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Khatabook Servers</span>
+                </td>
+                <td class="col-okcredit">
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> OkCredit Servers</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="feature-title">
+                  <strong>Zero Advertisements &amp; No Loan Spam</strong>
+                  <span>Clean workspace free from unprompted credit lines and marketing push</span>
+                </td>
+                <td class="highlight-col col-storeledger">
+                  <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> 100% Ad-Free</span>
+                </td>
+                <td class="col-khatabook">
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Loan &amp; card ads</span>
+                </td>
+                <td class="col-okcredit">
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Ecosystem upsells</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="feature-title">
+                  <strong>No Mandatory Phone / OTP Sign-In</strong>
+                  <span>Instant access without surrendering your phone number to sales databases</span>
+                </td>
+                <td class="highlight-col col-storeledger">
+                  <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> Instant Start (No OTP)</span>
+                </td>
+                <td class="col-khatabook">
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Mandatory Phone OTP</span>
+                </td>
+                <td class="col-okcredit">
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Mandatory Phone OTP</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="feature-title">
+                  <strong>Multi-Currency &amp; Decimal (.00) Support</strong>
+                  <span>Built for global commerce with INR, USD, EUR, GBP, BDT, AED, SAR...</span>
+                </td>
+                <td class="highlight-col col-storeledger">
+                  <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> 9 Currencies + Decimals</span>
+                </td>
+                <td class="col-khatabook">
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Primarily INR only</span>
+                </td>
+                <td class="col-okcredit">
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Primarily INR only</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="feature-title">
+                  <strong>Exact Integer Arithmetic</strong>
+                  <span>Minor unit accounting (paise/cents) eliminates rounding drifts</span>
+                </td>
+                <td class="highlight-col col-storeledger">
+                  <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> Strict Integer Math</span>
+                </td>
+                <td class="col-khatabook">
+                  <span class="status-neutral"><span class="material-symbols-outlined">check</span> Standard rounding</span>
+                </td>
+                <td class="col-okcredit">
+                  <span class="status-neutral"><span class="material-symbols-outlined">check</span> Standard rounding</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="feature-title">
+                  <strong>Encrypted Snapshots &amp; Backups</strong>
+                  <span>Exportable, cryptographically signed SHA-256 JSON backup snapshots</span>
+                </td>
+                <td class="highlight-col col-storeledger">
+                  <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> SHA-256 Encrypted</span>
+                </td>
+                <td class="col-khatabook">
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Proprietary lock-in</span>
+                </td>
+                <td class="col-okcredit">
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Proprietary lock-in</span>
+                </td>
+              </tr>
+              <tr>
+                <td class="feature-title">
+                  <strong>Software Transparency &amp; License</strong>
+                  <span>Fully auditable, verifiable open-source codebase on GitHub</span>
+                </td>
+                <td class="highlight-col col-storeledger">
+                  <span class="status-yes"><span class="material-symbols-outlined">check_circle</span> MIT Open Source</span>
+                </td>
+                <td class="col-khatabook">
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Closed Source</span>
+                </td>
+                <td class="col-okcredit">
+                  <span class="status-no"><span class="material-symbols-outlined">cancel</span> Closed Source</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DOWNLOAD & VERIFICATION SECTION
+       ============================================================ -->
+  <section class="section" id="download">
+    <div class="container download-card-wrapper">
+      <div class="download-hero-card">
+        <div class="badge-chip">
+          <span class="material-symbols-outlined" style="font-size: 18px;">download</span>
+          <span>OFFICIAL PRODUCTION BUILD</span>
+        </div>
+
+        <h2 style="font-size: 2.4rem; font-weight: 800; letter-spacing: -0.02em;">
+          Download Store Ledger v2.0.0
+        </h2>
+
+        <p style="color: var(--md-sys-color-on-surface-variant); max-width: 580px;">
+          Install the standalone Android production APK directly on any Android phone (Android 8.0 Oreo to Android 15).
+        </p>
+
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 16px;">
+          <a href="https://github.com/iamrony27/storeledger/releases/download/v2.0.0/StoreLedger-v2.0.0.apk" class="btn btn-primary btn-lg" style="font-size: 1.15rem; padding: 18px 36px;">
+            <span class="material-symbols-outlined" style="font-size: 28px;">android</span>
+            <span>Download APK (95.5 MB)</span>
+          </a>
+          <a href="https://rookieenough.github.io/Orion-Data/redirect.html?id=storeledger" target="_blank" rel="noopener" class="orion-badge-link" title="Get it on Orion Store">
+            <img src="https://raw.githubusercontent.com/RookieEnough/Orion-Store/refs/heads/main/assets/orion-badge.png" alt="Get it on Orion Store" class="orion-badge-img orion-badge-download" />
+          </a>
+        </div>
+
+        <!-- Checksum & Package Metadata Table -->
+        <div class="download-meta-table">
+          <div class="download-meta-row">
+            <span class="download-meta-label">Android Package ID:</span>
+            <span class="download-meta-value">com.gwd.book</span>
+          </div>
+          <div class="download-meta-row">
+            <span class="download-meta-label">App Version:</span>
+            <span class="download-meta-value">2.0.0 (Build Code: 12)</span>
+          </div>
+          <div class="download-meta-row">
+            <span class="download-meta-label">Expo SDK:</span>
+            <span class="download-meta-value">SDK 57 (React Native 0.81)</span>
+          </div>
+          <div class="download-meta-row">
+            <span class="download-meta-label">SHA-256 Checksum:</span>
+            <div class="checksum-box">
+              <span class="download-meta-value" id="checksumText">5735227a8d3e7ce2f589ded3abf78ae7a1d93afbdea897ac5127df9f01661f9e</span>
+              <button class="copy-btn" onclick="copyChecksum()" title="Copy SHA-256">
+                <span class="material-symbols-outlined" style="font-size: 16px;">content_copy</span>
+                <span id="copyBtnLabel">Copy</span>
+              </button>
+            </div>
+          </div>
+          <div class="download-meta-row">
+            <span class="download-meta-label">VirusTotal Scan:</span>
+            <a href="https://www.virustotal.com/gui/file/5735227a8d3e7ce2f589ded3abf78ae7a1d93afbdea897ac5127df9f01661f9e" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 6px; color: var(--md-sys-color-tertiary); font-weight: 700; text-decoration: none;">
+              <span class="material-symbols-outlined" style="font-size: 18px;">verified_user</span>
+              <span>100% Clean (0/68 Security Vendors)</span>
+            </a>
+          </div>
+        </div>
+
+        <div style="font-size: 0.85rem; color: var(--md-sys-color-on-surface-variant);">
+          Also available on <a href="https://github.com/iamrony27/storeledger/releases/tag/v2.0.0" target="_blank" style="color: var(--md-sys-color-primary); font-weight: 700; text-decoration: underline;">GitHub Releases</a> and compatible with Orion Store.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FAQ SECTION
+       ============================================================ -->
+  <section class="section" id="faq">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Common Questions</span>
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        <p class="section-subtitle">Everything you need to know about Store Ledger and data ownership.</p>
+      </div>
+
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>Is Store Ledger really 100% free with no forced subscriptions?</span>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="faq-answer">
+            Yes! Store Ledger is open-source under the MIT license. There are no monthly subscription fees, paywalls, or in-app ads. All offline features work indefinitely without payment.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>Do I need an internet connection to use the app?</span>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="faq-answer">
+            No. Store Ledger is completely offline-first. You can add customers, record credits/debits, view analytics, and generate PDF statements with zero internet. When internet is available, you can optionally enable cloud sync with your private Supabase backend to keep all devices in sync.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>How does the Bring-Your-Own Supabase cloud sync work?</span>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="faq-answer">
+            You create a free Supabase project and provide the Project URL and Anon/Publishable Key. Store Ledger syncs directly to your PostgreSQL database with Row Level Security, ensuring you retain 100% ownership of your records.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>Can I switch currencies or use fractional decimal amounts?</span>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="faq-answer">
+            Yes. Store Ledger supports 9 global currencies (INR, USD, EUR, GBP, BDT, AED, SAR, CAD, AUD). You can toggle decimal (.00) precision on or off anytime. Data is stored in exact minor units (paise/cents) so no precision is ever lost.
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question" onclick="toggleFaq(this)">
+            <span>How do I back up my ledger data safely?</span>
+            <span class="material-symbols-outlined">expand_more</span>
+          </div>
+          <div class="faq-answer">
+            You can create encrypted, SHA-256 verified snapshot backups directly from Settings. Backups can be shared via WhatsApp, Google Drive, email, or saved to your device's external storage.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-logo">
+        <img src="./assets/icon.png" alt="Store Ledger" />
+        <span>Store Ledger</span>
+      </div>
+
+      <ul class="footer-nav">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#screenshots">Screenshots</a></li>
+        <li><a href="#cloud-sync">Cloud Sync</a></li>
+        <li><a href="#comparison">Compare</a></li>
+        <li><a href="https://wa.me/917074018142?text=Hi%20Developer%2C%20I%20have%20a%20query%20about%20Store%20Ledger%20App" target="_blank" rel="noopener" style="color: #25D366; font-weight: 700;">WhatsApp Developer</a></li>
+        <li><a href="./privacy.html">Privacy Policy</a></li>
+        <li><a href="./terms.html">Terms of Service</a></li>
+        <li><a href="https://github.com/iamrony27/storeledger/releases/tag/v2.0.0" target="_blank">Release Notes</a></li>
+        <li><a href="https://github.com/iamrony27/storeledger" target="_blank">GitHub</a></li>
+        <li><a href="#download">Download APK</a></li>
+      </ul>
+
+      <p class="footer-copy">
+        &copy; 2026 Store Ledger Project • Built with Material 3 & Expo SDK 57 • Licensed under MIT
+      </p>
+    </div>
+  </footer>
+
+  <!-- Lightbox Modal for Screenshots -->
+  <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox()">
+    <img id="lightboxImg" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'/%3E" alt="Zoomed Screenshot" />
+  </div>
+
+  <!-- Floating WhatsApp Contact Developer Action Button -->
+  <a href="https://wa.me/917074018142?text=Hi%20Developer%2C%20I%20have%20a%20query%20about%20Store%20Ledger%20App" 
+     target="_blank" 
+     rel="noopener" 
+     class="whatsapp-fab" 
+     aria-label="Contact Developer on WhatsApp" 
+     title="Contact Developer on WhatsApp">
+    <div class="whatsapp-fab-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.42 0-2.82-.37-4.05-1.08l-.29-.17-3.12.82.83-3.04-.19-.3a8.212 8.212 0 0 1-1.26-4.46c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.58c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.03-1.25-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.12-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.6.19 1.15.16 1.59.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.11-.23-.17-.48-.3z"/>
+      </svg>
+    </div>
+    <span class="whatsapp-fab-label">Contact Developer</span>
+  </a>
+
+  <!-- ============================================================
+       INTERACTION SCRIPTS
+       ============================================================ -->
+  <script>
+    // 1. Dark/Light Theme Switcher
+    const html = document.documentElement;
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeIcon = document.getElementById('themeIcon');
+
+    function setTheme(theme) {
+      html.setAttribute('data-theme', theme);
+      localStorage.setItem('store_ledger_theme', theme);
+      if (theme === 'dark') {
+        themeIcon.textContent = 'light_mode';
+      } else {
+        themeIcon.textContent = 'dark_mode';
+      }
+    }
+
+    // Initialize theme
+    const savedTheme = localStorage.getItem('store_ledger_theme') || 'dark';
+    setTheme(savedTheme);
+
+    themeToggleBtn.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+
+    // 1b. Mobile Navigation Drawer Toggle
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    const menuIcon = document.getElementById('menuIcon');
+    const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+
+    if (menuToggleBtn && mobileNavDrawer) {
+      menuToggleBtn.addEventListener('click', () => {
+        const isOpen = mobileNavDrawer.classList.contains('active');
+        mobileNavDrawer.classList.toggle('active');
+        menuIcon.textContent = isOpen ? 'menu' : 'close';
+        menuToggleBtn.setAttribute('aria-label', isOpen ? 'Open navigation menu' : 'Close navigation menu');
+      });
+
+      // Close drawer when a mobile nav link is clicked
+      mobileNavDrawer.querySelectorAll('.mobile-nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+          mobileNavDrawer.classList.remove('active');
+          menuIcon.textContent = 'menu';
+        });
+      });
+    }
+
+    // 2. Interactive Mockup Tab Switcher
+    const tabBtns = document.querySelectorAll('.mockup-tab-btn');
+    const mockupImage = document.getElementById('mockupImage');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const targetSrc = btn.getAttribute('data-src');
+        mockupImage.style.opacity = '0';
+        setTimeout(() => {
+          mockupImage.src = targetSrc;
+          mockupImage.style.opacity = '1';
+        }, 150);
+      });
+    });
+
+    // 3. FAQ Accordion Toggle
+    function toggleFaq(el) {
+      const parent = el.parentElement;
+      const isOpen = parent.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(item => item.classList.remove('open'));
+      if (!isOpen) {
+        parent.classList.add('open');
+      }
+    }
+
+    // 4. Copy SHA-256 Checksum
+    function copyChecksum() {
+      const checksum = document.getElementById('checksumText').textContent;
+      navigator.clipboard.writeText(checksum).then(() => {
+        const label = document.getElementById('copyBtnLabel');
+        label.textContent = 'Copied!';
+        setTimeout(() => {
+          label.textContent = 'Copy';
+        }, 2000);
+      });
+    }
+
+    // 5. Screenshot Lightbox
+    const lightboxModal = document.getElementById('lightboxModal');
+    const lightboxImg = document.getElementById('lightboxImg');
+
+    function openLightbox(el) {
+      const img = el.querySelector('img');
+      if (img) {
+        lightboxImg.src = img.src;
+        lightboxModal.classList.add('active');
+      }
+    }
+
+    function closeLightbox() {
+      lightboxModal.classList.remove('active');
+    }
+
+    // 6. Mobile Comparison View Switcher (Dual View Fit)
+    const compTabBtns = document.querySelectorAll('.comp-tab-btn');
+    const compTable = document.getElementById('comparisonTable');
+    const compScrollHint = document.getElementById('compScrollHint');
+
+    if (compTabBtns && compTable) {
+      compTabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          compTabBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const view = btn.getAttribute('data-view');
+          compTable.classList.remove('view-khatabook', 'view-okcredit', 'view-all');
+          compTable.classList.add('view-' + view);
+          if (compScrollHint) {
+            compScrollHint.style.display = view === 'all' ? 'flex' : 'none';
+          }
+        });
+      });
+    }
+
+    // 7. Screenshot Gallery Swipe Dots Sync
+    const galleryGrid = document.getElementById('galleryGrid');
+    const galleryDots = document.querySelectorAll('.gallery-dot');
+
+    if (galleryGrid && galleryDots.length > 0) {
+      galleryGrid.addEventListener('scroll', () => {
+        const scrollLeft = galleryGrid.scrollLeft;
+        const width = galleryGrid.offsetWidth * 0.72;
+        const activeIdx = Math.min(Math.round(scrollLeft / width), galleryDots.length - 1);
+        galleryDots.forEach((dot, idx) => {
+          dot.classList.toggle('active', idx === activeIdx);
+        });
+      }, { passive: true });
+    }
+  </script>
 </body>
 </html>

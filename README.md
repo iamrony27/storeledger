@@ -11,7 +11,7 @@
   [![License](https://img.shields.io/badge/License-MIT-006874?style=for-the-badge)](./LICENSE)
   [![Expo SDK](https://img.shields.io/badge/Expo-SDK_57-000000?style=for-the-badge&logo=expo&logoColor=white)](https://docs.expo.dev/)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-  [![Offline First](https://img.shields.io/badge/Architecture-100%25%20Offline--First-FF6B00?style=for-the-badge)](https://www.storeledger.in/)
+  [![Architecture](https://img.shields.io/badge/Architecture-Offline--First_%2B_Cloud-FF6B00?style=for-the-badge)](https://www.storeledger.in/)
   [![VirusTotal](https://img.shields.io/badge/VirusTotal-100%25_Clean_(0%2F68)-00BCD4?style=for-the-badge&logo=virustotal&logoColor=white)](https://www.virustotal.com/gui/file/5735227a8d3e7ce2f589ded3abf78ae7a1d93afbdea897ac5127df9f01661f9e)
   [![WhatsApp Developer](https://img.shields.io/badge/WhatsApp-Chat_Developer-25D366?style=for-the-badge&logo=whatsapp&logoColor=white)](https://wa.me/917074018142?text=Hi%20Developer%2C%20I%20have%20a%20query%20about%20Store%20Ledger)
 
